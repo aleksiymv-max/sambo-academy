@@ -15,6 +15,38 @@ body{background:#f3f7ff}.nav{min-height:92px;padding-top:10px;padding-bottom:10p
 .approved-design{position:relative;width:100%;max-width:1536px;margin:0 auto;line-height:0;background:#fff}.approved-design[hidden]{display:none!important}.approved-design img{display:block;width:100%;height:auto}.approved-design .hotspot{position:absolute;display:block;z-index:4;border:0;background:transparent;color:transparent;cursor:pointer;padding:0;border-radius:8px}.approved-design .hotspot:focus-visible{outline:4px solid #0a57e6;background:#0a57e620}.approved-design .nav-home{left:18.5%;top:2.2%;width:6%;height:5.5%}.approved-design .nav-courses{left:25.8%;top:2.2%;width:6%;height:5.5%}.approved-design .nav-about{left:32%;top:2.2%;width:10%;height:5.5%}.approved-design .nav-login{left:73.5%;top:2%;width:9.5%;height:5.5%}.approved-design .nav-register{left:84%;top:2%;width:12%;height:5.5%}.approved-design .hero-start{left:3.5%;top:43.2%;width:22%;height:7%}.approved-design .athlete-link{left:27%;top:83%;width:17%;height:6%}.approved-design .judge-link{left:76%;top:83%;width:18%;height:6%}.approved-design .anchor-courses{position:absolute;top:52%;left:0}
 body:has(.approved-design:not([hidden]))>header{display:none}body:has(.approved-design:not([hidden])) #home>.container{display:none}
 @media(max-width:700px){.approved-design{min-width:700px}.approved-design img{width:700px}body:has(.approved-design:not([hidden])){overflow-x:auto}}
+</style><style id="responsive-portrait-fix">
+/* On portrait devices use real responsive HTML, not a scaled 1536px screenshot. */
+@media (max-width: 900px) {
+ #approvedDesign{display:none!important}
+ #regularHome{display:block!important}
+ body:has(#approvedDesign:not([hidden]))>header{display:block!important}
+ body{overflow-x:hidden!important}
+ .container{width:100%;padding:0 4%}
+ .hero{display:flex;flex-direction:column;min-height:0}
+ .heroText{width:100%;padding:28px 0 16px}
+ .hero h1{font-size:clamp(64px,13vw,104px);letter-spacing:-2px}
+ .hero h2{font-size:clamp(21px,4.7vw,32px);white-space:normal}
+ .hero p{font-size:clamp(16px,3.2vw,21px)}
+ .heroPhoto{width:100%;height:clamp(220px,43vw,400px);min-height:0;clip-path:none;background-position:center}
+ .features{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:18px 0}
+ .feature{font-size:clamp(12px,2.4vw,17px);gap:8px}
+ .feature b{font-size:24px}
+ .courses{display:grid;grid-template-columns:1fr;gap:18px}
+ .course{min-height:365px}
+ .courseBody{margin-left:43%;padding:22px 12px 20px 0}
+ .course h3{font-size:clamp(20px,3.5vw,30px)}
+ .course ul{font-size:clamp(12px,2vw,15px)}
+ .benefits{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:520px){
+ .courseBody{margin-left:31%}
+ .course{min-height:400px}
+ .course h3{font-size:20px}
+ .course .btn{padding:12px 10px;font-size:13px}
+ .course ul{font-size:12px}
+ .brand{width:64px;height:64px}
+}
 </style></head><body>
 <header><div class="nav"><div class="brand"><svg viewBox="0 0 200 200" role="img" aria-label="Эмблема самбо" xmlns="http://www.w3.org/2000/svg"><defs><path id="logoRing" d="M 100,100 m -76,0 a 76,76 0 1,1 152,0 a 76,76 0 1,1 -152,0"/></defs><circle cx="100" cy="100" r="98" fill="#e5091d"/><circle cx="100" cy="100" r="73" fill="white"/><path d="M100 26 L117 78 L172 78 L127 110 L145 163 L100 130 Z" fill="#e5091d"/><path d="M100 26 L83 78 L28 78 L73 110 L55 163 L100 130 Z" fill="#123e91"/><path d="M100 26 V130" stroke="white" stroke-width="3"/><text fill="white" font-size="14" font-weight="900" letter-spacing="2.4"><textPath href="#logoRing" startOffset="3%">ВСЕРОССИЙСКАЯ ФЕДЕРАЦИЯ</textPath></text><text x="100" y="189" fill="white" font-size="19" font-weight="900" text-anchor="middle" letter-spacing="9">САМБО</text></svg></div><nav class="navlinks"><button class="active" onclick="show('home')">Главная</button><button onclick="document.getElementById('courseCards').scrollIntoView({behavior:'smooth'})">Курсы</button><button onclick="show('about')">О платформе</button><button onclick="show('about')">Преподаватели</button><button onclick="show('about')">Контакты</button></nav><div class="actions"><button class="btn outline small" onclick="show('account')">Войти</button><button class="btn small" onclick="show('account')">Регистрация</button></div></div></header>
 <main><section id="home"><div id="approvedDesign" class="approved-design" hidden><img src="sambo-approved-design.webp" alt="САМБО — правила, судейство, практика. Два курса для спортсменов и судей." onload="document.getElementById('approvedDesign').hidden=false;document.getElementById('regularHome').hidden=true" onerror="document.getElementById('approvedDesign').hidden=true;document.getElementById('regularHome').hidden=false"><button class="hotspot nav-home" aria-label="Главная" onclick="show('home')"></button><button class="hotspot nav-courses" aria-label="Курсы" onclick="document.getElementById('approvedCourses').scrollIntoView({behavior:'smooth'})"></button><button class="hotspot nav-about" aria-label="О платформе" onclick="show('about')"></button><button class="hotspot nav-login" aria-label="Войти" onclick="show('account')"></button><button class="hotspot nav-register" aria-label="Регистрация" onclick="show('account')"></button><button class="hotspot hero-start" aria-label="Начать обучение" onclick="document.getElementById('approvedCourses').scrollIntoView({behavior:'smooth'})"></button><button class="hotspot athlete-link" aria-label="Подробнее о курсе для спортсменов" onclick="openCourse('athlete')"></button><button class="hotspot judge-link" aria-label="Подробнее о курсе для судей" onclick="openCourse('judge')"></button><span id="approvedCourses" class="anchor-courses"></span></div><div class="container" id="regularHome"><div class="hero"><div class="heroText"><h1>САМБО</h1><h2>ПРАВИЛА. СУДЕЙСТВО.<br>ПРАКТИКА.</h2><p>Официальные знания. Современный формат.<br>Для спортсменов, тренеров и судей.</p><button class="btn" onclick="document.getElementById('courseCards').scrollIntoView({behavior:'smooth'})">Начать обучение →</button></div><div class="heroPhoto" role="img" aria-label="Схватка спортсменов по самбо"></div><div class="features"><div class="feature"><b>🏆</b>Официальные правила</div><div class="feature"><b>▶</b>Видеоуроки</div><div class="feature"><b>▤</b>Тесты и задания</div><div class="feature"><b>♧</b>Сертификаты</div></div></div>
