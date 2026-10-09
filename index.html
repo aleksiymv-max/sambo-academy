@@ -47,6 +47,21 @@ body:has(.approved-design:not([hidden]))>header{display:none}body:has(.approved-
  .course ul{font-size:12px}
  .brand{width:64px;height:64px}
 }
+</style><style id="keep-approved-images-all-orientations">
+/* The approved design must remain the sole visual source across rotation. */
+@media(max-width:900px){
+ #approvedDesign{display:block!important;min-width:0!important;width:max(100%,980px)!important;max-width:none!important}
+ #approvedDesign[hidden]{display:none!important}
+ #approvedDesign img{width:100%!important;height:auto!important}
+ #regularHome{display:none!important}
+ body:has(#approvedDesign:not([hidden]))>header{display:none!important}
+ body:has(#approvedDesign:not([hidden])){overflow-x:auto!important}
+}
+@media(min-width:901px){
+ #approvedDesign{display:block!important}
+ #approvedDesign[hidden]{display:none!important}
+ #regularHome{display:none!important}
+}
 </style></head><body>
 <header><div class="nav"><div class="brand"><svg viewBox="0 0 200 200" role="img" aria-label="Эмблема самбо" xmlns="http://www.w3.org/2000/svg"><defs><path id="logoRing" d="M 100,100 m -76,0 a 76,76 0 1,1 152,0 a 76,76 0 1,1 -152,0"/></defs><circle cx="100" cy="100" r="98" fill="#e5091d"/><circle cx="100" cy="100" r="73" fill="white"/><path d="M100 26 L117 78 L172 78 L127 110 L145 163 L100 130 Z" fill="#e5091d"/><path d="M100 26 L83 78 L28 78 L73 110 L55 163 L100 130 Z" fill="#123e91"/><path d="M100 26 V130" stroke="white" stroke-width="3"/><text fill="white" font-size="14" font-weight="900" letter-spacing="2.4"><textPath href="#logoRing" startOffset="3%">ВСЕРОССИЙСКАЯ ФЕДЕРАЦИЯ</textPath></text><text x="100" y="189" fill="white" font-size="19" font-weight="900" text-anchor="middle" letter-spacing="9">САМБО</text></svg></div><nav class="navlinks"><button class="active" onclick="show('home')">Главная</button><button onclick="document.getElementById('courseCards').scrollIntoView({behavior:'smooth'})">Курсы</button><button onclick="show('about')">О платформе</button><button onclick="show('about')">Преподаватели</button><button onclick="show('about')">Контакты</button></nav><div class="actions"><button class="btn outline small" onclick="show('account')">Войти</button><button class="btn small" onclick="show('account')">Регистрация</button></div></div></header>
 <main><section id="home"><div id="approvedDesign" class="approved-design" hidden><img src="sambo-approved-design.webp" alt="САМБО — правила, судейство, практика. Два курса для спортсменов и судей." onload="document.getElementById('approvedDesign').hidden=false;document.getElementById('regularHome').hidden=true" onerror="document.getElementById('approvedDesign').hidden=true;document.getElementById('regularHome').hidden=false"><button class="hotspot nav-home" aria-label="Главная" onclick="show('home')"></button><button class="hotspot nav-courses" aria-label="Курсы" onclick="document.getElementById('approvedCourses').scrollIntoView({behavior:'smooth'})"></button><button class="hotspot nav-about" aria-label="О платформе" onclick="show('about')"></button><button class="hotspot nav-login" aria-label="Войти" onclick="show('account')"></button><button class="hotspot nav-register" aria-label="Регистрация" onclick="show('account')"></button><button class="hotspot hero-start" aria-label="Начать обучение" onclick="document.getElementById('approvedCourses').scrollIntoView({behavior:'smooth'})"></button><button class="hotspot athlete-link" aria-label="Подробнее о курсе для спортсменов" onclick="openCourse('athlete')"></button><button class="hotspot judge-link" aria-label="Подробнее о курсе для судей" onclick="openCourse('judge')"></button><span id="approvedCourses" class="anchor-courses"></span></div><div class="container" id="regularHome"><div class="hero"><div class="heroText"><h1>САМБО</h1><h2>ПРАВИЛА. СУДЕЙСТВО.<br>ПРАКТИКА.</h2><p>Официальные знания. Современный формат.<br>Для спортсменов, тренеров и судей.</p><button class="btn" onclick="document.getElementById('courseCards').scrollIntoView({behavior:'smooth'})">Начать обучение →</button></div><div class="heroPhoto" role="img" aria-label="Схватка спортсменов по самбо"></div><div class="features"><div class="feature"><b>🏆</b>Официальные правила</div><div class="feature"><b>▶</b>Видеоуроки</div><div class="feature"><b>▤</b>Тесты и задания</div><div class="feature"><b>♧</b>Сертификаты</div></div></div>
