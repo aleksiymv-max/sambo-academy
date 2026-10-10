@@ -686,6 +686,14 @@ const samboExpertCases={
  {q:'Сколько предупреждений максимально допускается в одной схватке?',a:['Два','Три','Четыре','Пять'],correct:1,why:'Статья 37 ограничивает количество предупреждений тремя; необходимость четвёртого ведёт к снятию.'}
  ]
 };
+
+const samboRefereeLabExam=[
+ {q:'Атакующий выполнил бросок из стойки без падения. Соперник упал на бок. Сколько баллов?',a:['1','2','4','Чистая победа'],correct:2,why:'Статья 35, пункт 2(а): бросок без падения на бок — четыре балла.'},
+ {q:'При броске из стойки атакующий упал вместе с соперником. Атакуемый упал на бок. Оценка?',a:['4 балла','2 балла','1 балл','Чистая победа'],correct:1,why:'Статья 35, пункт 3(б): бросок с падением на бок — два балла.'},
+ {q:'Бросок из стойки без падения атакующего закончился падением соперника на грудь. Оценка?',a:['4 балла','2 балла','1 балл','Без оценки'],correct:1,why:'Статья 35, пункт 3(а): бросок без падения на грудь — два балла.'},
+ {q:'Атакующий упал при броске из стойки, атакуемый приземлился на грудь. Оценка?',a:['1 балл','2 балла','4 балла','Чистая победа'],correct:0,why:'Статья 35, пункт 4(а): один балл.'},
+ {q:'Бросок начат вне ковра, а завершился падением на спину. Что учитывается в первую очередь?',a:['Красота броска','Место начала действия: бросок не оценивается','Мнение тренера','Цвет куртки'],correct:1,why:'Статья 36, пункт 7: бросок, начатый вне ковра, не оценивается.'}
+];
 function samboQuizQuestions(group){
  const base=group.parts.map(p=>({q:p.q,a:p.a,correct:p.correct,body:p.body,kind:'Теория'}))
    .filter(p=>p.q&&Array.isArray(p.a)&&p.a.length>1&&Number.isInteger(p.correct)&&p.correct>=0&&p.correct<p.a.length);
@@ -696,7 +704,8 @@ function samboQuizQuestions(group){
  const workshop=samboLessonWorkshops[group.title];const tasks=workshop?workshop.quiz.map(c=>({q:c[0],a:c[1],correct:c[2],body:c[3],kind:'Практическая задача'})):[];
  const admission=(samboAdmissionExam[group.title]||[]).map(c=>({q:c.q,a:c.a,correct:c.correct,body:c.why,kind:'Ситуационный экзамен'}));
  const normative=samboNormativeCurriculum[group.title]?.cases.map(c=>({q:c[0],a:c[1],correct:c[2],body:c[3],kind:'Нормативный практикум'}))||[];
- return base.concat(cases,extra,tasks,special,admission,normative);
+ const referee=/технические действия|судейский практикум/.test(group.title.toLowerCase())?samboRefereeLabExam.map(c=>({q:c.q,a:c.a,correct:c.correct,body:c.why,kind:'Судейская лаборатория'})):[];
+ return base.concat(cases,extra,tasks,special,admission,normative,referee);
 }
 
 const samboAdvancedChapters={
