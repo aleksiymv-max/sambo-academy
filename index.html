@@ -916,7 +916,12 @@ function samboLessonSections(group){
  const cases=samboCaseSection(group);if(cases)sections.push({title:'Ситуационные задачи с разбором',html:cases});
  const technique=samboTechniqueFor(group);
  if(technique)sections.push({title:'Наглядный разбор технических действий',html:technique});
- group.parts.forEach((p,j)=>sections.push({title:p.title,html:samboTopicTeachingCard(p,j,group)}));
+ for(let offset=0;offset<group.parts.length;offset+=3){
+ const batch=group.parts.slice(offset,offset+3);
+ sections.push({title:batch.length===1?batch[0].title:'Тематический блок '+(Math.floor(offset/3)+1)+': '+batch[0].title,
+ html:'<div class="sambo-lesson-intro"><strong>В этом разделе</strong><p>Разберём '+batch.length+' связанных вопроса: '+batch.map(p=>samboEsc(p.title)).join('; ')+'. После каждого объяснения проверьте, как применяется соответствующее правило.</p></div>'+
+ batch.map((p,i)=>samboTopicTeachingCard(p,offset+i,group)).join('')});
+}
  sections.push({title:'Итоговая проверка знаний',quiz:true,html:'<div class="sambo-lesson-intro"><strong>Закрепление материала</strong><p>Вы изучили все разделы. Пройдите итоговый тест по материалу урока. При ошибках можно пройти его повторно.</p></div>'});
  return sections;
 }
