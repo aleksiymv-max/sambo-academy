@@ -414,7 +414,7 @@ const samboArticleExcerpts={
 3. При проведении соревнований на помосте высота его не должна быть более 1 метра. Боковые стороны помоста должны иметь наклон 45 градусов во внешнюю сторону.`,note:'Показаны пункты 1–3 статьи 42. Остальные положения статьи необходимо сверять с первоисточником.'}
 };
 function samboCitedArticlePanel(html){
- const ids=[...new Set([...String(html).matchAll(/стат(?:ья|ьи|ьёй|ью|ей|е|ей|ях|ями|ям|ям)?\\s*№?\\s*(\\d{1,2})(?:\\s*[–-]\\s*(\\d{1,2}))?/gi)].flatMap(m=>{const a=+m[1],b=m[2]?+m[2]:a;return b>=a&&b-a<=8?Array.from({length:b-a+1},(_,i)=>a+i):[a]})];
+ const ids=[...new Set([...String(html).matchAll(/стат(?:ья|ьи|ьёй|ью|ей|е|ей|ях|ями|ям|ям)?\\s*№?\\s*(\\d{1,2})(?:\\s*[–-]\\s*(\\d{1,2}))?/gi)].flatMap(m=>{const a=+m[1],b=m[2]?+m[2]:a;return b>=a&&b-a<=8?Array.from({length:b-a+1},(_,i)=>a+i):[a]}))];
  if(!ids.length)return '';
  return '<aside class="sambo-article-panel"><h3>Статьи Правил, упомянутые в разделе</h3><p>Ниже размещён текст доступных статей или их пунктов. Для остальных ссылок приведено пояснение; точный текст сверяйте с приложенным официальным PDF Правил.</p>'+ids.map(n=>{const a=samboArticleExcerpts[n];return a?'<details><summary>Статья '+n+'. '+samboEsc(a.title)+' — текст из Правил</summary><pre>'+samboEsc(a.text)+'</pre><p>'+samboEsc(a.note)+'</p></details>':'<div class="sambo-article-pending"><strong>Статья '+n+'</strong> · Текст статьи пока не перенесён в электронный учебник. Необходимо добавить его из загруженного PDF без сокращений, меняющих смысл.</div>'}).join('')+'</aside>';
 }
