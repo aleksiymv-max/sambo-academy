@@ -490,14 +490,40 @@ function samboLessonObjective(group){
  return '<div class="sambo-lesson-intro"><h3>Цель и содержание урока</h3><p><strong>В этом уроке вы узнаете:</strong></p><ul>'+d.topics.map(t=>'<li>'+samboEsc(t)+'</li>').join('')+'</ul><p><strong>После изучения вы сможете:</strong> '+samboEsc(d.outcome)+'.</p><p><strong>Как проходит обучение:</strong> последовательно изучите теорию, терминологию, схемы и примеры, затем проверьте знания в итоговом тесте.</p></div>';
 }
 
+
+const samboVerifiedCases={
+ score:[
+ {q:'Спортсмен из стойки выполняет бросок без собственного падения. Соперник приземляется на бок. Какова оценка?',a:['2 балла','4 балла','1 балл','Без оценки'],correct:1,why:'По статье 35, пункту 2(а), бросок без падения на бок оценивается в четыре балла.',ref:35},
+ {q:'Атакующий из стойки проводит бросок с падением. Атакуемый падает на бок. Сколько баллов?',a:['Чистая победа','4 балла','2 балла','1 балл'],correct:2,why:'Статья 35, пункт 3(б): бросок с падением на бок — два балла.',ref:35},
+ {q:'Атакующий бросает соперника из стойки без собственного падения, соперник падает на спину. Что это?',a:['Чистый бросок','4 балла','2 балла','Без оценки'],correct:0,why:'В таблице статьи 35 бросок без падения из стойки на спину указан как чистый бросок.',ref:35},
+ {q:'Удержание продолжалось 20 секунд. Какое решение соответствует статье 35?',a:['1 балл','2 балла','4 балла','Без оценки'],correct:2,why:'Пункт 2(г) статьи 35: удержание в течение 20 секунд оценивается четырьмя баллами.',ref:35},
+ {q:'Атакующий из стойки бросает с падением, атакуемый приземляется на живот. Сколько баллов?',a:['4 балла','2 балла','1 балл','Чистая победа'],correct:2,why:'Статья 35, пункт 4(а): бросок с падением на живот — один балл.',ref:35}
+ ],
+ boundary:[
+ {q:'В стойке один спортсмен поставил за границу рабочей зоны ковра только одну ногу. Достаточно ли этого для определения «вне ковра» по пункту 3 статьи 36?',a:['Да, всегда','Нет, в стойке указаны две ноги','Да, если он атакует','Да, если соперник не сопротивляется'],correct:1,why:'Статья 36, пункт 3(а), устанавливает критерий двух ног за границей рабочей зоны.',ref:36},
+ {q:'Бросок начат в рабочей зоне, завершён за её пределами; туловище атакуемого после падения полностью находится в зоне безопасности. Что с оценкой?',a:['Не оценивается при любых обстоятельствах','Может оцениваться при выполнении остальных условий','Автоматически чистая победа','Обязательно предупреждение'],correct:1,why:'Статья 36, пункт 6, допускает оценку при указанных условиях; размер оценки определяется по статье 35.',ref:36},
+ {q:'Бросок начат уже в положении «вне ковра». Как он оценивается?',a:['4 балла','2 балла','1 балл','Не оценивается'],correct:3,why:'Статья 36, пункт 7: бросок, начатый в положении «вне ковра», не оценивается.',ref:36}
+ ]
+};
+function samboCaseKind(group){
+ const t=group.title.toLowerCase();
+ if(/техническ|оцениван|оценк/.test(t))return 'score';
+ if(/границ|нарушен|санкци|жест|схватк/.test(t))return 'boundary';
+ return null;
+}
+function samboCaseIllustration(kind){
+ if(kind==='score')return '<figure class="sambo-figure"><figcaption>Схема: как определяется оценка броска</figcaption><div class="sambo-diagram"><div class="sambo-node"><span class="sambo-node-num">1</span>Положение атакуемого до броска</div><div class="sambo-node"><span class="sambo-node-num">2</span>Атакующий падает или остаётся в стойке</div><div class="sambo-node"><span class="sambo-node-num">3</span>На какую часть тела падает атакуемый</div><div class="sambo-node"><span class="sambo-node-num">4</span>Оценка по таблице статьи 35</div></div></figure>';
+ return '<figure class="sambo-figure"><figcaption>Схема: решение у границы ковра</figcaption><div class="sambo-diagram"><div class="sambo-node"><span class="sambo-node-num">1</span>Положение стоя или лёжа</div><div class="sambo-node"><span class="sambo-node-num">2</span>Контакт с рабочей зоной</div><div class="sambo-node"><span class="sambo-node-num">3</span>Где начат и завершён приём</div><div class="sambo-node"><span class="sambo-node-num">4</span>Решение по статье 36</div></div></figure>';
+}
+function samboCaseSection(group){
+ const kind=samboCaseKind(group);if(!kind)return '';
+ const cases=samboVerifiedCases[kind];
+ return '<section class="sambo-topic"><h3>Разбор реальных судейских решений</h3><p>В каждом эпизоде изменяется существенное условие. Сравните случаи и объясните, почему оценка или решение отличается.</p>'+samboCaseIllustration(kind)+
+ cases.map((c,i)=>'<div class="sambo-lesson-intro"><h4>Ситуация '+(i+1)+'</h4><p>'+samboEsc(c.q)+'</p><p><strong>Разбор:</strong> '+samboEsc(c.why)+'</p></div>').join('')+'</section>';
+}
 function samboExpandedTopic(p,j,group){
  const title=samboEsc(p.title),body=samboEsc(p.body||'');
- const steps=['Определите обстоятельства эпизода','Найдите соответствующую норму','Проверьте условия и исключения','Обоснуйте итоговое решение'];
- return '<section class="sambo-topic"><h3>'+(j+1)+'. '+title+'</h3><div class="sambo-lesson-intro"><strong>Основное правило и объяснение</strong><p>'+body+'</p></div>'+
- '<h4>Разбор темы</h4><p>'+body+'</p><h4>Алгоритм применения</h4><p>Рассмотрите ситуацию, относящуюся к теме «'+title+'». Для правильного решения важно проверить не только само правило, но и обстоятельства его применения.</p>'+
- '<figure class="sambo-figure"><figcaption>Четыре шага анализа</figcaption><div class="sambo-diagram">'+steps.map((t,i)=>'<div class="sambo-node"><span class="sambo-node-num">'+(i+1)+'</span><span>'+t+'</span></div>').join('')+'</div></figure>'+
- '<h4>Вопросы для закрепления</h4><ol><li>Какие условия должны быть выполнены для применения этого правила?</li><li>Что изменится, если одно из условий не выполнено?</li><li>На какой пункт Правил нужно сослаться при обосновании?</li></ol>'+
- '<p><strong>Итог:</strong> изучив раздел, вы должны уметь объяснить его содержание и порядок применения своими словами.</p></section>';
+ return '<section class="sambo-topic"><h3>'+(j+1)+'. '+title+'</h3><div class="sambo-lesson-intro"><strong>Основные положения</strong><p>'+body+'</p></div><h4>Применение на практике</h4><p>Для анализа темы «'+title+'» установите исходные обстоятельства, проверьте применимую норму и сформулируйте решение. Не смешивайте правила разных дисциплин.</p><h4>Вопросы для самопроверки</h4><ol><li>Какие обстоятельства влияют на решение?</li><li>Что изменится при других исходных условиях?</li><li>Как подтвердить вывод текстом Правил?</li></ol></section>';
 }
 function samboQuizQuestions(group){
  const base=group.parts.map(p=>({q:p.q,a:p.a,correct:p.correct,body:p.body,kind:'Теория'})).filter(p=>p.q&&Array.isArray(p.a)&&p.a.length>1&&Number.isInteger(p.correct));
@@ -506,7 +532,7 @@ function samboQuizQuestions(group){
  a:[p.a[p.correct],'Любое решение допустимо без проверки условий.','Правило действует одинаково для всех дисциплин и случаев.','Достаточно мнения спортсмена, ссылка на Правила не нужна.'],
  correct:0,body:p.body,kind:'Применение знаний'
  }));
- return base.concat(applied);
+ const kind=samboCaseKind(group);return base.concat(kind?samboVerifiedCases[kind].map(c=>({...c,body:c.why,kind:'Ситуационная задача'})):[]);
 }
 function samboLessonSections(group){
  const sections=[{title:'Введение',html:samboLessonObjective(group)+samboDiagram(group.title,group.parts)}];
@@ -518,6 +544,7 @@ function samboLessonSections(group){
  const protest=samboProtestFor(group);if(protest)sections.push({title:'Протесты и порядок рассмотрения',html:protest});
  const boundaries=samboBoundariesFor(group);if(boundaries)sections.push({title:'Границы ковра, нарушения и решения судей',html:boundaries});
  const supplement=samboSupplementalFor(group);if(supplement)sections.push({title:'Дополнительные нормативные документы',html:supplement});
+ const cases=samboCaseSection(group);if(cases)sections.push({title:'Ситуационные задачи с разбором',html:cases});
  const technique=samboTechniqueFor(group);
  if(technique)sections.push({title:'Наглядный разбор технических действий',html:technique});
  group.parts.forEach((p,j)=>sections.push({title:p.title,html:samboExpandedTopic(p,j,group)}));
