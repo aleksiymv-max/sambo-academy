@@ -778,10 +778,33 @@ function samboPreparationSection(group){
  d.blocks.map((b,i)=>'<div class="sambo-lesson-intro"><h4>'+(i+1)+'. '+samboEsc(b[0])+'</h4><p>'+samboEsc(b[1])+'</p><p><strong>Типичная ошибка:</strong> '+samboEsc(b[2])+'</p></div>').join('')+
  '<h4>Практическое задание</h4><p>Составьте контрольный список из четырёх этапов и для каждого назовите документ, участника процесса или действие, которые необходимо проверить. Отметьте, какие вопросы регулируются Правилами, а какие уточняются Положением конкретного турнира.</p></article>';
 }
+
+const samboHoldAndPainGuide={
+ 'Технические действия и оценки':true,
+ 'Технические действия и оценивание':true,
+ 'Порядок проведения схватки':true,
+ 'Проведение схватки и жесты':true
+};
+function samboHoldAndPainLesson(group){
+ if(!samboHoldAndPainGuide[group.title])return '';
+ return '<article class="sambo-topic"><h3>Удержание, болевой приём и досрочное завершение схватки</h3>'+
+ '<p>В судейском разборе важно не смешивать оценку за удержание и досрочную победу. Статья 35 регулирует балльную оценку удержания, а статья 33 перечисляет основания досрочной победы, включая сигнал о сдаче на болевом приёме или удержании.</p>'+
+ '<div class="sambo-table-wrap"><table><thead><tr><th>Эпизод</th><th>Решение</th><th>Обоснование</th></tr></thead><tbody>'+
+ '<tr><td>Удержание продолжалось 20 секунд</td><td>4 балла</td><td>Статья 35, пункт 2(г).</td></tr>'+
+ '<tr><td>Неоконченное удержание длилось более 10 секунд</td><td>2 балла</td><td>Статья 35, пункт 3(д).</td></tr>'+
+ '<tr><td>Спортсмен подал сигнал о сдаче на болевом приёме</td><td>Досрочная победа соперника</td><td>Статья 33, пункт 1(б).</td></tr>'+
+ '<tr><td>Спортсмен подал сигнал о сдаче на удержании</td><td>Досрочная победа соперника</td><td>Статья 33, пункт 1(б).</td></tr>'+
+ '</tbody></table></div>'+
+ '<figure class="sambo-figure"><figcaption>Логика решения при удержании</figcaption><div class="sambo-diagram"><div class="sambo-node"><span class="sambo-node-num">1</span>Зафиксировать начало действия</div><div class="sambo-node"><span class="sambo-node-num">2</span>Следить за временем и сигналом о сдаче</div><div class="sambo-node"><span class="sambo-node-num">3</span>Проверить основание для досрочной победы</div><div class="sambo-node"><span class="sambo-node-num">4</span>При отсутствии досрочной победы определить баллы</div></div></figure>'+
+ '<h4>Сравните два эпизода</h4><p><strong>Первый:</strong> удержание продолжалось двадцать секунд без сигнала о сдаче — применяют оценку четыре балла. <strong>Второй:</strong> в ходе удержания спортсмен сдался — рассматривают досрочную победу по статье 33, а не только накопленные секунды.</p>'+
+ '<h4>Проверка понимания</h4><p>Почему при одинаковом положении спортсменов итог может отличаться? Потому что сигнал о сдаче и продолжительность удержания являются разными юридически значимыми обстоятельствами.</p>'+
+ '<p><strong>Нормативная основа:</strong> статьи 33 и 35.</p></article>';
+}
 function samboLessonSections(group){
  const sections=[{title:'Введение',html:samboLessonObjective(group)+samboDiagram(group.title,group.parts)}];
  const advanced=samboAdvancedChapter(group);if(advanced)sections.push({title:'Углублённый разбор и типичные ошибки',html:advanced});
  const prep=samboPreparationSection(group);if(prep)sections.push({title:'Практический маршрут и разбор ошибок',html:prep});
+ const hold=samboHoldAndPainLesson(group);if(hold)sections.push({title:'Удержания, болевые приёмы и решения судей',html:hold});
  const core=samboCoreMasterclass(group);if(core)sections.push({title:'Подробная теория и разбор правил',html:core});
  const rich=samboRichChapters[currentCourse]?.[group.title]||'';
  if(rich)sections.push({title:'Теория, терминология и таблицы',html:rich});
