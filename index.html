@@ -1070,6 +1070,18 @@ function samboOfficialScoringMatrix(group){
  '<details class="sambo-self-check"><summary>Проверка: соперник был лёжа, атакующий не упал, соперник упал на бок. Какая оценка?</summary><p><strong>2 балла.</strong> Точка пересечения второй строки и третьего столбца. Норма: статья 35, пункт 3(г).</p></details>'+
  '<p><strong>Нормативная основа:</strong> статья 35, пункты 1–6, и таблица оценок бросков. Для досрочной победы также применяется статья 33.</p></section>';
 }
+
+function samboBoundaryVisualLesson(group){
+ if(!/схватк|нарушен|судейский практикум/.test(group.title.toLowerCase()))return '';
+ return '<section class="sambo-topic"><h3>Граница ковра: как судья определяет место действия</h3>'+
+ '<p>Статья 36 различает рабочую зону, зону безопасности и положение «вне ковра». Оценка зависит не только от падения спортсмена, но и от того, <strong>где бросок начался</strong> и где оказалось туловище атакуемого после падения.</p>'+
+ '<figure class="sambo-figure"><svg viewBox="0 0 680 365" role="img" aria-label="Схема ковра: внешняя зона безопасности и внутренняя рабочая зона, условные позиции спортсменов"><rect x="18" y="18" width="644" height="320" rx="20" fill="#d9e8f4" stroke="#3b6b96" stroke-width="3"/><rect x="112" y="67" width="456" height="218" rx="13" fill="#f7fafd" stroke="#9f2638" stroke-width="5"/><g fill="#1e4365" font-size="17" text-anchor="middle"><text x="340" y="50">Зона безопасности</text><text x="340" y="100">Рабочая зона</text></g><circle cx="290" cy="173" r="18" fill="#bb2d40"/><circle cx="345" cy="173" r="18" fill="#2864a2"/><path d="M320 171 L435 171" stroke="#243b53" stroke-width="4" stroke-dasharray="9 7"/><path d="M427 164 L439 171 L427 178" fill="none" stroke="#243b53" stroke-width="4"/><circle cx="590" cy="174" r="18" fill="#2864a2" opacity=".7"/><g font-size="15" fill="#1d3650"><text x="234" y="214">Начало действия</text><text x="508" y="220">За рабочей</text><text x="508" y="239">зоной</text><text x="340" y="315" text-anchor="middle">Схема условная, размеры и расположение не в масштабе</text></g></svg><figcaption>Рабочая зона и зона безопасности: для решения важно положение спортсменов в момент начала и завершения действия.</figcaption></figure>'+
+ '<div class="sambo-referee-lab">'+
+ '<article class="sambo-referee-case"><h4>Эпизод А: начало в рабочей зоне</h4><p>Бросок начат внутри рабочей зоны и завершился за её пределами, но в зоне безопасности. Туловище атакуемого после падения полностью осталось в зоне безопасности.</p><details><summary>Решение судьи</summary><p>Бросок может оцениваться при выполнении остальных условий оценки. Статья 36, пункт 6.</p></details></article>'+
+ '<article class="sambo-referee-case"><h4>Эпизод Б: начало вне ковра</h4><p>Бросок начат в положении «вне ковра». После этого соперник упал на спину.</p><details><summary>Решение судьи</summary><p>Бросок не оценивается. Статья 36, пункт 7.</p></details></article>'+
+ '</div><h4>Контрольный алгоритм</h4><ol><li>Установите, находились ли спортсмены в положении «вне ковра» по пункту 3 статьи 36.</li><li>Определите, где начался бросок.</li><li>Если бросок начался в рабочей зоне, проверьте место падения и положение туловища атакуемого.</li><li>Только после этого применяйте критерии оценки из статьи 35.</li></ol>'+
+ '<p><strong>Нормативная основа:</strong> статья 36, пункты 3–8.</p></section>';
+}
 function samboLessonSections(group){
  const sections=[{title:'Введение',html:samboLessonObjective(group)+samboDiagram(group.title,group.parts)}];
  const advanced=samboAdvancedChapter(group);if(advanced)sections.push({title:'Углублённый разбор и типичные ошибки',html:advanced});
@@ -1077,6 +1089,7 @@ function samboLessonSections(group){
  const discipline=samboDisciplinesChapter(group);if(discipline)sections.push({title:'Различия дисциплин и применение правил',html:discipline});
  const workshop=samboWorkshop(group);if(workshop)sections.push({title:'Практикум с разбором ошибок',html:workshop});
  const prep=samboPreparationSection(group);if(prep)sections.push({title:'Практический маршрут и разбор ошибок',html:prep});
+ const boundaryVisual=samboBoundaryVisualLesson(group);if(boundaryVisual)sections.push({title:'Наглядная схема границ ковра',html:boundaryVisual});
  const matrix=samboOfficialScoringMatrix(group);if(matrix)sections.push({title:'Полная матрица оценок по статье 35',html:matrix});
  const lab=samboRefereeLab(group);if(lab)sections.push({title:'Судейская лаборатория: шесть эпизодов',html:lab});
  const atlas=samboScoringAtlas(group);if(atlas)sections.push({title:'Атлас оценок и удержаний',html:atlas});
