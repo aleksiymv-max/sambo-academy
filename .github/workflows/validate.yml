@@ -22,5 +22,6 @@ jobs:
           for (const token of required) if (!html.includes(token)) throw new Error('Missing critical feature: '+token);
           if (!html.includes('samboLearningObjectives')) throw new Error('Missing lesson objectives');
           if (!html.includes('samboActiveQuiz')) throw new Error('Missing shuffled exam logic');
+          if (!/function answer\(i,j\)[\s\S]*?const qs=samboActiveQuiz,p=qs\[currentQuestion\]/.test(html)) throw new Error('Quiz grading must use displayed shuffled question');
           console.log('PASS: '+scripts.length+' scripts parsed and '+required.length+' core features found');
           NODE
