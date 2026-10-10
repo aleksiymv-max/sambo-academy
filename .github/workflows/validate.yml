@@ -38,5 +38,15 @@ jobs:
             const index=arr.findIndex(x=>x.isCorrect);
             if (index<0 || arr[index].label!=='B') throw new Error('Answer mapping failed');
           }
+          const curriculumChecks = [
+            'function samboOfficialScoringMatrix(group)',
+            'function samboBoundaryVisualLesson(group)',
+            'const samboMatrixExam=',
+            'function samboRefereeLab(group)'
+          ];
+          for (const token of curriculumChecks) if (!html.includes(token)) throw new Error('Missing advanced curriculum: '+token);
+          for (const token of ['Чистый бросок','4 балла','2 балла','1 балл','Без оценки']) {
+            if (!html.includes(token)) throw new Error('Missing scoring category: '+token);
+          }
           console.log('PASS: '+scripts.length+' scripts parsed and '+required.length+' core features found');
           NODE
