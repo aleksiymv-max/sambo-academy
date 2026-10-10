@@ -1,4 +1,4 @@
-name: Validate demo
+name: Validate Sambo Academy
 on:
   push:
   pull_request:
@@ -7,9 +7,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Verify static demo
+      - name: Verify JavaScript syntax and core features
         run: |
-          test -s index.html
-          grep -q 'САМБО' index.html
-          grep -q 'athlete' index.html
-          grep -q 'judge' index.html
+          node <<'NODE'
+          const fs = require('fs');
+          const vm = require('vm');
+          const html = fs.readFileSync('index.html', 'utf8');
+          const scripts = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)];
+          if (scripts.length < 3) throw new Error('Expected embedded JavaScript blocks');
+          for (let i = 0; i < scripts.length; i++) {
+            new vm.Script(scripts[i][1], {filename:'inline-'+i+'.js'});
+          }
+          const required = ['function openCourse(', 'function openLesson(', 'function samboLessonSections(', 'function startModuleQuiz(', 'function samboCitedArticlePanel(', 'function finishModuleQuiz('];
+          for (const token of required) if (!html.includes(token)) throw new Error('Missing critical feature: '+token);
+          if (!html.includes('samboLearningObjectives')) throw new Error('Missing lesson objectives');
+          if (!html.includes('samboActiveQuiz')) throw new Error('Missing shuffled exam logic');
+          console.log('PASS: '+scripts.length+' scripts parsed and '+required.length+' core features found');
+          NODE
