@@ -965,10 +965,10 @@ function samboGoSection(direction){
  renderSamboSection();
  document.getElementById('lessonTitle').scrollIntoView({behavior:'smooth',block:'start'});
 }
-let samboActiveQuiz=[];
+let samboActiveQuiz=[];let samboQuizMistakes=[];
 function samboShuffle(items){const arr=items.slice();for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
 function startModuleQuiz(){
- currentQuestion=0;moduleCorrect=0;
+ currentQuestion=0;moduleCorrect=0;samboQuizMistakes=[];
  const group=samboModuleData(currentCourse)[currentModule];
  samboActiveQuiz=samboShuffle(samboQuizQuestions(group).map(p=>{
   const variants=samboShuffle(p.a.map((label,i)=>({label,isCorrect:i===p.correct})));
@@ -987,7 +987,7 @@ function renderModuleQuestion(){
 function answer(i,j){
  if(moduleAnswered||i!==currentModule)return;
  const qs=samboActiveQuiz,p=qs[currentQuestion],ok=!!p&&j===p.correct;
- moduleAnswered=true;if(ok)moduleCorrect++;
+ moduleAnswered=true;if(ok)moduleCorrect++;else samboQuizMistakes.push({q:p.q,expected:p.a[p.correct],why:String(p.body||'Сверьте материал урока.').slice(0,450)});
  document.getElementById('feedback').textContent=(ok?'Верно! ':'Неверно. Правильный ответ: '+p.a[p.correct]+'. ')+'Объяснение: '+String(p.body||'Повторите соответствующий раздел теории.').slice(0,600);
  document.getElementById('answers').innerHTML='<button class="btn" onclick="nextModuleQuestion()">'+(currentQuestion===qs.length-1?'Посмотреть результат':'Следующий вопрос →')+'</button>';
 }
@@ -995,8 +995,11 @@ function nextModuleQuestion(){currentQuestion++;renderModuleQuestion();}
 function finishModuleQuiz(){
  const count=samboActiveQuiz.length,pass=count>0&&moduleCorrect===count;
  document.getElementById('question').textContent='Результат: '+moduleCorrect+' из '+count;
- document.getElementById('feedback').textContent=pass?'Урок пройден!':'Повторите теорию и попробуйте ещё раз.';
- document.getElementById('answers').innerHTML='<button class="btn" onclick="'+(pass?'openCourse(currentCourse)':'startModuleQuiz()')+'">'+(pass?'К списку уроков':'Повторить тест')+'</button>';
+ document.getElementById('feedback').textContent=pass?'Урок пройден! Все ответы верны.':'В этом тесте необходимо ответить правильно на все вопросы. Изучите ошибки ниже и повторите попытку.';
+ if(!pass&&samboQuizMistakes.length){
+  document.getElementById('answers').innerHTML='<div class="sambo-quiz-review"><h3>Разбор ошибок ('+samboQuizMistakes.length+')</h3>'+samboQuizMistakes.map((x,i)=>'<div class="sambo-lesson-intro"><strong>'+(i+1)+'. '+samboEsc(x.q)+'</strong><p><b>Верный ответ:</b> '+samboEsc(x.expected)+'</p><p>'+samboEsc(x.why)+'</p></div>').join('')+'</div>';
+ }
+ document.getElementById('answers').insertAdjacentHTML('beforeend','<button class="btn" onclick="'+(pass?'openCourse(currentCourse)':'startModuleQuiz()')+'">'+(pass?'К списку уроков':'Повторить тест')+'</button>');
  if(pass&&typeof saveSamboProgress==='function')saveSamboProgress(currentCourse,100+currentModule);
 }
 </script><script>
