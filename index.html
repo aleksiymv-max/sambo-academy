@@ -254,7 +254,7 @@ function openCourse(key){
  const completed=groups.filter((_,i)=>typeof progressDone==='function'&&progressDone(key,100+i)).length;
  const percent=groups.length?Math.round(100*completed/groups.length):0;
  document.getElementById('courseRoadmap').innerHTML+='<div class="sambo-course-status"><strong>Ваш прогресс: '+completed+' из '+groups.length+' уроков ('+percent+'%)</strong><div class="student-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+percent+'"><span style="width:'+percent+'%"></span></div></div>';
- document.getElementById('lessons').innerHTML=groups.map((g,i)=>{const done=typeof progressDone==='function'&&progressDone(key,100+i);return '<div class="lesson"><strong>'+(i+1)+'. '+samboEsc(g.title)+'</strong><p>'+g.parts.length+' разделов · '+Math.min(g.parts.length,5)+' контрольных вопросов</p><p class="sambo-lesson-state">'+(done?'✓ Урок пройден':'○ Не завершён')+'</p><button class="btn" onclick="openLesson('+i+')">'+(done?'Повторить урок →':'Изучить урок →')+'</button></div>'}).join('');
+ document.getElementById('lessons').innerHTML=groups.map((g,i)=>{const done=typeof progressDone==='function'&&progressDone(key,100+i);return '<div class="lesson"><strong>'+(i+1)+'. '+samboEsc(g.title)+'</strong><p>'+g.parts.length+' разделов · '+samboQuizQuestions(g).length+' контрольных вопросов</p><p class="sambo-lesson-state">'+(done?'✓ Урок пройден':'○ Не завершён')+'</p><button class="btn" onclick="openLesson('+i+')">'+(done?'Повторить урок →':'Изучить урок →')+'</button></div>'}).join('');
  show('course');
 }
 let samboSectionIndex=0;
@@ -489,6 +489,25 @@ function samboLessonObjective(group){
  const d=item||fallback;
  return '<div class="sambo-lesson-intro"><h3>Цель и содержание урока</h3><p><strong>В этом уроке вы узнаете:</strong></p><ul>'+d.topics.map(t=>'<li>'+samboEsc(t)+'</li>').join('')+'</ul><p><strong>После изучения вы сможете:</strong> '+samboEsc(d.outcome)+'.</p><p><strong>Как проходит обучение:</strong> последовательно изучите теорию, терминологию, схемы и примеры, затем проверьте знания в итоговом тесте.</p></div>';
 }
+
+function samboExpandedTopic(p,j,group){
+ const title=samboEsc(p.title),body=samboEsc(p.body||'');
+ const steps=['Определите обстоятельства эпизода','Найдите соответствующую норму','Проверьте условия и исключения','Обоснуйте итоговое решение'];
+ return '<section class="sambo-topic"><h3>'+(j+1)+'. '+title+'</h3><div class="sambo-lesson-intro"><strong>Основное правило и объяснение</strong><p>'+body+'</p></div>'+
+ '<h4>Разбор темы</h4><p>'+body+'</p><h4>Алгоритм применения</h4><p>Рассмотрите ситуацию, относящуюся к теме «'+title+'». Для правильного решения важно проверить не только само правило, но и обстоятельства его применения.</p>'+
+ '<figure class="sambo-figure"><figcaption>Четыре шага анализа</figcaption><div class="sambo-diagram">'+steps.map((t,i)=>'<div class="sambo-node"><span class="sambo-node-num">'+(i+1)+'</span><span>'+t+'</span></div>').join('')+'</div></figure>'+
+ '<h4>Вопросы для закрепления</h4><ol><li>Какие условия должны быть выполнены для применения этого правила?</li><li>Что изменится, если одно из условий не выполнено?</li><li>На какой пункт Правил нужно сослаться при обосновании?</li></ol>'+
+ '<p><strong>Итог:</strong> изучив раздел, вы должны уметь объяснить его содержание и порядок применения своими словами.</p></section>';
+}
+function samboQuizQuestions(group){
+ const base=group.parts.map(p=>({q:p.q,a:p.a,correct:p.correct,body:p.body,kind:'Теория'})).filter(p=>p.q&&Array.isArray(p.a)&&p.a.length>1&&Number.isInteger(p.correct));
+ const applied=group.parts.slice(0,5).filter(p=>Array.isArray(p.a)&&Number.isInteger(p.correct)&&p.a[p.correct]!=null).map(p=>({
+ q:'Практическая ситуация по теме «'+p.title+'»: какое утверждение соответствует изученным Правилам?',
+ a:[p.a[p.correct],'Любое решение допустимо без проверки условий.','Правило действует одинаково для всех дисциплин и случаев.','Достаточно мнения спортсмена, ссылка на Правила не нужна.'],
+ correct:0,body:p.body,kind:'Применение знаний'
+ }));
+ return base.concat(applied);
+}
 function samboLessonSections(group){
  const sections=[{title:'Введение',html:samboLessonObjective(group)+samboDiagram(group.title,group.parts)}];
  const rich=samboRichChapters[currentCourse]?.[group.title]||'';
@@ -501,7 +520,7 @@ function samboLessonSections(group){
  const supplement=samboSupplementalFor(group);if(supplement)sections.push({title:'Дополнительные нормативные документы',html:supplement});
  const technique=samboTechniqueFor(group);
  if(technique)sections.push({title:'Наглядный разбор технических действий',html:technique});
- group.parts.forEach((p,j)=>sections.push({title:p.title,html:'<section class="sambo-topic"><h3>'+(j+1)+'. '+samboEsc(p.title)+'</h3><p>'+samboEsc(p.body)+'</p></section>'}));
+ group.parts.forEach((p,j)=>sections.push({title:p.title,html:samboExpandedTopic(p,j,group)}));
  sections.push({title:'Итоговая проверка знаний',quiz:true,html:'<div class="sambo-lesson-intro"><strong>Закрепление материала</strong><p>Вы изучили все разделы. Пройдите итоговый тест по материалу урока. При ошибках можно пройти его повторно.</p></div>'});
  return sections;
 }
@@ -526,23 +545,23 @@ function samboGoSection(direction){
 }
 function startModuleQuiz(){currentQuestion=0;moduleCorrect=0;renderModuleQuestion();}
 function renderModuleQuestion(){
- const g=samboModuleData(currentCourse)[currentModule],qs=g.parts.slice(0,5),p=qs[currentQuestion];
+ const g=samboModuleData(currentCourse)[currentModule],qs=samboQuizQuestions(g),p=qs[currentQuestion];
  if(!p){finishModuleQuiz();return;}
  moduleAnswered=false;
- document.getElementById('question').textContent='Вопрос '+(currentQuestion+1)+' из '+qs.length+': '+p.q;
+ document.getElementById('question').textContent='Вопрос '+(currentQuestion+1)+' из '+qs.length+' · '+p.kind+': '+p.q;
  document.getElementById('answers').innerHTML=p.a.map((a,j)=>'<button class="answer" onclick="answer('+currentModule+','+j+')">'+samboEsc(a)+'</button>').join('');
  document.getElementById('feedback').textContent='';
 }
 function answer(i,j){
  if(moduleAnswered||i!==currentModule)return;
- const g=samboModuleData(currentCourse)[currentModule],qs=g.parts.slice(0,5),p=qs[currentQuestion],ok=j===p.correct;
+ const g=samboModuleData(currentCourse)[currentModule],qs=samboQuizQuestions(g),p=qs[currentQuestion],ok=j===p.correct;
  moduleAnswered=true;if(ok)moduleCorrect++;
- document.getElementById('feedback').textContent=(ok?'Верно! ':'Неверно. Правильный ответ: '+p.a[p.correct]+'. ')+'Объяснение: '+(p.body||'Повторите соответствующий раздел теории.');
+ document.getElementById('feedback').textContent=(ok?'Верно! ':'Неверно. Правильный ответ: '+p.a[p.correct]+'. ')+'Объяснение: '+String(p.body||'Повторите соответствующий раздел теории.').slice(0,600);
  document.getElementById('answers').innerHTML='<button class="btn" onclick="nextModuleQuestion()">'+(currentQuestion===qs.length-1?'Посмотреть результат':'Следующий вопрос →')+'</button>';
 }
 function nextModuleQuestion(){currentQuestion++;renderModuleQuestion();}
 function finishModuleQuiz(){
- const count=Math.min(5,samboModuleData(currentCourse)[currentModule].parts.length),pass=moduleCorrect===count;
+ const count=samboQuizQuestions(samboModuleData(currentCourse)[currentModule]).length,pass=moduleCorrect===count;
  document.getElementById('question').textContent='Результат: '+moduleCorrect+' из '+count;
  document.getElementById('feedback').textContent=pass?'Урок пройден!':'Повторите теорию и попробуйте ещё раз.';
  document.getElementById('answers').innerHTML='<button class="btn" onclick="'+(pass?'openCourse(currentCourse)':'startModuleQuiz()')+'">'+(pass?'К списку уроков':'Повторить тест')+'</button>';
