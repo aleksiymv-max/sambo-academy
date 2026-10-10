@@ -640,18 +640,19 @@ function samboCaseSection(group){
 function samboTopicTeachingCard(p,j,group){
  const title=samboEsc(p.title),body=samboEsc(p.body||'');
  const objectives=samboLearningObjectives[currentCourse]?.[group.title]?.topics||[];
- const focus=objectives[j%Math.max(1,objectives.length)]||'условия применения изучаемого правила';
- const check=[
- ['Что нужно установить до решения?','Выделите действующих лиц, положение спортсменов, этап соревнования и применимую дисциплину.'],
- ['На что опирается вывод?','Сопоставьте фактические обстоятельства с формулировкой изучаемого правила. Не подменяйте норму личным мнением.'],
- ['Когда вывод может измениться?','Измените один существенный факт и проверьте, сохраняются ли условия применения правила.']
- ];
+ const focus=objectives[j%Math.max(1,objectives.length)]||'определить условия применения нормы';
+ const answers=Array.isArray(p.a)?p.a:[];
+ const valid=Number.isInteger(p.correct)&&p.correct>=0&&p.correct<answers.length;
+ const practice=valid?'<div class="sambo-topic-case"><h4>Проверьте понимание на конкретном вопросе</h4><p><strong>'+samboEsc(p.q)+'</strong></p><ol>'+answers.map(a=>'<li>'+samboEsc(a)+'</li>').join('')+'</ol><details class="sambo-self-check"><summary>Показать верный ответ и объяснение</summary><p><strong>Правильный ответ:</strong> '+samboEsc(answers[p.correct])+'.</p><p>'+body+'</p></details></div>':'';
  return '<section class="sambo-topic sambo-teaching-card"><h3>'+(j+1)+'. '+title+'</h3>'+
- '<div class="sambo-lesson-intro"><strong>Что изучаем</strong><p>В центре внимания: '+samboEsc(focus)+'.</p></div>'+
- '<h4>Основное содержание</h4><p>'+body+'</p>'+
- '<h4>Разбираем правило по шагам</h4><div class="sambo-teaching-steps">'+check.map((x,i)=>'<div class="sambo-teaching-step"><span class="sambo-node-num">'+(i+1)+'</span><div><strong>'+x[0]+'</strong><p>'+x[1]+'</p></div></div>').join('')+'</div>'+
- '<h4>Самопроверка: применяем знания</h4><details class="sambo-self-check"><summary>Ситуация: одно из существенных условий изменилось. Как проверить прежнее решение?</summary><p>Повторно сопоставьте ситуацию с каждым условием правила. Если необходимое условие больше не выполнено, прежний вывод нельзя переносить автоматически. Назовите изменившееся обстоятельство и норму, которая регулирует новый случай.</p></details>'+
- '<p><strong>Результат раздела:</strong> вы должны уметь объяснить, какие обстоятельства влияют на применение темы «'+title+'», и обосновать решение.</p></section>';
+ '<div class="sambo-lesson-intro"><strong>Цель изучения</strong><p>'+samboEsc(focus)+'.</p></div>'+
+ '<h4>Нормативное содержание</h4><p>'+body+'</p>'+
+ '<h4>Как применить материал</h4><div class="sambo-teaching-steps">'+
+ '<div class="sambo-teaching-step"><span class="sambo-node-num">1</span><div><strong>Определите ситуацию</strong><p>Какие действия, участники и условия указаны в тексте именно этой темы?</p></div></div>'+
+ '<div class="sambo-teaching-step"><span class="sambo-node-num">2</span><div><strong>Найдите критерий решения</strong><p>Какая формулировка нормы непосредственно подтверждает вывод?</p></div></div>'+
+ '<div class="sambo-teaching-step"><span class="sambo-node-num">3</span><div><strong>Проверьте альтернативу</strong><p>Объясните, почему остальные варианты не соответствуют заданным условиям.</p></div></div></div>'+
+ practice+
+ '<p><strong>Результат:</strong> объясните решение по теме «'+title+'» своими словами, назовите применимую норму и исключения, если они предусмотрены.</p></section>';
 }
 
 const samboExpertCases={
