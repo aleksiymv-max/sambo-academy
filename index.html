@@ -986,7 +986,7 @@ function renderModuleQuestion(){
 }
 function answer(i,j){
  if(moduleAnswered||i!==currentModule)return;
- const g=samboModuleData(currentCourse)[currentModule],qs=samboQuizQuestions(g),p=qs[currentQuestion],ok=j===p.correct;
+ const qs=samboActiveQuiz,p=qs[currentQuestion],ok=!!p&&j===p.correct;
  moduleAnswered=true;if(ok)moduleCorrect++;
  document.getElementById('feedback').textContent=(ok?'Верно! ':'Неверно. Правильный ответ: '+p.a[p.correct]+'. ')+'Объяснение: '+String(p.body||'Повторите соответствующий раздел теории.').slice(0,600);
  document.getElementById('answers').innerHTML='<button class="btn" onclick="nextModuleQuestion()">'+(currentQuestion===qs.length-1?'Посмотреть результат':'Следующий вопрос →')+'</button>';
