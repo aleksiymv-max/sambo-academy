@@ -633,8 +633,9 @@ function samboQuizQuestions(group){
  const kind=samboCaseKind(group);
  const cases=kind?samboVerifiedCases[kind].map(c=>({...c,body:c.why,kind:'Ситуационная задача'})):[];
  const extra=(samboExpertCases[group.title]||[]).map(c=>({q:c.q,a:c.a,correct:c.correct,body:c.why,kind:'Экспертная задача'}));
+ const special=group.title==='Особенности дисциплин самбо'?[{q:'Судья работает на турнире по пляжному самбо. С какого нормативного блока следует начинать проверку специальных требований?',a:['Только с раздела спортивного самбо','С раздела VII, посвящённого пляжному самбо','Только с таблицы оценок бросков','С правил любой другой дисциплины'],correct:1,body:'Раздел VII (статьи 44–58) содержит специальные правила пляжного самбо.',kind:'Выбор нормативной базы'},{q:'На демонстрационных соревнованиях возник спор об оценке выступления. Как правильно выбирать норму?',a:['Всегда применять статью 35 без проверки','Пользоваться разделом Правил о соответствующей демонстрационной дисциплине','Ориентироваться на мнение зрителей','Использовать правила пляжного самбо'],correct:1,body:'Демонстрационные дисциплины регулируются отдельными разделами Правил.',kind:'Выбор нормативной базы'}]:[];
  const workshop=samboLessonWorkshops[group.title];const tasks=workshop?workshop.quiz.map(c=>({q:c[0],a:c[1],correct:c[2],body:c[3],kind:'Практическая задача'})):[];
- return base.concat(cases,extra,tasks);
+ return base.concat(cases,extra,tasks,special);
 }
 
 const samboAdvancedChapters={
@@ -875,9 +876,30 @@ function samboDecisionIllustrations(group){
  '<div class="sambo-comparison-grid">'+items.map((row,i)=>'<div class="sambo-comparison-card"><div class="sambo-comparison-art" aria-hidden="true"><svg viewBox="0 0 200 105" role="img"><rect x="8" y="75" width="184" height="10" rx="4" fill="#cddbe7"/><circle cx="'+(isThrow?54:60)+'" cy="26" r="10" fill="#c6303e"/><path d="M54 36 L54 61 M54 45 L33 55 M54 45 L78 49 M54 61 L40 75 M54 61 L72 75" stroke="#c6303e" stroke-width="7" stroke-linecap="round" fill="none"/><circle cx="'+(isThrow?134:139)+'" cy="'+(i%2===0?52:65)+'" r="10" fill="#2864b0"/><path d="'+(i%2===0?'M130 61 L108 74 M130 61 L158 74':'M130 73 L108 78 M130 73 L160 78')+'" stroke="#2864b0" stroke-width="8" stroke-linecap="round" fill="none"/><path d="M85 26 L111 26 M105 20 L112 26 L105 32" stroke="#334155" stroke-width="3" fill="none"/></svg></div><strong>'+samboEsc(row[0])+'</strong><p>'+samboEsc(row[1])+'</p><p class="sambo-comparison-result">'+samboEsc(row[2])+'</p><small>Статья '+samboEsc(row[3])+'</small></div>').join('')+'</div>'+
  '<p class="sambo-diagram-note">Иллюстрации схематические: они показывают участников и направление движения, но не являются учебником безопасной техники выполнения приёмов.</p></section>';
 }
+
+const samboSpecialDisciplines={
+ title:'Спортивное, боевое, пляжное и демонстрационное самбо: как не смешивать правила',
+ intro:'Разные дисциплины объединяет название «самбо», но порядок соревнований и разрешённые действия могут отличаться. Судья сначала определяет дисциплину и только затем применяет соответствующий раздел Правил.',
+ cards:[
+ ['Спортивное самбо','Основные положения о схватке, бросках, удержаниях и болевых приёмах раскрываются в разделе IV Правил.','Нельзя автоматически переносить в спортивную схватку действия, разрешённые только в другой дисциплине.'],
+ ['Боевое самбо','Специальные требования к боевому самбо содержатся в разделе VI.','Не следует оценивать эпизод боевого самбо исключительно по схеме спортивного самбо без проверки специальных положений.'],
+ ['Пляжное самбо','Отдельные нормы дисциплины собраны в разделе VII (статьи 44–58).','Место соревнований и формат поединка отличаются; следует пользоваться соответствующим разделом.'],
+ ['Демонстрационные дисциплины','Правила предусматривают отдельные разделы для демонстрационных форматов (статьи 59–69).','Оценивание выступления не сводится к баллам за броски в обычной схватке.']
+ ]
+};
+function samboDisciplinesChapter(group){
+ if(group.title!=='Особенности дисциплин самбо')return '';
+ const d=samboSpecialDisciplines;
+ return '<article class="sambo-topic"><h3>'+samboEsc(d.title)+'</h3><p>'+samboEsc(d.intro)+'</p>'+
+ '<figure class="sambo-figure"><figcaption>Карта разделов Правил</figcaption><div class="sambo-diagram">'+d.cards.map((x,i)=>'<div class="sambo-node"><span class="sambo-node-num">'+(i+1)+'</span>'+samboEsc(x[0])+'</div>').join('')+'</div></figure>'+
+ d.cards.map(x=>'<div class="sambo-lesson-intro"><h4>'+samboEsc(x[0])+'</h4><p>'+samboEsc(x[1])+'</p><p><strong>Типичная ошибка:</strong> '+samboEsc(x[2])+'</p></div>').join('')+
+ '<h4>Практическое упражнение</h4><p>Организатор сообщил, что турнир проводится по пляжному самбо. Какой раздел Правил необходимо открыть первым? Почему нельзя автоматически пользоваться таблицей оценок спортивного самбо? Объясните порядок выбора нормативной базы.</p>'+
+ '<p><strong>Нормативные ссылки:</strong> статьи 44–58, 59–69. При чтении учитывайте специальные разделы для конкретной дисциплины.</p></article>';
+}
 function samboLessonSections(group){
  const sections=[{title:'Введение',html:samboLessonObjective(group)+samboDiagram(group.title,group.parts)}];
  const advanced=samboAdvancedChapter(group);if(advanced)sections.push({title:'Углублённый разбор и типичные ошибки',html:advanced});
+ const discipline=samboDisciplinesChapter(group);if(discipline)sections.push({title:'Различия дисциплин и применение правил',html:discipline});
  const workshop=samboWorkshop(group);if(workshop)sections.push({title:'Практикум с разбором ошибок',html:workshop});
  const prep=samboPreparationSection(group);if(prep)sections.push({title:'Практический маршрут и разбор ошибок',html:prep});
  const illustrations=samboDecisionIllustrations(group);if(illustrations)sections.push({title:'Иллюстрированное сравнение эпизодов',html:illustrations});
