@@ -503,10 +503,13 @@ a) за бросок с падением, при котором противни
 function samboCitedArticlePanel(html){
  const plain=String(html).replace(/<[^>]+>/g,' ');
  const ids=new Set();
- for(const m of plain.matchAll(/стат(?:ья|ьи|ьёй|ью|ей|е|ей|ях|ями|ям)?\s*№?\s*(\d{1,2})(?:\s*[–-]\s*(\d{1,2}))?/gi)){
-   const a=+m[1],b=m[2]?+m[2]:a;
-   if(a<1||a>69)continue;
-   for(let n=a;n<=Math.min(b,a+12,69);n++)ids.add(n);
+ for(const m of plain.matchAll(/стат(?:ья|ьи|ьёй|ью|ей|е|ей|ях|ями|ям)?\s*№?\s*(\d{1,2}(?:\s*[–-]\s*\d{1,2})?(?:\s*(?:,|и)\s*\d{1,2}(?:\s*[–-]\s*\d{1,2})?)*)/gi)){
+   for(const part of m[1].split(/\s*(?:,|и)\s*/)){
+     const pair=part.split(/\s*[–-]\s*/).map(Number);
+     const a=pair[0],b=pair.length>1?pair[1]:a;
+     if(a<1||a>69||b<a)continue;
+     for(let n=a;n<=Math.min(b,a+12,69);n++)ids.add(n);
+   }
  }
  if(!ids.size)return '';
  return '<aside class="sambo-article-panel"><h3>Нормативные статьи, упомянутые в разделе</h3><p>Текст приводится из предоставленных Правил самбо. Если указаны только пункты, это отмечено отдельно.</p>'+[...ids].sort((a,b)=>a-b).map(n=>{
