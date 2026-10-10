@@ -91,7 +91,7 @@ async function loadGuardianApplication(user){
   if(error)throw error;
   if(!data){
    const m=user.user_metadata||{};
-   const row={user_id:user.id,child_last_name:m.last_name,child_first_name:m.first_name,child_middle_name:m.middle_name||null,child_birth_date:m.date_of_birth,guardian_full_name:m.guardian_name,guardian_relation:m.guardian_relation};
+   const row={user_id:user.id,child_last_name:m.last_name,child_first_name:m.first_name,child_middle_name:m.middle_name||null,child_birth_date:m.date_of_birth,guardian_full_name:m.guardian_name,guardian_relation:m.guardian_relation,declaration_text:m.guardian_declaration_text||null,consent_version:m.guardian_consent_version||null,consent_at:m.guardian_declaration_at||null,status:m.account_type==='child_learner'?'approved':'pending'};
    const created=await db.from('guardian_applications').insert(row);
    if(created.error&&created.error.code!=='23505')throw created.error;
    const refreshed=await db.from('guardian_applications').select('status').eq('user_id',user.id).maybeSingle();
