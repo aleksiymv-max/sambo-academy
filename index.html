@@ -259,6 +259,25 @@ let samboSectionIndex=0;
 
 
 
+
+const samboEquipmentMasterclass=`
+<section class="sambo-rich"><h2>Подготовка места соревнований и документация</h2>
+<p>Статья 42 определяет требования к ковру, статья 43 — к инвентарю. Эти положения нужны не только организаторам: судья должен понимать, почему отсутствие оборудования может влиять на безопасность и достоверность результатов.</p>
+<h3>Схема оборудования ковра</h3><div class="sambo-mat-figure"><svg viewBox="0 0 340 245" role="img" aria-label="Условное расположение ковра, судейского стола, бокового судьи и табло"><rect x="65" y="42" width="210" height="145" rx="10" fill="#e2effb" stroke="#295a8e" stroke-width="3"/><rect x="92" y="64" width="156" height="102" rx="8" fill="#f3d4a7" stroke="#b97a34" stroke-width="2"/><circle cx="170" cy="114" r="21" fill="#fff" stroke="#b97a34" stroke-dasharray="4 3"/><text x="170" y="116" text-anchor="middle" font-size="11" fill="#22446b">Ковёр</text><rect x="108" y="200" width="124" height="32" rx="7" fill="#244f86"/><text x="170" y="219" text-anchor="middle" font-size="12" fill="#fff">Стол судей</text><rect x="4" y="91" width="51" height="34" rx="5" fill="#fff" stroke="#295a8e"/><text x="29" y="104" text-anchor="middle" font-size="9" fill="#244f86">Боковой</text><text x="29" y="115" text-anchor="middle" font-size="9" fill="#244f86">судья</text><rect x="282" y="91" width="54" height="34" rx="5" fill="#fff" stroke="#295a8e"/><text x="309" y="104" text-anchor="middle" font-size="9" fill="#244f86">Табло</text><text x="309" y="115" text-anchor="middle" font-size="9" fill="#244f86">оценок</text></svg><p class="sambo-source">Учебная схема расположения объектов; точное размещение определяется Правилами и условиями спортивного объекта.</p></div>
+<h3>Требования и смысл</h3><div class="sambo-table-wrap"><table class="sambo-table"><thead><tr><th>Объект</th><th>Требование</th><th>Зачем</th></tr></thead><tbody>
+<tr><td>Ковёр</td><td>Маты и покрышка размером от 11 × 11 до 14 × 14 м</td><td>Создать предусмотренную площадь борьбы и безопасности</td></tr>
+<tr><td>Площадка под ковёр</td><td>Шире ковра минимум на 1 м с каждой стороны</td><td>Безопасный подход и размещение</td></tr>
+<tr><td>Помост</td><td>Высота не более 1 м; боковые стороны с наклоном 45° наружу</td><td>Снизить риск травм у края помоста</td></tr>
+<tr><td>Весы</td><td>Должны быть выверены</td><td>Обеспечить точность взвешивания</td></tr>
+<tr><td>Секундомер</td><td>Остановка и возобновление без сброса времени</td><td>Сохранить чистое время схватки</td></tr>
+<tr><td>Резервное оборудование</td><td>Механическое табло, гонг, ручные секундомеры</td><td>Продолжить соревнования при отключении питания</td></tr>
+<tr><td>Видеозапись</td><td>Система с возможностью просмотра видеоповторов на каждом ковре</td><td>Обеспечить возможность просмотра спорных эпизодов</td></tr>
+</tbody></table></div>
+<h3>Документы главного судьи</h3><dl class="sambo-glossary"><dt>Приложение № 11</dt><dd>Акт приёма места проведения соревнований: документальная фиксация проверки помещения, оборудования и инвентаря.</dd><dt>Приложение № 12</dt><dd>Отчёт главного судьи. По статье 15 его направляют организатору в течение трёх дней после соревнований на бумажном и электронном носителях.</dd><dt>Приложение № 14</dt><dd>Протокол схватки, который ведёт технический секретарь: оценки, предупреждения, итог и время досрочного завершения.</dd></dl>
+<h3>Как читать протокол схватки</h3><p>По статье 21 оценки приёмов записывают цифрами <strong>1, 2, 4</strong>; оценки удержаний обводят кружком. Досрочное окончание фиксируют знаком <strong>«Х»</strong> с указанием причины и времени. Баллы за предупреждения записывают в рамку. Эти обозначения позволяют восстановить последовательность событий.</p>
+<div class="sambo-example"><strong>Ситуация.</strong> Во время турнира отключилось электронное табло. Статья 43 требует резервные механические табло, гонги и ручные секундомеры: их использование позволяет продолжать учёт времени и оценок. Окончательное решение об организации соревнований остаётся за ответственными должностными лицами.</div>
+<p class="sambo-source">Основной источник: статьи 15, 21, 42, 43; приложения № 11, 12 и 14 предоставленных Правил.</p></section>`;
+function samboEquipmentFor(group){return /Оборудование и документация|Судейская коллегия/.test(group.title)?samboEquipmentMasterclass:'';}
 const samboGesturesMasterclass=`
 <section class="sambo-rich"><h2>Судейские жесты: как читать сигналы на ковре</h2><p>Судейские жесты — это стандартизированный язык оценки действий. Их форма описана в <strong>приложении № 13</strong> к Правилам. Цвет рукава указывает, какому спортсмену относится оценка. Ниже приведены учебные схемы, не заменяющие официальные рисунки приложения.</p>
 <div class="sambo-visual-grid">
@@ -370,6 +389,7 @@ function samboLessonSections(group){
  const sections=[{title:'Введение',html:'<div class="sambo-lesson-intro"><strong>Цель урока</strong><p>Изучить тему «'+samboEsc(group.title)+'», разобраться в терминах и научиться применять изученные правила.</p></div>'+samboDiagram(group.title,group.parts)}];
  const rich=samboRichChapters[currentCourse]?.[group.title]||'';
  if(rich)sections.push({title:'Теория, терминология и таблицы',html:rich});
+ const equipment=samboEquipmentFor(group);if(equipment)sections.push({title:'Оборудование, безопасность и протоколы',html:equipment});
  const gestures=samboGesturesFor(group);if(gestures)sections.push({title:'Судейские жесты: изображения и расшифровка',html:gestures});
  const judging=samboJudgingFor(group);if(judging)sections.push({title:'Судейская коллегия и обязанности судей',html:judging});
  const protest=samboProtestFor(group);if(protest)sections.push({title:'Протесты и порядок рассмотрения',html:protest});
