@@ -100,7 +100,7 @@ async function loadGuardianApplication(user){
   }
   if(window.samboCurrentUser?.id!==user.id)return;
   window.samboGuardianStatus=data?.status||'error';
- }catch(e){window.samboGuardianStatus='error';}
+ }catch(e){window.samboGuardianStatus='error';console.error('Guardian application sync failed:',e);if(window.samboCurrentUser?.id===user.id&&user?.user_metadata?.account_type==='child_learner'){const notice=document.getElementById('authFeedback');if(notice)notice.textContent='Профиль создан, но заявление не удалось сохранить в базе. Обратитесь к администратору.';}}
  renderStudentDashboard();
 }
 function samboGuardianPending(){return window.samboCurrentUser?.user_metadata?.account_type==='guardian_pending'&&window.samboGuardianStatus!=='approved'}
