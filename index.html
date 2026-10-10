@@ -1037,7 +1037,7 @@ function renderModuleQuestion(){
  if(!p){finishModuleQuiz();return;}
  moduleAnswered=false;
  document.getElementById('question').textContent='Вопрос '+(currentQuestion+1)+' из '+qs.length+' · '+p.kind+': '+p.q;
- document.getElementById('answers').innerHTML=p.a.map((a,j)=>'<button class="answer" onclick="answer('+currentModule+','+j+')">'+samboEsc(a)+'</button>').join('');
+ document.getElementById('answers').innerHTML=p.a.map((a,j)=>'<button type="button" class="answer" onclick="answer('+currentModule+','+j+')" aria-label="Вариант '+(j+1)+': '+samboEsc(a)+'">'+samboEsc(a)+'</button>').join('');
  document.getElementById('feedback').textContent='';
 }
 function answer(i,j){
@@ -1045,6 +1045,7 @@ function answer(i,j){
  const qs=samboActiveQuiz,p=qs[currentQuestion],ok=!!p&&j===p.correct;
  moduleAnswered=true;if(ok)moduleCorrect++;else samboQuizMistakes.push({q:p.q,expected:p.a[p.correct],why:String(p.body||'Сверьте материал урока.').slice(0,450)});
  document.getElementById('feedback').textContent=(ok?'Верно! ':'Неверно. Правильный ответ: '+p.a[p.correct]+'. ')+'Объяснение: '+String(p.body||'Повторите соответствующий раздел теории.').slice(0,600);
+ document.getElementById('feedback').setAttribute('role','status');document.getElementById('feedback').setAttribute('aria-live','polite');
  document.getElementById('answers').innerHTML='<button class="btn" onclick="nextModuleQuestion()">'+(currentQuestion===qs.length-1?'Посмотреть результат':'Следующий вопрос →')+'</button>';
 }
 function nextModuleQuestion(){currentQuestion++;renderModuleQuestion();}
