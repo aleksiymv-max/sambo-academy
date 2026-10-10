@@ -23,5 +23,20 @@ jobs:
           if (!html.includes('samboLearningObjectives')) throw new Error('Missing lesson objectives');
           if (!html.includes('samboActiveQuiz')) throw new Error('Missing shuffled exam logic');
           if (!/function answer\(i,j\)[\s\S]*?const qs=samboActiveQuiz,p=qs\[currentQuestion\]/.test(html)) throw new Error('Quiz grading must use displayed shuffled question');
+          // Check that displayed options and grading refer to the same shuffled attempt.
+          const quizStart = html.indexOf('function startModuleQuiz()');
+          const quizAnswer = html.indexOf('function answer(i,j)');
+          const quizFinish = html.indexOf('function finishModuleQuiz()');
+          const quizBlock = html.slice(quizStart,quizFinish);
+          if (!quizBlock.includes('samboActiveQuiz=samboShuffle(')) throw new Error('Quiz shuffle missing');
+          if (!/function renderModuleQuestion\(\)[\s\S]*?const qs=samboActiveQuiz/.test(quizBlock)) throw new Error('Rendered quiz does not use shuffled questions');
+          if (!/function answer\(i,j\)[\s\S]*?const qs=samboActiveQuiz/.test(quizBlock)) throw new Error('Grading does not use shuffled questions');
+          if (!quizBlock.includes('samboQuizMistakes.push')) throw new Error('Mistake review collection missing');
+          const sample=[{label:'A',isCorrect:false},{label:'B',isCorrect:true},{label:'C',isCorrect:false}];
+          for (let t=0;t<100;t++) {
+            const arr=sample.slice().sort(()=>Math.random()-0.5);
+            const index=arr.findIndex(x=>x.isCorrect);
+            if (index<0 || arr[index].label!=='B') throw new Error('Answer mapping failed');
+          }
           console.log('PASS: '+scripts.length+' scripts parsed and '+required.length+' core features found');
           NODE
