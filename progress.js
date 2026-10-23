@@ -8,7 +8,7 @@ window.progressDone = (course,index) => {
 window.loadSamboProgress = async function(user) {
   const p=window.samboProgress;
   p.userId=user?.id||null;p.completed=new Set();p.ready=false;p.error=false;
-  if (!user || !window.samboAuthClient){p.ready=true;renderStudentDashboard();return;}
+  if (!user || !window.samboAuthClient){p.ready=true;renderStudentDashboard();return true;}
   const userId=user.id;
   try {
     const {data,error}=await window.samboAuthClient.from('lesson_progress').select('course_key,lesson_index').eq('user_id',userId);
@@ -21,11 +21,12 @@ window.loadSamboProgress = async function(user) {
 window.saveSamboProgress = async function(course,index) {
   const p=window.samboProgress;
   if(!p.userId){localStorage.setItem('sambo-demo-'+course+'-'+index,'done');renderStudentDashboard();return;}
-  if(!p.ready||p.error){authMessage('Прогресс пока не сохранён: проверьте подключение базы данных.');return;}
+  if(!p.ready||p.error){authMessage('Прогресс пока не сохранён: проверьте подключение базы данных.');return false;}
   const userId=p.userId;
   try {
     const {error}=await window.samboAuthClient.from('lesson_progress').upsert({user_id:userId,course_key:course,lesson_index:index},{onConflict:'user_id,course_key,lesson_index',ignoreDuplicates:true});
     if(error)throw error;
-    if(p.userId===userId){p.completed.add(progressKey(course,index));renderStudentDashboard();}
-  } catch(e) {authMessage('Не удалось сохранить результат в облаке. Повторите ответ позже.');}
+    if(p.userId===userId){p.completed.add(progressKey(course,index));renderStudentDashboard();return true;}
+    return false;
+  } catch(e) {authMessage('Не удалось сохранить результат в облаке. Повторите ответ позже.');return false;}
 };
