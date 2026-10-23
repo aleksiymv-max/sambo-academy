@@ -64,5 +64,39 @@ jobs:
           if(!html.includes('group.premiumFoundations')) throw new Error('Premium judge lesson routing missing');
           if(!html.includes('samboModuleProgressIndex(')) throw new Error('Versioned module progress missing');
           if(!html.includes('judge-foundations.css') || !html.includes('judge-foundations.js')) throw new Error('Judge assets missing');
+          const programFiles=[
+            'judge-course-engine.js',
+            'judge-program-admission.js',
+            'judge-program-participants.js',
+            'judge-program-officials.js',
+            'judge-program-bout.js',
+            'judge-program-scoring.js',
+            'judge-program-sanctions.js',
+            'judge-program-infrastructure.js',
+            'judge-program-combat.js',
+            'judge-program-beach.js',
+            'judge-program-demo.js',
+            'judge-program-practicum.js',
+            'judge-program-bridge.js'
+          ];
+          const sandbox={window:{}};vm.createContext(sandbox);
+          for(const name of programFiles){
+            const code=fs.readFileSync(name,'utf8');
+            new vm.Script(code,{filename:name});
+            if(name!=='judge-program-bridge.js')vm.runInContext(code,sandbox,{filename:name});
+            if(!html.includes('src="'+name+'"')) throw new Error('Course file not loaded on site: '+name);
+          }
+          const modules=sandbox.window.samboJudgeCourseEngine.modules;
+          if(modules.length!==11)throw new Error('Expected 11 expanded judge modules; got '+modules.length);
+          const lessons=modules.reduce((n,m)=>n+m.lessons.length,0);
+          if(lessons<50)throw new Error('Missing authored judge lessons: '+lessons);
+          for(const m of modules){
+           if(!m.questions.length)throw new Error('Empty exam: '+m.title);
+           for(const lesson of m.lessons){
+            if(!lesson.ref||!lesson.blocks?.length||!lesson.checks?.length||!lesson.decision)throw new Error('Incomplete lesson: '+lesson.title);
+            for(const q of lesson.checks)if(!Array.isArray(q[1])||q[2]<0||q[2]>=q[1].length)throw new Error('Bad answer mapping: '+lesson.title);
+           }
+          }
+          console.log('PASS: '+(lessons+6)+' full judge lessons across '+(modules.length+1)+' modules, JS parsing and question integrity');
           console.log('PASS: '+scripts.length+' inline scripts, course navigation, result saving and guardian checks');
           NODE
