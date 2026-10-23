@@ -77,6 +77,24 @@ try {
  await page.locator('#authSubmit').click();
  await page.waitForFunction(()=>!!window.samboCurrentUser,{timeout:10000});
  check('mock signed-in nav only account',await page.locator('#navAccount').isVisible()&&!(await page.locator('#navSignup').isVisible())&&!(await page.locator('#navLogin').isVisible()));
+ // Verify cloud save failure is not reported as a completed module, and retry succeeds.
+ await page.evaluate(()=>{window.__mock.saveFails=true;openCourse('athlete');openLesson(0);samboSectionIndex=samboLessonSections(samboModuleData(currentCourse)[currentModule]).length-1;renderSamboSection();startModuleQuiz();});
+ n=await page.evaluate(()=>samboActiveQuiz.length);
+ if(n>0&&n<=60){
+  for(let i=0;i<n;i++){
+   const correct=await page.evaluate(()=>samboActiveQuiz[currentQuestion].correct);
+   await page.locator('#answers button.answer').nth(correct).click();
+   await page.locator('#answers button.btn').first().click();
+  }
+  await page.waitForTimeout(200);
+  check('failed cloud save does not claim completion',(await page.locator('#feedback').textContent()).includes('не сохранён')&&await page.locator('button[onclick="samboRetrySave()"]').isVisible());
+  check('failed cloud save leaves progress undone',!(await page.evaluate(()=>progressDone('athlete',100))));
+  await page.evaluate(()=>{window.__mock.saveFails=false;});
+  await page.locator('button[onclick="samboRetrySave()"]').click();
+  await page.waitForFunction(()=>window.samboProgress?.completed?.has('athlete:100'),{timeout:10000});
+  check('retry cloud save updates progress',await page.locator('#feedback').textContent()==='Результат сохранён.');
+ }
+ await page.evaluate(()=>show('account'));
  await page.evaluate(()=>studentTab('profile'));
  check('logout located in profile',await page.locator('#studentContent').getByText('Выйти из аккаунта').isVisible());
  await page.getByText('Выйти из аккаунта').click();
@@ -101,6 +119,37 @@ try {
  width=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,viewport:innerWidth}));
  check('mobile lesson no horizontal overflow',width.scroll<=width.viewport+3,JSON.stringify(width));
  check('no uncaught JS errors',errors.length===0,errors.slice(0,5).join(' | '));
+ // Real published-page browser check (no credentials, no account mutations).
+ try {
+  const liveCtx=await browser.newContext({viewport:{width:1280,height:800}});
+  const livePage=await liveCtx.newPage();
+  const liveErrors=[];
+  livePage.on('pageerror',e=>liveErrors.push(e.message));
+  await livePage.goto('https://sambo-academy.pages.dev/',{waitUntil:'domcontentloaded',timeout:20000});
+  await livePage.waitForFunction(()=>!document.querySelector('.nav-actions')?.classList.contains('auth-pending'),{timeout:25000});
+  check('LIVE browser opens public site',await livePage.locator('h1').first().textContent()==='САМБО');
+  check('LIVE real Supabase SDK starts',!(await livePage.locator('#authSubmit').isDisabled()));
+  await livePage.evaluate(()=>openCourse('athlete'));
+  check('LIVE athlete modules clickable',await livePage.locator('#lessons details').count()>=4);
+  await livePage.locator('#lessons details').first().locator('.sambo-topic-link').first().click();
+  check('LIVE lesson shown after click',await livePage.locator('#lesson').isVisible());
+  check('LIVE browser no uncaught errors',liveErrors.length===0,liveErrors.slice(0,4).join(' | '));
+  await livePage.setViewportSize({width:390,height:844});
+  check('LIVE mobile lesson within viewport',await livePage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+3));
+  await liveCtx.close();
+ }catch(e){check('LIVE interactive browser smoke',false,String(e.stack||e).slice(0,550));}
+ // Supabase anonymous API must not return student records.
+ try {
+  const anonKey='sb_publishable_ejURt14DFSQ56wP9IzOSKw_xhH6-BgP';
+  const api='https://nabdooqbunipkwkmdufn.supabase.co';
+  const health=await page.request.get(api+'/auth/v1/health',{headers:{apikey:anonKey},timeout:12000,failOnStatusCode:false});
+  check('Supabase Auth API responds',health.status()>=200&&health.status()<500,health.status().toString());
+  const progress=await page.request.get(api+'/rest/v1/lesson_progress?select=user_id,course_key,lesson_index',{headers:{apikey:anonKey},timeout:12000,failOnStatusCode:false});
+  check('anonymous progress table not readable',progress.status()===401||progress.status()===403,progress.status().toString());
+  const guardians=await page.request.get(api+'/rest/v1/guardian_applications?select=user_id,status',{headers:{apikey:anonKey},timeout:12000,failOnStatusCode:false});
+  check('anonymous guardian applications not readable',guardians.status()===401||guardians.status()===403,guardians.status().toString());
+ }catch(e){check('Supabase external API connectivity',false,String(e).slice(0,250));}
+
  // The published URL is inspected separately from the checkout, without using test credentials.
  try {
    const response=await page.request.get('https://sambo-academy.pages.dev/',{timeout:12000,failOnStatusCode:false});
