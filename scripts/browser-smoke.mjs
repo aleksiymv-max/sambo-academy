@@ -65,6 +65,7 @@ try {
  for(const g of judgeModules.slice(1)){
   await page.evaluate(()=>openCourse('judge'));
   const card=page.locator('#lessons .sambo-module-card').nth(g.index);
+  await card.locator('summary').click();
   await card.locator('.sambo-topic-link').first().click();
   const shown=(await page.locator('.judge-prime h2').first().textContent())||'';
   check('judge module '+(g.index+1)+' opens authored lesson',shown.includes(g.first)&&await page.locator('.judge-prime .jp-part').count()>=2,shown);
