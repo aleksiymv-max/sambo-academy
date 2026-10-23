@@ -20,7 +20,7 @@ window.loadSamboProgress = async function(user) {
 };
 window.saveSamboProgress = async function(course,index) {
   const p=window.samboProgress;
-  if(!p.userId){localStorage.setItem('sambo-demo-'+course+'-'+index,'done');renderStudentDashboard();return;}
+  if(!p.userId){localStorage.setItem('sambo-demo-'+course+'-'+index,'done');renderStudentDashboard();return true;}
   if(!p.ready||p.error){authMessage('Прогресс пока не сохранён: проверьте подключение базы данных.');return false;}
   const userId=p.userId;
   try {
