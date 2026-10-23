@@ -8,7 +8,7 @@ const previousSections=samboLessonSections;
 samboModuleData=function(key){
  const groups=previousData(key);
  if(key==='judge')engine.modules.forEach((m,i)=>{
-  const g=groups[i+1];if(!g)return;
+  const g=groups[i+1]||{title:m.title,parts:[]};
   groups[i+1]={...g,title:m.title,premiumFoundations:true,premiumCourse:true,
   moduleIndex:i,progressIndex:1101+i,
   parts:m.lessons.map((l,j)=>({title:l.title,sourceIndex:-1,order:j}))};
