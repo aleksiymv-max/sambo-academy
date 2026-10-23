@@ -8,6 +8,9 @@ create table if not exists public.guardian_applications (
  child_birth_date date not null,
  guardian_full_name text not null,
  guardian_relation text not null check (guardian_relation in ('parent','guardian','other')),
+ declaration_text text,
+ consent_version text,
+ consent_at timestamptz,
  submitted_at timestamptz not null default now(),
  status text not null default 'pending' check (status in ('pending','approved','rejected')),
  reviewed_at timestamptz,
@@ -29,3 +32,8 @@ create policy "Guardian creates own pending application" on public.guardian_appl
 -- where user_id='UUID_ПОЛЬЗОВАТЕЛЯ' and status='pending';
 -- ВНИМАНИЕ: решение об одобрении НЕ означает, что согласие юридически оформлено;
 -- процедура верификации и юридические документы требуют отдельного утверждения.
+
+-- Upgrade previously created application tables to match the browser form.
+alter table public.guardian_applications add column if not exists declaration_text text;
+alter table public.guardian_applications add column if not exists consent_version text;
+alter table public.guardian_applications add column if not exists consent_at timestamptz;
