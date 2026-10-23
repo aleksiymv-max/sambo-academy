@@ -240,7 +240,9 @@ try {
    ['judge-program-admission.js','Медицинская заявка: обязательные реквизиты'],
    ['judge-program-participants.js','Куртка, рукав и пояс: измеряемые параметры'],
    ['judge-program-officials.js','Оператор табло и секундометрист: время и сигналы'],
-   ['judge-program-sanctions.js','Результат схватки и две процедуры протеста']
+   ['judge-program-sanctions.js','Результат схватки и две процедуры протеста'],
+   ['judge-program-scoring.js','Шаг 5. Одновременные предупреждения'],
+   ['judge-program-scoring.js','Бросок начался внутри, закончился снаружи рабочей зоны']
   ]){
    const response=await livePage.request.get('https://sambo-academy.pages.dev/'+asset,{timeout:12000,failOnStatusCode:false});
    const body=await response.text();
