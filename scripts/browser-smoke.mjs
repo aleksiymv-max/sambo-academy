@@ -60,7 +60,9 @@ try {
   progress:samboModuleProgressIndex('judge',i)
  })));
  check('all twelve judge modules registered',judgeModules.length===12,'modules='+judgeModules.length);
- check('expanded judge modules contain fifty-three authored lessons',judgeModules.slice(1).reduce((n,g)=>n+g.lessons,0)===53);
+ check('expanded judge modules contain fifty-four authored lessons',judgeModules.slice(1).reduce((n,g)=>n+g.lessons,0)===54);
+  check('independent exam bank loaded',await page.evaluate(()=>window.samboJudgeIndependentExamLoaded===true));
+  check('all revised judge exams use independent questions',await page.evaluate(()=>window.samboJudgeCourseEngine.modules.every(m=>m.examRevision===2&&m.questions.length>=8&&!m.questions.some(q=>m.lessons.some(l=>l.checks.some(c=>c[0].trim().toLowerCase()===q.q.trim().toLowerCase()))))));
  check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.progress)).size===judgeModules.length);
  for(const g of judgeModules.slice(1)){
   await page.evaluate(()=>openCourse('judge'));
@@ -230,7 +232,8 @@ try {
    progress:samboModuleProgressIndex('judge',i)
   })));
   check('LIVE all twelve judge modules deployed',liveModules.length===12,'modules='+liveModules.length);
-  check('LIVE all judge modules have nonempty exams',liveModules.every(g=>g.questions>0));
+  check('LIVE revised judge modules have eight independent exam questions',liveModules.slice(1).every(g=>g.questions===8));
+   check('LIVE independent exam bank and new result keys deployed',await livePage.evaluate(()=>window.samboJudgeIndependentExamLoaded===true)&&liveModules.slice(1).every((g,i)=>g.progress===1201+i));
   check('LIVE judge progress IDs are unique',new Set(liveModules.map(g=>g.progress)).size===liveModules.length);
   for(const i of [1,6,11]){
    if(!liveModules[i])continue;
