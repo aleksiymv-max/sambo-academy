@@ -44,4 +44,4 @@ for(const r of rows){
 console.log('TOTAL: '+modules.length+' expanded modules, '+lessonTotal+' lessons, '+examTotal+' exam questions; '+duplicateTotal+' repeated, '+independentTotal+' independent.');
 if(duplicateTotal)console.log('EDITORIAL GAP: final tests repeat lesson self-checks; add independent scenario questions before treating them as qualifying exams.');
 console.log('EDITORIAL GAP: normative point-by-point verification against the uploaded PDF, original illustrations and real-account progress E2E require separate evidence.');
-if(modules.length!==11||lessonTotal<50)process.exitCode=1;
+if(modules.length!==11||lessonTotal<50||duplicateTotal!==0||rows.some(r=>r.independent<Math.max(8,r.lessons)))process.exitCode=1;
