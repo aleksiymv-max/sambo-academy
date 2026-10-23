@@ -1,0 +1,22 @@
+name: Browser and deployment smoke tests
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright browser driver
+        run: npm install --no-save --no-package-lock playwright@1.57.0
+      - name: Run browser checks
+        run: |
+          google-chrome --version
+          node scripts/browser-smoke.mjs
