@@ -122,3 +122,6 @@ jobs:
           console.log('PASS: '+(lessons+6)+' full judge lessons across '+(modules.length+1)+' modules, JS parsing and question integrity');
           console.log('PASS: '+scripts.length+' inline scripts, course navigation, result saving and guardian checks');
           NODE
+
+      - name: Report editorial gaps without treating them as a validated course
+        run: node scripts/audit-judge-content.cjs
