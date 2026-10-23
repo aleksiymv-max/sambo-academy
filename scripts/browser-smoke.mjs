@@ -140,6 +140,16 @@ try {
   check('LIVE course prices marked planned',(await livePage.locator('.course.athlete .price').textContent()).includes('Планируемая стоимость'));
 
   check('LIVE real Supabase SDK starts',!(await livePage.locator('#authSubmit').isDisabled()));
+  // A negative login checks the real Auth API without creating accounts or using anyone's credentials.
+  const tokenResponses=[];
+  livePage.on('response',response=>{if(response.url().includes('/auth/v1/token'))tokenResponses.push(response.status())});
+  await livePage.locator('#navLogin').click();
+  await livePage.locator('#authEmail').fill('qa-nonexistent-20261023@example.invalid');
+  await livePage.locator('#authPassword').fill('qa-invalid-password-2026');
+  await livePage.locator('#authSubmit').click();
+  await livePage.waitForFunction(()=>document.getElementById('authFeedback')?.textContent.includes('Не удалось выполнить действие'),{timeout:14000});
+  check('LIVE invalid login handled without signing in',!(await livePage.locator('#authUser').isVisible())&&tokenResponses.some(code=>code===400||code===401),JSON.stringify(tokenResponses));
+
   await livePage.evaluate(()=>openCourse('athlete'));
   check('LIVE athlete modules clickable',await livePage.locator('#lessons details').count()>=4);
   await livePage.locator('#lessons details').first().locator('.sambo-topic-link').first().click();
