@@ -54,6 +54,23 @@ try {
  check('brand logo returns home',!(await page.locator('#home').evaluate(e=>e.classList.contains('hidden'))));
  await page.evaluate(()=>{openCourse('judge');});
  check('judge modules render',await page.locator('#lessons .sambo-module-card').count()>=5);
+ // Every expanded module must be reachable from the visible course and render its own first lesson.
+ const judgeModules=await page.evaluate(()=>samboModuleData('judge').map((g,i)=>({
+  index:i,title:g.title,lessons:g.parts.length,first:g.parts[0]?.title,questions:samboQuizQuestions(g).length,
+  progress:samboModuleProgressIndex('judge',i)
+ })));
+ check('all twelve judge modules registered',judgeModules.length===12,'modules='+judgeModules.length);
+ check('expanded judge modules contain fifty-three authored lessons',judgeModules.slice(1).reduce((n,g)=>n+g.lessons,0)===53);
+ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.progress)).size===judgeModules.length);
+ for(const g of judgeModules.slice(1)){
+  await page.evaluate(()=>openCourse('judge'));
+  const card=page.locator('#lessons .sambo-module-card').nth(g.index);
+  await card.locator('.sambo-topic-link').first().click();
+  const shown=(await page.locator('.judge-prime h2').first().textContent())||'';
+  check('judge module '+(g.index+1)+' opens authored lesson',shown.includes(g.first)&&await page.locator('.judge-prime .jp-part').count()>=2,shown);
+  check('judge module '+(g.index+1)+' has exam questions',g.questions>=g.lessons);
+ }
+ await page.evaluate(()=>openCourse('judge'));
  const openFirst=await page.locator('#lessons details').first().evaluate(e=>e.open);
  check('first module expanded',openFirst);
  const judgeInfo=await page.evaluate(()=>{const g=samboModuleData('judge')[0];return {name:g.title,lessons:g.parts.length,premium:g.premiumFoundations,questions:samboQuizQuestions(g).length,progress:samboModuleProgressIndex('judge',0),sections:samboLessonSections(g).length}});
