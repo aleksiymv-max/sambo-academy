@@ -97,6 +97,7 @@ try {
  await page.evaluate(()=>show('account'));
  await page.evaluate(()=>studentTab('profile'));
  check('logout located in profile',await page.locator('#studentContent').getByText('Выйти из аккаунта').isVisible());
+ check('profile birth date is locked after registration',await page.locator('#profileBirth').isDisabled());
  await page.getByText('Выйти из аккаунта').click();
  await page.waitForFunction(()=>!window.samboCurrentUser,{timeout:10000});
  check('logout returns login',await page.locator('#navLogin').isVisible());
