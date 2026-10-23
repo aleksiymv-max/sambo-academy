@@ -240,6 +240,7 @@ try {
    ['judge-program-admission.js','Медицинская заявка: обязательные реквизиты'],
    ['judge-program-participants.js','Куртка, рукав и пояс: измеряемые параметры'],
    ['judge-program-officials.js','Оператор табло и секундометрист: время и сигналы'],
+   ['judge-program-sanctions.js','Две разные линии предупреждений'],
    ['judge-program-sanctions.js','Результат схватки и две процедуры протеста'],
    ['judge-program-scoring.js','Шаг 5. Одновременные предупреждения'],
    ['judge-program-scoring.js','Бросок начался внутри, закончился снаружи рабочей зоны']
