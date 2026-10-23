@@ -1,0 +1,118 @@
+import { chromium } from 'playwright';
+import { createServer } from 'node:http';
+import fs from 'node:fs';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+
+const root=process.cwd(),port=8765;
+const results=[];
+const check=(name,ok,detail='')=>{results.push({name,ok,detail});console.log((ok?'PASS ':'FAIL ')+name+(detail?' — '+detail:''));if(!ok)process.exitCode=1};
+const contentTypes={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css','.png':'image/png','.jpeg':'image/jpeg','.webp':'image/webp','.svg':'image/svg+xml'};
+const server=createServer((req,res)=>{const pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);const file=path.resolve(root,'.'+pathname.replace(/\/$/,'/index.html'));if(!file.startsWith(root+path.sep)||!fs.existsSync(file)||!fs.statSync(file).isFile()){res.writeHead(404);res.end('Not found');return;}res.writeHead(200,{'Content-Type':contentTypes[path.extname(file)]||'application/octet-stream','Cache-Control':'no-cache'});fs.createReadStream(file).pipe(res);});
+await new Promise(resolve=>server.listen(port,'127.0.0.1',resolve));
+const errors=[];
+let browser;
+try {
+ browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||'/usr/bin/google-chrome',args:['--no-sandbox','--disable-dev-shm-usage']});
+ const context=await browser.newContext({viewport:{width:1365,height:900}});
+ await context.addInitScript(()=>{
+   window.__mock={user:null,cb:null,saved:[],guardian:'pending',saveFails:false};
+ });
+ const page=await context.newPage();
+ page.on('pageerror',e=>errors.push(e.message));
+ const moduleCode=`export function createClient(){
+ const m=window.__mock;
+ const auth={
+   getUser:async()=>({data:{user:m.user},error:null}),
+   onAuthStateChange:(cb)=>{m.cb=cb;return {data:{subscription:{unsubscribe(){}}}}},
+   signInWithPassword:async()=>{m.user={id:'test-adult-1',email:'student@example.test',user_metadata:{date_of_birth:'1995-01-01',account_type:'adult_learner'}};m.cb?.('SIGNED_IN',{user:m.user});return {data:{user:m.user},error:null}},
+   signOut:async()=>{m.user=null;m.cb?.('SIGNED_OUT',null);return {error:null}},
+   signUp:async()=>({data:{user:null},error:null}),
+   resetPasswordForEmail:async()=>({data:{},error:null}),
+   updateUser:async({data})=>{m.user.user_metadata={...m.user.user_metadata,...data};return {data:{user:m.user},error:null}}
+ };
+ const from=(table)=>({
+    select:()=>({eq:async()=>table==='lesson_progress'?{data:m.saved,error:null}:{data:{status:m.guardian},error:null},eq(){return this},maybeSingle:async()=>({data:{status:m.guardian},error:null})}),
+    upsert:async(row)=>m.saveFails?{error:{message:'mock database offline'}}:(m.saved.push(row),{error:null}),
+    insert:async()=>({error:null})
+ });
+ return {auth,from};
+}`;
+ await page.route('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm',route=>route.fulfill({status:200,contentType:'text/javascript',body:moduleCode}));
+ await page.goto('http://127.0.0.1:'+port+'/',{waitUntil:'domcontentloaded'});
+ await page.waitForFunction(()=>!document.querySelector('.nav-actions')?.classList.contains('auth-pending'),{timeout:12000});
+ check('initial landing, no browser errors',!!(await page.locator('h1').first().textContent()),errors.join(' | '));
+ check('logged-out header login/signup visible',await page.locator('#navLogin').isVisible()&&await page.locator('#navSignup').isVisible());
+ await page.evaluate(()=>openCourse('athlete'));
+ const totalAthlete=await page.locator('#lessons .sambo-module-card').count();
+ check('athlete course modules render',totalAthlete>=4,'modules='+totalAthlete);
+ await page.locator('#lessons .sambo-module-card').first().locator('.sambo-topic-link').last().click();
+ const heading=await page.locator('#lessonTitle').textContent();
+ const currentTopic=await page.evaluate(()=>samboModuleData(currentCourse)[currentModule].parts.at(-1).title);
+ check('topic link opens requested individual topic',heading.includes(currentTopic),heading);
+ await page.locator('.logo-home').click();
+ check('brand logo returns home',!(await page.locator('#home').evaluate(e=>e.classList.contains('hidden'))));
+ await page.evaluate(()=>{openCourse('judge');});
+ check('judge modules render',await page.locator('#lessons .sambo-module-card').count()>=5);
+ const openFirst=await page.locator('#lessons details').first().evaluate(e=>e.open);
+ check('first module expanded',openFirst);
+ await page.evaluate(()=>{openCourse('athlete');openLesson(0);samboSectionIndex=samboLessonSections(samboModuleData(currentCourse)[currentModule]).length-1;renderSamboSection();startModuleQuiz();});
+ let n=await page.evaluate(()=>samboActiveQuiz.length);
+ check('module quiz has questions',n>0,'questions='+n);
+ if(n>0&&n<=60){
+  for(let i=0;i<n;i++){
+   const correct=await page.evaluate(()=>samboActiveQuiz[currentQuestion].correct);
+   await page.locator('#answers button.answer').nth(correct).click();
+   await page.locator('#answers button.btn').first().click();
+  }
+  await page.waitForTimeout(150);
+  const saved=await page.evaluate(()=>localStorage.getItem('sambo-demo-athlete-100'));
+  check('guest test stored, completion acknowledged',saved==='done'&&(await page.locator('#feedback').textContent()).includes('сохранён'));
+  await page.reload({waitUntil:'domcontentloaded'});
+  check('guest result retained on reload',await page.evaluate(()=>progressDone('athlete',100)));
+ }
+ await page.locator('#navLogin').click();
+ check('login tab accessible',await page.locator('#account').isVisible()&&await page.locator('#authGuest').isVisible());
+ await page.locator('#authEmail').fill('student@example.test');await page.locator('#authPassword').fill('test-password-123');
+ await page.locator('#authSubmit').click();
+ await page.waitForFunction(()=>!!window.samboCurrentUser,{timeout:10000});
+ check('mock signed-in nav only account',await page.locator('#navAccount').isVisible()&&!(await page.locator('#navSignup').isVisible())&&!(await page.locator('#navLogin').isVisible()));
+ await page.evaluate(()=>studentTab('profile'));
+ check('logout located in profile',await page.locator('#studentContent').getByText('Выйти из аккаунта').isVisible());
+ await page.getByText('Выйти из аккаунта').click();
+ await page.waitForFunction(()=>!window.samboCurrentUser,{timeout:10000});
+ check('logout returns login',await page.locator('#navLogin').isVisible());
+ await page.evaluate(()=>{window.__mock.guardian='pending';authLoggedIn({id:'test-child-1',email:'minor@example.test',user_metadata:{account_type:'child_learner',date_of_birth:'2015-04-04'}})});
+ await page.waitForFunction(()=>window.samboGuardianStatus==='pending',{timeout:10000});
+ await page.evaluate(()=>openCourse('athlete'));
+ check('pending minor blocked from course',await page.locator('#account').isVisible()&&!(await page.locator('#course').isVisible()));
+ await page.setViewportSize({width:390,height:844});
+ await page.evaluate(()=>authLoggedIn(null));
+ await page.goto('http://127.0.0.1:'+port+'/',{waitUntil:'domcontentloaded'});
+ await page.waitForTimeout(600);
+ let width=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,viewport:innerWidth}));
+ check('mobile home no horizontal overflow',width.scroll<=width.viewport+3,JSON.stringify(width));
+ const menu=page.locator('.mobile-navigation summary');
+ check('mobile menu visible',await menu.isVisible());
+ await page.evaluate(()=>openCourse('judge'));
+ width=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,viewport:innerWidth}));
+ check('mobile course no horizontal overflow',width.scroll<=width.viewport+3,JSON.stringify(width));
+ await page.evaluate(()=>openLesson(0));
+ width=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,viewport:innerWidth}));
+ check('mobile lesson no horizontal overflow',width.scroll<=width.viewport+3,JSON.stringify(width));
+ check('no uncaught JS errors',errors.length===0,errors.slice(0,5).join(' | '));
+ // The published URL is inspected separately from the checkout, without using test credentials.
+ try {
+   const response=await page.request.get('https://sambo-academy.pages.dev/',{timeout:12000,failOnStatusCode:false});
+   const liveHtml=await response.text();
+   check('Cloudflare Pages responds',response.ok()&&liveHtml.includes('САМБО'),response.status().toString());
+   if(response.ok()) {
+     check('Cloudflare Pages has latest topic routing',liveHtml.includes('sections.findIndex(x=>x.topicIndex===topicIndex)'), 'code-marker in published HTML');
+     const pr=await page.request.get('https://sambo-academy.pages.dev/progress.js',{timeout:12000,failOnStatusCode:false});
+     const liveProgress=await pr.text();
+     check('Cloudflare Pages has latest progress saving',pr.ok()&&liveProgress.includes('return true;'),pr.status().toString());
+   }
+ }catch(e){check('Cloudflare Pages reachable from CI',false,String(e).slice(0,220));}
+} catch(e) {check('smoke test execution',false,e.stack||String(e));} finally {if(browser)await browser.close();await new Promise(resolve=>server.close(resolve));}
+console.log('\nSUMMARY '+results.filter(x=>x.ok).length+'/'+results.length+' passed');
+if(process.exitCode)process.exit(process.exitCode);
