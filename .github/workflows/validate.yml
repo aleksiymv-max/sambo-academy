@@ -97,6 +97,28 @@ jobs:
             for(const q of lesson.checks)if(!Array.isArray(q[1])||q[2]<0||q[2]>=q[1].length)throw new Error('Bad answer mapping: '+lesson.title);
            }
           }
+          // Execute the bridge, not just parse it: otherwise valid files may still fail to appear in the course.
+          const oldGroups=Array.from({length:10},(_,i)=>({title:'Legacy '+i,parts:[{title:'Legacy lesson'}]}));
+          oldGroups[0]={title:'Foundation',parts:Array.from({length:6},(_,i)=>({title:'Foundation '+i})),progressIndex:1100};
+          const integration={window:sandbox.window,
+            samboModuleData:key=>key==='judge'?oldGroups.map(g=>({...g})):[],
+            samboQuizQuestions:()=>[],
+            samboLessonSections:()=>[]
+          };
+          vm.createContext(integration);
+          vm.runInContext(fs.readFileSync('judge-program-bridge.js','utf8'),integration);
+          const allGroups=integration.samboModuleData('judge');
+          if(allGroups.length!==12)throw new Error('Expected 12 visible judge modules; got '+allGroups.length);
+          for(let i=0;i<modules.length;i++){
+            const group=allGroups[i+1],module=modules[i];
+            if(group.title!==module.title||group.parts.length!==module.lessons.length)throw new Error('Bridge lost lessons: '+module.title);
+            if(group.progressIndex!==1101+i)throw new Error('Progress key collision: '+module.title);
+            if(integration.samboQuizQuestions(group).length!==module.questions.length)throw new Error('Exam not routed: '+module.title);
+            const sections=integration.samboLessonSections(group);
+            if(sections.length!==module.lessons.length+2||!sections.at(-1).quiz)throw new Error('Lesson/exam sections not routed: '+module.title);
+            if(!sections[1].html.includes('СУДЕЙСКАЯ СИТУАЦИЯ'))throw new Error('Case study not rendered: '+module.title);
+          }
+          console.log('PASS: 12 visible judge modules, bridge routing, 53 authored lessons, independent progress keys');
           console.log('PASS: '+(lessons+6)+' full judge lessons across '+(modules.length+1)+' modules, JS parsing and question integrity');
           console.log('PASS: '+scripts.length+' inline scripts, course navigation, result saving and guardian checks');
           NODE
