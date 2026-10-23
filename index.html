@@ -1190,8 +1190,9 @@ function openLesson(i){
 function renderSamboSection(){
  const group=samboModuleData(currentCourse)[currentModule];if(!group)return;
  const sections=samboLessonSections(group),section=sections[samboSectionIndex];
- document.getElementById('lessonTitle').textContent=group.title+' — '+(section.topicIndex===undefined?'Материалы модуля':section.title);
- const nav='<nav class="sambo-section-nav" aria-label="Навигация по уроку"><div class="sambo-section-meta">Раздел '+(samboSectionIndex+1)+' из '+sections.length+'</div><div class="sambo-section-progress" role="progressbar" aria-valuemin="0" aria-valuemax="'+sections.length+'" aria-valuenow="'+(samboSectionIndex+1)+'"><span style="width:'+Math.round((samboSectionIndex+1)/sections.length*100)+'%"></span></div><h2>'+samboEsc(section.title)+'</h2></nav>';
+ document.getElementById('lessonTitle').textContent=group.premiumFoundations?'Школа судей · '+section.title:group.title+' — '+(section.topicIndex===undefined?'Материалы модуля':section.title);
+ const sectionPosition=group.premiumFoundations?(section.quiz?'Итоговый тест':section.topicIndex===undefined?'Обзор модуля':'Урок '+(section.topicIndex+1)+' из '+group.parts.length):'Раздел '+(samboSectionIndex+1)+' из '+sections.length;
+ const nav='<nav class="sambo-section-nav" aria-label="Навигация по уроку"><div class="sambo-section-meta">'+sectionPosition+'</div><div class="sambo-section-progress" role="progressbar" aria-valuemin="0" aria-valuemax="'+sections.length+'" aria-valuenow="'+(samboSectionIndex+1)+'"><span style="width:'+Math.round((samboSectionIndex+1)/sections.length*100)+'%"></span></div><h2>'+samboEsc(section.title)+'</h2></nav>';
  document.getElementById('lessonBody').innerHTML=nav+section.html+(group.premiumFoundations?'':samboCitedArticlePanel(section.html))+'<div class="sambo-section-actions">'+(samboSectionIndex>0?'<button class="btn outline" onclick="samboGoSection(-1)">← Предыдущий раздел</button>':'<button class="btn outline" onclick="openCourse(currentCourse)">← К курсу</button>')+(section.quiz?'':'<button class="btn" onclick="samboGoSection(1)">Следующий раздел →</button>')+'</div>';
  const quiz=document.querySelector('#lesson .quiz');quiz.style.display=section.quiz?'':'none';
  document.getElementById('feedback').textContent='';
