@@ -222,6 +222,26 @@ try {
   check('LIVE new judge course shown',(await judgeFirst.textContent()).includes('Нормативная основа и способы проведения'));
   await judgeFirst.locator('.sambo-topic-link').first().click();
   check('LIVE detailed judge lesson has ordered sections',await livePage.locator('.judge-prime .jp-part').count()>=4);
+  // Verify the published Cloudflare version, not just the checked-out source.
+  // Earlier smoke coverage exercised the expanded modules only on localhost.
+  await livePage.evaluate(()=>openCourse('judge'));
+  const liveModules=await livePage.evaluate(()=>samboModuleData('judge').map((g,i)=>({
+   index:i,title:g.title,first:g.parts[0]?.title,questions:samboQuizQuestions(g).length,
+   progress:samboModuleProgressIndex('judge',i)
+  })));
+  check('LIVE all twelve judge modules deployed',liveModules.length===12,'modules='+liveModules.length);
+  check('LIVE all judge modules have nonempty exams',liveModules.every(g=>g.questions>0));
+  check('LIVE judge progress IDs are unique',new Set(liveModules.map(g=>g.progress)).size===liveModules.length);
+  for(const i of [1,6,11]){
+   if(!liveModules[i])continue;
+   await livePage.evaluate(()=>openCourse('judge'));
+   const card=livePage.locator('#lessons .sambo-module-card').nth(i);
+   await card.locator('summary').click();
+   await card.locator('.sambo-topic-link').first().click();
+   const heading=await livePage.locator('.judge-prime h2').first().textContent();
+   check('LIVE module '+(i+1)+' opens its authored lesson',heading.includes(liveModules[i].first)&&await livePage.locator('.judge-prime .jp-part').count()>=2,heading);
+  }
+
   check('LIVE judge typography stylesheet loaded',(await livePage.locator('.judge-prime').evaluate(el=>getComputedStyle(el).borderRadius))!=='0px');
   check('LIVE browser no uncaught errors',liveErrors.length===0,liveErrors.slice(0,4).join(' | '));
   await livePage.setViewportSize({width:390,height:844});
