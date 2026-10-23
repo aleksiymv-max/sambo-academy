@@ -101,6 +101,14 @@ try {
  await page.getByText('Выйти из аккаунта').click();
  await page.waitForFunction(()=>!window.samboCurrentUser,{timeout:10000});
  check('logout returns login',await page.locator('#navLogin').isVisible());
+ await page.evaluate(()=>{show('account');authMode('signup')});
+ await page.locator('#authBirth').fill('2015-01-01');
+ await page.locator('#authBirth').dispatchEvent('change');
+ check('signup form requires parent information for a minor',await page.locator('#guardianName').evaluate(e=>e.required));
+ await page.locator('#authBirth').fill('1990-01-01');
+ await page.locator('#authBirth').dispatchEvent('change');
+ check('adult signup hides parental requirements',!(await page.locator('#guardianName').evaluate(e=>e.required)));
+
  await page.evaluate(()=>{window.__mock.guardian='pending';authLoggedIn({id:'test-child-1',email:'minor@example.test',user_metadata:{account_type:'child_learner',date_of_birth:'2015-04-04'}})});
  await page.waitForFunction(()=>window.samboGuardianStatus==='pending',{timeout:10000});
  await page.evaluate(()=>openCourse('athlete'));
