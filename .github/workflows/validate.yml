@@ -57,5 +57,12 @@ jobs:
           const progress = fs.readFileSync('progress.js','utf8');
           new vm.Script(progress, {filename:'progress.js'});
           if (!progress.includes('return true;') || !progress.includes('return false;')) throw new Error('Progress storage must return a success state');
+          const judgeSource = fs.readFileSync('judge-foundations.js','utf8');
+          new vm.Script(judgeSource, {filename:'judge-foundations.js'});
+          const foundationTerms=['Нормативная основа: как судья','Положение о соревнованиях: что проверить','Характер соревнований: личный','Группы, подгруппы и жеребьёвка','Пять способов проведения','Судейский практикум: от Положения'];
+          for (const term of foundationTerms) if(!judgeSource.includes(term)) throw new Error('Missing judge module lesson: '+term);
+          if(!html.includes('group.premiumFoundations')) throw new Error('Premium judge lesson routing missing');
+          if(!html.includes('samboModuleProgressIndex(')) throw new Error('Versioned module progress missing');
+          if(!html.includes('judge-foundations.css') || !html.includes('judge-foundations.js')) throw new Error('Judge assets missing');
           console.log('PASS: '+scripts.length+' inline scripts, course navigation, result saving and guardian checks');
           NODE
