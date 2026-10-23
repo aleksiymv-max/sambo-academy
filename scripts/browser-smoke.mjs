@@ -238,7 +238,9 @@ try {
   // Detect stale deployments of the actual normative lesson content, not just module registration.
   for(const [asset,marker] of [
    ['judge-program-admission.js','Медицинская заявка: обязательные реквизиты'],
-   ['judge-program-participants.js','Куртка, рукав и пояс: измеряемые параметры']
+   ['judge-program-participants.js','Куртка, рукав и пояс: измеряемые параметры'],
+   ['judge-program-officials.js','Оператор табло и секундометрист: время и сигналы'],
+   ['judge-program-sanctions.js','Результат схватки и две процедуры протеста']
   ]){
    const response=await livePage.request.get('https://sambo-academy.pages.dev/'+asset,{timeout:12000,failOnStatusCode:false});
    const body=await response.text();
