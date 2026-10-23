@@ -137,6 +137,8 @@ try {
   await livePage.goto('https://sambo-academy.pages.dev/',{waitUntil:'domcontentloaded',timeout:20000});
   await livePage.waitForFunction(()=>!document.querySelector('.nav-actions')?.classList.contains('auth-pending'),{timeout:25000});
   check('LIVE browser opens public site',await livePage.locator('h1').first().textContent()==='САМБО');
+  check('LIVE course prices marked planned',(await livePage.locator('.course.athlete .price').textContent()).includes('Планируемая стоимость'));
+
   check('LIVE real Supabase SDK starts',!(await livePage.locator('#authSubmit').isDisabled()));
   await livePage.evaluate(()=>openCourse('athlete'));
   check('LIVE athlete modules clickable',await livePage.locator('#lessons details').count()>=4);
