@@ -10,7 +10,7 @@ samboModuleData=function(key){
  if(key==='judge')engine.modules.forEach((m,i)=>{
   const g=groups[i+1]||{title:m.title,parts:[]};
   groups[i+1]={...g,title:m.title,premiumFoundations:true,premiumCourse:true,
-  moduleIndex:i,progressIndex:1101+i,
+  moduleIndex:i,progressIndex:1201+i,
   parts:m.lessons.map((l,j)=>({title:l.title,sourceIndex:-1,order:j}))};
  });
  return groups;
