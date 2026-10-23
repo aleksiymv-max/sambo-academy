@@ -82,6 +82,22 @@ try {
   check('new judge exam persists versioned completion',await page.evaluate(()=>localStorage.getItem('sambo-demo-judge-1100')==='done'));
   await page.reload({waitUntil:'domcontentloaded'});
   check('new judge completion survives reload',await page.evaluate(()=>progressDone('judge',1100)));
+  await page.evaluate(()=>{openCourse('judge');openLesson(0);samboSectionIndex=samboLessonSections(samboModuleData(currentCourse)[0]).length-1;renderSamboSection();startModuleQuiz();});
+  for(let j=0;j<24;j++){
+   const correct=await page.evaluate(()=>samboActiveQuiz[currentQuestion].correct);
+   await page.locator('#answers button.answer').nth(j<20?correct:(correct+1)%4).click();
+   await page.locator('#answers button.btn').first().click();
+  }
+  check('20 of 24 is below 85 percent pass mark',(await page.locator('#feedback').textContent()).includes('21 правильных'));
+  await page.evaluate(()=>startModuleQuiz());
+  for(let j=0;j<24;j++){
+   const correct=await page.evaluate(()=>samboActiveQuiz[currentQuestion].correct);
+   await page.locator('#answers button.answer').nth(j<21?correct:(correct+1)%4).click();
+   await page.locator('#answers button.btn').first().click();
+  }
+  await page.waitForTimeout(150);
+  check('21 of 24 reaches 85 percent pass mark',(await page.locator('#feedback').textContent()).includes('Модуль пройден'));
+  check('successful judge exam still provides mistake review',await page.locator('.sambo-quiz-review .sambo-lesson-intro').count()===3);
  }
 
  await page.evaluate(()=>localStorage.removeItem('sambo-demo-judge-100'));
