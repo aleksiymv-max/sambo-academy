@@ -69,6 +69,21 @@ try {
  check('judge last lesson is integrated practical exercise',(await page.locator('.judge-prime h2').textContent()).includes('практикум'));
  await page.evaluate(()=>{localStorage.setItem('sambo-demo-judge-100','done');openCourse('judge')});
  check('old judge module completion is not falsely credited',(await page.locator('#lessons .sambo-module-card').first().locator('.sambo-module-state').textContent()).includes('Раскрыть'));
+ await page.evaluate(()=>{openLesson(0);samboSectionIndex=samboLessonSections(samboModuleData(currentCourse)[0]).length-1;renderSamboSection();startModuleQuiz();});
+ const judgeQuizLength=await page.evaluate(()=>samboActiveQuiz.length);
+ check('judge final exam creates all 24 questions',judgeQuizLength===24);
+ if(judgeQuizLength===24){
+  for(let j=0;j<judgeQuizLength;j++){
+   const correct=await page.evaluate(()=>samboActiveQuiz[currentQuestion].correct);
+   await page.locator('#answers button.answer').nth(correct).click();
+   await page.locator('#answers button.btn').first().click();
+  }
+  await page.waitForTimeout(200);
+  check('new judge exam persists versioned completion',await page.evaluate(()=>localStorage.getItem('sambo-demo-judge-1100')==='done'));
+  await page.reload({waitUntil:'domcontentloaded'});
+  check('new judge completion survives reload',await page.evaluate(()=>progressDone('judge',1100)));
+ }
+
  await page.evaluate(()=>localStorage.removeItem('sambo-demo-judge-100'));
  await page.evaluate(()=>{openCourse('athlete');openLesson(0);samboSectionIndex=samboLessonSections(samboModuleData(currentCourse)[currentModule]).length-1;renderSamboSection();startModuleQuiz();});
  let n=await page.evaluate(()=>samboActiveQuiz.length);
@@ -173,6 +188,7 @@ try {
   check('LIVE new judge course shown',(await judgeFirst.textContent()).includes('Нормативная основа и способы проведения'));
   await judgeFirst.locator('.sambo-topic-link').first().click();
   check('LIVE detailed judge lesson has ordered sections',await livePage.locator('.judge-prime .jp-part').count()>=4);
+  check('LIVE judge typography stylesheet loaded',(await livePage.locator('.judge-prime').evaluate(el=>getComputedStyle(el).borderRadius))!=='0px');
   check('LIVE browser no uncaught errors',liveErrors.length===0,liveErrors.slice(0,4).join(' | '));
   await livePage.setViewportSize({width:390,height:844});
   check('LIVE mobile lesson within viewport',await livePage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+3));
