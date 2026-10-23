@@ -77,6 +77,7 @@ jobs:
             'judge-program-beach.js',
             'judge-program-demo.js',
             'judge-program-practicum.js',
+            'judge-exam-independent.js',
             'judge-program-bridge.js'
           ];
           const sandbox={window:{}};vm.createContext(sandbox);
