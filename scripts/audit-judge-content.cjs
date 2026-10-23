@@ -10,7 +10,8 @@ const names=[
  'judge-program-scoring.js','judge-program-sanctions.js',
  'judge-program-infrastructure.js','judge-program-combat.js',
  'judge-program-beach.js','judge-program-demo.js',
- 'judge-program-practicum.js'
+ 'judge-program-practicum.js',
+ 'judge-exam-independent.js'
 ];
 const context={window:{}};vm.createContext(context);
 for(const file of ['judge-course-engine.js',...names]){
