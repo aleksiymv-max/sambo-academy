@@ -22,6 +22,7 @@ revoke all on public.guardian_applications from anon, authenticated;
 grant select, insert on public.guardian_applications to authenticated;
 drop policy if exists "Guardian reads own application" on public.guardian_applications;
 create policy "Guardian reads own application" on public.guardian_applications for select to authenticated using (user_id=(select auth.uid()));
+drop policy if exists "Guardian creates own application" on public.guardian_applications;
 drop policy if exists "Guardian creates own pending application" on public.guardian_applications;
 create policy "Guardian creates own pending application" on public.guardian_applications for insert to authenticated with check (user_id=(select auth.uid()) and status='pending' and reviewed_at is null and reviewer_note is null);
 -- Не выдаём UPDATE/DELETE пользователям: они не могут одобрить собственную заявку.
@@ -34,6 +35,7 @@ create policy "Guardian creates own pending application" on public.guardian_appl
 -- процедура верификации и юридические документы требуют отдельного утверждения.
 
 -- Upgrade previously created application tables to match the browser form.
+alter table public.guardian_applications alter column status set default 'pending';
 alter table public.guardian_applications add column if not exists declaration_text text;
 alter table public.guardian_applications add column if not exists consent_version text;
 alter table public.guardian_applications add column if not exists consent_at timestamptz;
