@@ -119,7 +119,7 @@ jobs:
             if(sections.length!==module.lessons.length+2||!sections.at(-1).quiz)throw new Error('Lesson/exam sections not routed: '+module.title);
             if(!sections[1].html.includes('СУДЕЙСКАЯ СИТУАЦИЯ'))throw new Error('Case study not rendered: '+module.title);
           }
-          console.log('PASS: 12 visible judge modules, bridge routing, 53 authored lessons, independent progress keys');
+          console.log('PASS: 12 visible judge modules, bridge routing, '+lessons+' authored expanded lessons, independent progress keys');
           console.log('PASS: '+(lessons+6)+' full judge lessons across '+(modules.length+1)+' modules, JS parsing and question integrity');
           console.log('PASS: '+scripts.length+' inline scripts, course navigation, result saving and guardian checks');
           NODE
