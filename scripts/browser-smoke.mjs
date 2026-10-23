@@ -235,6 +235,16 @@ try {
   check('LIVE revised judge modules have eight independent exam questions',liveModules.slice(1).every(g=>g.questions===8));
    check('LIVE independent exam bank and new result keys deployed',await livePage.evaluate(()=>window.samboJudgeIndependentExamLoaded===true)&&liveModules.slice(1).every((g,i)=>g.progress===1201+i));
   check('LIVE judge progress IDs are unique',new Set(liveModules.map(g=>g.progress)).size===liveModules.length);
+  // Detect stale deployments of the actual normative lesson content, not just module registration.
+  for(const [asset,marker] of [
+   ['judge-program-admission.js','Медицинская заявка: обязательные реквизиты'],
+   ['judge-program-participants.js','Куртка, рукав и пояс: измеряемые параметры']
+  ]){
+   const response=await livePage.request.get('https://sambo-academy.pages.dev/'+asset,{timeout:12000,failOnStatusCode:false});
+   const body=await response.text();
+   check('LIVE normative lesson asset '+asset+' matches current revision',response.ok()&&body.includes(marker),String(response.status()));
+  }
+
   for(const i of [1,6,11]){
    if(!liveModules[i])continue;
    await livePage.evaluate(()=>openCourse('judge'));
