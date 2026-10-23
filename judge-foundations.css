@@ -1,0 +1,31 @@
+/* Первый редакционно выверенный судейский модуль. */
+.judge-prime{max-width:920px;margin:0 auto 24px;background:#fff;border:1px solid #e0e8f6;border-radius:20px;padding:clamp(20px,4vw,42px);box-shadow:0 12px 35px rgba(7,30,80,.06);line-height:1.7;color:#183258}
+.judge-prime h2{font-size:clamp(23px,3.5vw,34px);line-height:1.22;letter-spacing:-.5px;color:#071e50;margin:8px 0 21px}
+.judge-prime h3{font-size:clamp(19px,2.2vw,23px);line-height:1.32;color:#092a70;margin:0 0 11px}
+.judge-prime p{margin:9px 0 16px}
+.jp-kicker{font-size:12px;font-weight:800;letter-spacing:.09em;color:#d60a25;text-transform:uppercase}
+.jp-lead{font-size:18px;line-height:1.65;color:#345271}
+.jp-goal,.jp-panel{background:#f0f5fe;border-left:4px solid #1365dd;border-radius:0 10px 10px 0;padding:17px 20px;margin:21px 0;font-size:16px}
+.jp-goal p{margin-bottom:0}
+.jp-part{padding:22px 0 20px;border-top:1px solid #e6edf7}
+.jp-part:first-of-type{border-top:0}
+.jp-case{margin-top:20px;border:1px solid #bdceed;border-radius:15px;background:#f5f9ff;padding:22px}
+.jp-case h3{margin:9px 0 14px}
+.jp-case p:last-child{margin-bottom:0}
+.jp-case p{line-height:1.7}
+.jp-mistake{border-left:4px solid #bf5d24;background:#fff8f0;padding:15px 19px;margin:18px 0;border-radius:0 10px 10px 0}
+.jp-summary{border-left:4px solid #147c67;background:#edf9f5;padding:15px 19px;margin:18px 0;border-radius:0 10px 10px 0}
+.jp-self{margin-top:27px;border-top:2px solid #e8eef8;padding-top:20px}
+.jp-self>p{color:#53708e;font-size:15px}
+.jp-question{border:1px solid #dce7f7;border-radius:10px;margin:10px 0;overflow:hidden}
+.jp-question>summary{cursor:pointer;padding:15px 17px;display:flex;align-items:center;gap:12px;font-weight:650;list-style:none;line-height:1.5}
+.jp-question>summary::-webkit-details-marker{display:none}
+.jp-question>summary span{display:inline-grid;flex:0 0 29px;height:29px;place-items:center;border-radius:50%;background:#e9efff;color:#1358c7;font-weight:bold}
+.jp-question[open]>summary{background:#f1f6fe}
+.jp-answer{padding:14px 18px;border-top:1px solid #dce7f7}
+.jp-answer p{margin-bottom:0}
+.jp-source{font-size:13px;color:#6a809b;border-top:1px solid #e7eef8;padding-top:20px;margin-top:30px}
+.jp-flow{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin:22px 0}
+.jp-flow span{background:#edf3fd;padding:10px 12px;border-radius:9px;font-size:14px;font-weight:750;color:#09387e}
+.jp-flow b{color:#ca0f2c}
+@media(max-width:600px){.judge-prime{padding:18px;border-radius:15px}.jp-lead{font-size:16px}.jp-case{padding:16px}.jp-flow{gap:5px}.jp-flow span{padding:8px 9px;font-size:12px}.jp-goal,.jp-panel{padding:13px 14px}}
