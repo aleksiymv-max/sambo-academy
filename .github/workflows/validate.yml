@@ -48,5 +48,14 @@ jobs:
           for (const token of ['Чистый бросок','4 балла','2 балла','1 балл','Без оценки']) {
             if (!html.includes(token)) throw new Error('Missing scoring category: '+token);
           }
-          console.log('PASS: '+scripts.length+' scripts parsed and '+required.length+' core features found');
+          if (!html.includes('topicIndex:topic')) throw new Error('Missing per-topic navigation markers');
+          if (!html.includes('sections.findIndex(x=>x.topicIndex===topicIndex)')) throw new Error('Topic navigation must select the requested lesson');
+          if (html.includes("Math.floor(topicIndex/3)")) throw new Error('Incorrect grouped topic navigation remains');
+          if (!html.includes("Promise.resolve(saveSamboProgress(")) throw new Error('Result must wait for cloud save');
+          if (!html.includes("status:'pending'")) throw new Error('Guardian application must begin pending');
+          if (!html.includes("['guardian_pending','child_learner'].includes(")) throw new Error('Minor account access must depend on approval');
+          const progress = fs.readFileSync('progress.js','utf8');
+          new vm.Script(progress, {filename:'progress.js'});
+          if (!progress.includes('return true;') || !progress.includes('return false;')) throw new Error('Progress storage must return a success state');
+          console.log('PASS: '+scripts.length+' inline scripts, course navigation, result saving and guardian checks');
           NODE
