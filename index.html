@@ -1141,7 +1141,7 @@ function samboLessonSections(group){
   const pages=[{title:'Маршрут модуля',html:premium.intro()}];
   premium.lessons.forEach((lesson,i)=>pages.push({title:lesson.title,topicIndex:i,html:premium.render(lesson,i)}));
   pages.push({title:'Итоговая проверка знаний',quiz:true,
-    html:'<div class="jp-panel"><strong>Итоговый тест: '+premium.questions.length+' вопросов</strong><p>Здесь собраны нормативные вопросы из всех шести уроков. После ответа вы получите объяснение. Для завершения текущей программы теста требуется правильно ответить на все вопросы; при ошибках доступен повторный проход.</p></div>'});
+    html:'<div class="jp-panel"><strong>Итоговый тест: '+premium.questions.length+' вопросов</strong><p>Здесь собраны нормативные вопросы из всех шести уроков. После ответа вы получите объяснение. Для зачёта нужно набрать не менее 85% правильных ответов. После теста вы увидите разбор ошибок и при необходимости сможете пройти его повторно.</p></div>'});
   return pages;
  }
  const sections=[{title:'Введение',html:samboLessonObjective(group)+samboDiagram(group.title,group.parts)}];
@@ -1236,15 +1236,18 @@ function samboRetrySave(){
  }).catch(()=>{if(btn)btn.disabled=false;});
 }
 function finishModuleQuiz(){
- const count=samboActiveQuiz.length,pass=count>0&&moduleCorrect===count;
+ const count=samboActiveQuiz.length;
+ const premiumJudge=currentCourse==='judge'&&!!samboModuleData(currentCourse)[currentModule]?.premiumFoundations;
+ const required=premiumJudge?Math.ceil(count*.85):count;
+ const pass=count>0&&moduleCorrect>=required;
  document.getElementById('question').textContent='Результат: '+moduleCorrect+' из '+count;
- document.getElementById('feedback').textContent=pass?'Все ответы верны. Сохранение будет проверено отдельно.':'В этом тесте необходимо ответить правильно на все вопросы. Изучите ошибки ниже и повторите попытку.';
- if(!pass&&samboQuizMistakes.length){
+ document.getElementById('feedback').textContent=pass?'Порог прохождения достигнут ('+moduleCorrect+' из '+count+'). Сохранение проверяется отдельно.':'Для зачёта необходимо '+required+' правильных ответов из '+count+'. Изучите разбор ошибок и повторите тест.';
+ if(samboQuizMistakes.length){
   document.getElementById('answers').innerHTML='<div class="sambo-quiz-review"><h3>Разбор ошибок ('+samboQuizMistakes.length+')</h3>'+samboQuizMistakes.map((x,i)=>'<div class="sambo-lesson-intro"><strong>'+(i+1)+'. '+samboEsc(x.q)+'</strong><p><b>Верный ответ:</b> '+samboEsc(x.expected)+'</p><p>'+samboEsc(x.why)+'</p></div>').join('')+'</div>';
  }
  document.getElementById('answers').insertAdjacentHTML('beforeend','<button class="btn" '+(pass?'disabled ':'')+'onclick="'+(pass?'openCourse(currentCourse)':'startModuleQuiz()')+'">'+(pass?'К списку модулей':'Повторить тест')+'</button>');
  if(pass&&typeof saveSamboProgress==='function'){
-  document.getElementById('feedback').textContent='Ответы верны. Сохраняем результат…';
+  document.getElementById('feedback').textContent='Тест успешно пройден. Сохраняем результат…';
   Promise.resolve(saveSamboProgress(currentCourse,samboModuleProgressIndex(currentCourse,currentModule))).then(saved=>{
    document.getElementById('feedback').textContent=saved?(window.samboProgress?.userId?'Модуль пройден! Результат сохранён в вашем аккаунте.':'Модуль пройден! Результат сохранён только в этом браузере. Для облачной синхронизации войдите в аккаунт.'):'Ответы верны, но результат пока не сохранён. Попробуйте сохранить его повторно.';
    const backButton=document.querySelector('#answers button[onclick="openCourse(currentCourse)"]');if(backButton)backButton.disabled=false;
