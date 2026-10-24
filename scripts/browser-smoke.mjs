@@ -254,6 +254,7 @@ try {
    ['judge-program-scoring.js','Критерий для досрочного преимущества — разница счёта'],
    ['judge-program-scoring.js','Исключение: полный отрыв с вращением'],
    ['judge-program-scoring.js','Бросок начался внутри, закончился снаружи рабочей зоны'],
+   ['judge-program-scoring.js','Положение лёжа: рабочая зона и зона безопасности'],
    ['judge-program-bout.js','Разъяснения ВФС к изменениям с 1 сентября 2026 года вводят оценку «Активность»'],
    ['judge-program-bout.js','Статья 29(4–5) различает момент совершения действия и момент судейского жеста'],
    ['judge-program-bout.js','Второе удержание после неполного'],
@@ -320,7 +321,8 @@ try {
    [0,'Досрочная чистая победа: пять оснований'],
    [1,'Оценка броска: матрица без и с падением'],
    [2,'Удержания и общая сумма оценок'],
-   [3,'Как определить победителя после времени']
+   [3,'Как определить победителя после времени'],
+   [4,'Граница ковра и оцениваемые действия']
   ]){
    await livePage.evaluate(()=>openCourse('judge'));
    const scoringCard=livePage.locator('#lessons .sambo-module-card').nth(5);
@@ -330,7 +332,7 @@ try {
    const blocks=await livePage.locator('.judge-prime .jp-part').count();
    const checks=await livePage.locator('.judge-prime .jp-question').count();
    check('LIVE scoring lesson '+(lessonIndex+1)+' revised editorial depth',
-    heading.includes(headingText)&&blocks>=(lessonIndex===3?11:9)&&checks===(lessonIndex===3?7:5),
+    heading.includes(headingText)&&blocks>=(lessonIndex===3?11:lessonIndex===4?10:9)&&checks===(lessonIndex===3||lessonIndex===4?7:5),
     'blocks='+blocks+' checks='+checks);
   }
 
