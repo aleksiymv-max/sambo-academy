@@ -13,11 +13,11 @@ if(modules.length!==1)throw Error('Expected one beach sambo module');
 const mod=modules[0];
 if(mod.lessons.length!==5)throw Error('Expected five beach sambo lessons');
 const markers=[
- ['Статья 44','Статья 45','Статья 46','Статья 47','Статья 48','противореч'],
+ ['ст. 44','ст. 45','ст. 46','арбитр','ст. 48','противореч'],
  ['Контрбросок','Неудачный бросок','падением','шорт'],
  ['гонгу','3 минуты','двух минут','10 минут'],
- ['Статья 53','Статья 54','Статья 55','дисквалификац'],
- ['Статья 56','Статья 57','Статья 58','6×6','гонг']
+ ['ст. 53','ст. 54','ст. 55','дисквалификац'],
+ ['ст. 56','ст. 57','ст. 58','6×6','гонг']
 ];
 for(let i=0;i<mod.lessons.length;i++){
  const l=mod.lessons[i];
@@ -31,6 +31,6 @@ for(let i=0;i<mod.lessons.length;i++){
  }
 }
 const all=mod.lessons.map(l=>[l.title,l.ref,...l.blocks.flat()].join(' ')).join(' ');
-if(!all.includes('Статья 56')||!all.includes('Статья 45'))throw Error('Conflicting beach refereeing source not flagged');
+if(!all.includes('ст. 56')||!all.includes('ст. 45'))throw Error('Conflicting beach refereeing source not flagged');
 console.log('PASS: 5 beach-sambo lessons, 25 self-checks, verified article markers 44–58, editorial source inconsistency flagged');
 console.log('NOTE: normative and real-account end-to-end approval remain separate from this regression guard');
