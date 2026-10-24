@@ -244,6 +244,7 @@ try {
    ['judge-program-sanctions.js','Результат схватки и две процедуры протеста'],
    ['judge-program-scoring.js','Шаг 5. Одновременные предупреждения'],
    ['judge-program-scoring.js','Бросок начался внутри, закончился снаружи рабочей зоны'],
+   ['judge-program-beach.js','Статья 56 упоминает «большинство из трех»'],
    ['judge-program-demo.js','Это внутреннее расхождение текста источника']
   ]){
    const response=await livePage.request.get('https://sambo-academy.pages.dev/'+asset,{timeout:12000,failOnStatusCode:false});
@@ -251,7 +252,7 @@ try {
    check('LIVE normative lesson asset '+asset+' matches current revision',response.ok()&&body.includes(marker),String(response.status()));
   }
 
-  for(const i of [1,6,11]){
+  for(const i of [1,6,9,11]){
    if(!liveModules[i])continue;
    await livePage.evaluate(()=>openCourse('judge'));
    const card=livePage.locator('#lessons .sambo-module-card').nth(i);
