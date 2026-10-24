@@ -177,3 +177,6 @@ jobs:
 
       - name: Check boundary decisions and scoring under articles 28, 35, 36 and 37
         run: node scripts/check-scoring-boundary-36-normative.cjs
+
+      - name: Check admission ages and documentary workflow
+        run: node scripts/check-admission-ages-workflow-2026.cjs
