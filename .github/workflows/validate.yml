@@ -189,3 +189,6 @@ jobs:
 
       - name: Check article 8 weighing, medical gate and signed protocol
         run: node scripts/check-admission-weighing-article8.cjs
+
+      - name: Check athlete duties under article 9 and preserve participant exam
+        run: node scripts/check-participants-duties-article9.cjs
