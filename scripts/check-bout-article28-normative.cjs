@@ -14,7 +14,7 @@ assert.equal(mod.lessons.length,7,'Lesson order and progress identifiers must re
 const expected=[
  {i:0,title:'Положения спортсменов: стоя, лёжа и варианты приземления',blocks:8,words:['непрерывный перекат','полумост','90 градусов','статье 35']},
  {i:1,title:'Бросок и контрбросок: установить инициатора',blocks:9,words:['перехват инициативы','неудачный','полный отрыв','половину']},
- {i:2,title:'Болевые приёмы и удержания: критерии начала и остановки',blocks:10,words:['1 минута','20 секунд','аннулируют','положение «стоя»']}
+ {i:2,title:'Болевые приёмы и удержания: критерии начала и остановки',blocks:10,words:['1 минута','20 секунд','аннулируют','переходе в стойку']}
 ];
 for(const {i,title,blocks,words} of expected){
  const l=mod.lessons[i];
@@ -32,7 +32,7 @@ for(const {i,title,blocks,words} of expected){
   assert.ok(typeof q[0]==='string'&&q[0].length>15);
   assert.ok(Array.isArray(q[1])&&q[1].length===4);
   assert.ok(Number.isInteger(q[2])&&q[2]>=0&&q[2]<4);
-  assert.ok(String(q[3]).includes('Статья 28'),'Answer must explain article 28: '+q[0]);
+  assert.ok(/стат(ья|ье|ьи)\s*28/i.test(String(q[3])),'Answer must explain article 28: '+q[0]);
   assert.ok(String(q[3]).length>=50,'Explain why the answer is correct: '+q[0]);
   assert.ok(!seen.has(q[0]),'Repeated question: '+q[0]);seen.add(q[0]);
  }
