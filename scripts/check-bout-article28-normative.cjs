@@ -8,16 +8,16 @@ const ctx={window:{}};vm.createContext(ctx);
 for(const file of ['judge-course-engine.js','judge-program-bout.js']){
  vm.runInContext(fs.readFileSync(file,'utf8'),ctx,{filename:file});
 }
-const module=ctx.window.samboJudgeCourseEngine.modules[0];
-assert.equal(module.title,'Проведение схватки: положения, время и результат');
-assert.equal(module.lessons.length,7,'Lesson order and progress identifiers must remain stable');
+const mod=ctx.window.samboJudgeCourseEngine.modules[0];
+assert.equal(mod.title,'Проведение схватки: положения, время и результат');
+assert.equal(mod.lessons.length,7,'Lesson order and progress identifiers must remain stable');
 const expected=[
  {i:0,title:'Положения спортсменов: стоя, лёжа и варианты приземления',blocks:8,words:['непрерывный перекат','полумост','90 градусов','статье 35']},
  {i:1,title:'Бросок и контрбросок: установить инициатора',blocks:9,words:['перехват инициативы','неудачный','полный отрыв','половину']},
  {i:2,title:'Болевые приёмы и удержания: критерии начала и остановки',blocks:10,words:['1 минута','20 секунд','аннулируют','положение «стоя»']}
 ];
 for(const {i,title,blocks,words} of expected){
- const l=module.lessons[i];
+ const l=mod.lessons[i];
  assert.equal(l.title,title);
  assert.ok(l.ref.includes('28'),'Article 28 anchor required: '+title);
  assert.ok(l.blocks.length>=blocks,'Too few teaching sections: '+title);
@@ -37,6 +37,6 @@ for(const {i,title,blocks,words} of expected){
   assert.ok(!seen.has(q[0]),'Repeated question: '+q[0]);seen.add(q[0]);
  }
 }
-assert.equal(module.lessons[3].title,'Выход на ковёр, начало и окончание схватки');
-assert.equal(module.lessons[6].title,'Определение активности в середине встречи');
+assert.equal(mod.lessons[3].title,'Выход на ковёр, начало и окончание схватки');
+assert.equal(mod.lessons[6].title,'Определение активности в середине встречи');
 console.log('PASS: article 28 positions, throws, holds; 27 sections, 15 explained checks; 7 lesson IDs unchanged');
