@@ -372,6 +372,34 @@ try {
    check('LIVE officials lesson '+(lessonIndex+1)+' revised editorial depth',title.includes(headingText)&&blocks>=8&&checks>=5,'blocks='+blocks+' checks='+checks);
   }
 
+  // Article 14: PR checks source through Validate; after merge require the deployed lesson.
+  if(process.env.GITHUB_EVENT_NAME!=='pull_request'){
+   let article14AssetReady=false;
+   let article14Status='not fetched';
+   for(let attempt=0;attempt<6;attempt++){
+    try{
+     const res=await livePage.request.get('https://sambo-academy.pages.dev/judge-program-officials.js',{timeout:12000,failOnStatusCode:false});
+     article14Status=String(res.status());
+     article14AssetReady=res.ok()&&(await res.text()).includes('Назначение коллегии: четыре уровня');
+     if(article14AssetReady)break;
+    }catch(e){article14Status=String(e).slice(0,120);}
+    await new Promise(resolve=>setTimeout(resolve,5000));
+   }
+   check('LIVE article 14 revised source published',article14AssetReady,article14Status);
+   if(article14AssetReady){
+    await livePage.evaluate(()=>openCourse('judge'));
+    const article14Card=livePage.locator('#lessons .sambo-module-card').nth(3);
+    await article14Card.locator('summary').click();
+    await article14Card.locator('.sambo-topic-link').first().click();
+    const article14Title=await livePage.locator('.judge-prime h2').first().textContent();
+    const article14Blocks=await livePage.locator('.judge-prime .jp-part').count();
+    const article14Checks=await livePage.locator('.judge-prime .jp-question').count();
+    check('LIVE article 14 neutral-trio lesson editorial depth',
+     article14Title.includes('Состав коллегии и судейская тройка')&&article14Blocks>=9&&article14Checks>=7,
+     'blocks='+article14Blocks+' checks='+article14Checks);
+   }
+  }
+
   // Verify article 28 as well as the previously published articles 29–34 on Cloudflare.
   for(const [lessonIndex,headingText,minBlocks] of [
    [0,'Положения спортсменов: стоя, лёжа и варианты приземления',8],
