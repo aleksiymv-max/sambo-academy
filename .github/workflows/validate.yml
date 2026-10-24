@@ -129,3 +129,6 @@ jobs:
 
       - name: Check demonstration sambo normative lesson coverage
         run: node scripts/check-demo-normative.cjs
+
+      - name: Check beach sambo normative lesson coverage
+        run: node scripts/check-beach-normative.cjs
