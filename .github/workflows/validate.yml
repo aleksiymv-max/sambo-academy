@@ -126,3 +126,6 @@ jobs:
 
       - name: Report editorial gaps without treating them as a validated course
         run: node scripts/audit-judge-content.cjs
+
+      - name: Check demonstration sambo normative lesson coverage
+        run: node scripts/check-demo-normative.cjs
