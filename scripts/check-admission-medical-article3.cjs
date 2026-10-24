@@ -29,5 +29,11 @@ for(const q of lesson.checks){
 }
 assert.equal(new Set(lesson.checks.map(q=>q[0])).size,lesson.checks.length,
  'Self-checks must not repeat');
-assert.equal(mod.questions.length,8,'Independent exam bank must remain unchanged');
+// Load the independent bank only after all eleven modules are registered.
+for(const file of ['judge-program-participants.js','judge-program-officials.js',
+ 'judge-program-bout.js','judge-program-scoring.js','judge-program-sanctions.js',
+ 'judge-program-infrastructure.js','judge-program-combat.js','judge-program-beach.js',
+ 'judge-program-demo.js','judge-program-practicum.js','judge-exam-independent.js'])
+ vm.runInContext(fs.readFileSync(file,'utf8'),ctx,{filename:file});
+assert.equal(mod.questions.length,8,'Independent exam bank must remain eight questions');
 console.log('PASS: article 3 medical/anti-doping distinctions, worked case, five checks; lesson positions and eight exam questions preserved');
