@@ -13,7 +13,7 @@ if(modules.length!==1)throw Error('Expected one beach sambo module');
 const mod=modules[0];
 if(mod.lessons.length!==5)throw Error('Expected five beach sambo lessons');
 const markers=[
- ['ст. 44','ст. 45','ст. 46','арбитр','ст. 48','противореч'],
+ ['ст. 44','ст. 45','ст. 46','арбитр','ст. 48','боковой судья'],
  ['Контрбросок','Неудачный бросок','падением','шорт'],
  ['гонгу','3 минуты','двух минут','10 минут'],
  ['ст. 53','ст. 54','ст. 55','дисквалификац'],
@@ -31,6 +31,6 @@ for(let i=0;i<mod.lessons.length;i++){
  }
 }
 const all=mod.lessons.map(l=>[l.title,l.ref,...l.blocks.flat()].join(' ')).join(' ');
-if(!all.includes('ст. 56')||!all.includes('ст. 45'))throw Error('Conflicting beach refereeing source not flagged');
-console.log('PASS: 5 beach-sambo lessons, 25 self-checks, verified article markers 44–58, editorial source inconsistency flagged');
+if(!all.includes('ст. 56')||!all.includes('ст. 45')||!all.includes('Изменения от 1 сентября 2026'))throw Error('Official beach-sambo side-referee amendment not documented');
+console.log('PASS: 5 beach-sambo lessons, 25 self-checks, verified article markers 44–58, 2026 side-referee amendment applied and PDF discrepancy documented');
 console.log('NOTE: normative and real-account end-to-end approval remain separate from this regression guard');
