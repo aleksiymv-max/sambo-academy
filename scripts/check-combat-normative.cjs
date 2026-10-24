@@ -16,7 +16,7 @@ const markers=[
  ['14–16','16–18','6 унций','тейпирование','Статья 10'],
  ['нокдаун','10','14–16','16–18','снять шлем','врача'],
  ['одна минута','параллельные отсчёты','20 секунд','два балла','исходного положения'],
- ['Четыре балла','Два балла','Один балл','большинством','медицинского лимита']
+ ['Четыре балла','Два балла','Один балл','большинством','3 минуты']
 ];
 let questions=0;
 for(let i=0;i<mod.lessons.length;i++){
@@ -33,6 +33,6 @@ for(let i=0;i<mod.lessons.length;i++){
 }
 const all=mod.lessons.map(l=>[l.title,...l.blocks.flat(),l.decision,l.trap].join(' ')).join(' ');
 if(all.includes('не накладывать два несоответствующих таймера'))throw Error('Old incorrect parallel-timer instruction persists');
-if(!all.includes('До официального разъяснения'))throw Error('Medical-time ambiguity must be flagged');
+if(!all.includes('сводном PDF')||!all.includes('3 минуты'))throw Error('2026 medical-time amendment and source discrepancy must be explained');
 console.log('PASS: 4 combat lessons, '+questions+' self-checks, verified article markers and parallel timer correction');
 console.log('NOTE: independent normative expertise and real-account Supabase E2E remain open');
