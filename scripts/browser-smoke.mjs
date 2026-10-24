@@ -243,6 +243,7 @@ try {
    ['judge-program-admission.js','Индивидуальная отметка «Допущен»'],
    ['judge-program-admission.js','Норма: участие несовершеннолетних без стартового взноса'],
    ['judge-program-admission.js','Шаг 7. Разобрать расхождение с сеткой'],
+   ['judge-program-participants.js','Внешний вид: борода, ногти и волосы'],
    ['judge-program-participants.js','Куртка, рукав и пояс: измеряемые параметры'],
    ['judge-program-participants.js','увеличили специальный лимит до 3 минут'],
    ['judge-program-officials.js','Оператор табло и секундометрист: время и сигналы'],
@@ -307,7 +308,19 @@ try {
     'blocks='+blocks+' checks='+checks);
   }
 
-  // Verify revised officials lessons are rendered in the deployed course.
+  // Verify article 9 duties lesson in the published participant module.
+   await livePage.evaluate(()=>openCourse('judge'));
+   const participantCard=livePage.locator('#lessons .sambo-module-card').nth(2);
+   await participantCard.locator('summary').click();
+   await participantCard.locator('.sambo-topic-link').first().click();
+   const participantTitle=await livePage.locator('.judge-prime h2').first().textContent();
+   const participantBlocks=await livePage.locator('.judge-prime .jp-part').count();
+   const participantChecks=await livePage.locator('.judge-prime .jp-question').count();
+   check('LIVE article 9 athlete duties lesson revised editorial depth',
+    participantTitle.includes('Обязанности спортсмена')&&participantBlocks>=9&&participantChecks>=5,
+    'blocks='+participantBlocks+' checks='+participantChecks);
+
+   // Verify revised officials lessons are rendered in the deployed course.
   for(const [lessonIndex,headingText] of [[3,'Главный секретарь и секретариат'],[4,'Руководитель ковра, арбитр, боковой судья'],[5,'Технический секретарь и протокол схватки'],[7,'Информатор, контроль формы, врач, администратор']]){
    await livePage.evaluate(()=>openCourse('judge'));
    const officialsCard=livePage.locator('#lessons .sambo-module-card').nth(3);
