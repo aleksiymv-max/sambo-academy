@@ -244,7 +244,8 @@ try {
    ['judge-program-admission.js','Норма: участие несовершеннолетних без стартового взноса'],
    ['judge-program-admission.js','Шаг 7. Разобрать расхождение с сеткой'],
    ['judge-program-participants.js','Внешний вид: борода, ногти и волосы'],
-   ['judge-program-participants.js','Куртка, рукав и пояс: измеряемые параметры'],
+   ['judge-program-participants.js','Куртка: цвет, материал, рукав и просвет'],
+   ['judge-program-participants.js','Бандажи и тейпы: разрешение с условием'],
    ['judge-program-participants.js','увеличили специальный лимит до 3 минут'],
    ['judge-program-officials.js','Оператор табло и секундометрист: время и сигналы'],
    ['judge-program-officials.js','Пределы полномочий главного судьи'],
@@ -319,6 +320,19 @@ try {
    check('LIVE article 9 athlete duties lesson revised editorial depth',
     participantTitle.includes('Обязанности спортсмена')&&participantBlocks>=9&&participantChecks>=5,
     'blocks='+participantBlocks+' checks='+participantChecks);
+
+   // Article 10: verify the published equipment lesson and original progress position.
+   await livePage.evaluate(()=>openCourse('judge'));
+   const equipmentCard=livePage.locator('#lessons .sambo-module-card').nth(2);
+   await equipmentCard.locator('summary').click();
+   await equipmentCard.locator('.sambo-topic-link').nth(2).click();
+   const equipmentTitle=await livePage.locator('.judge-prime h2').first().textContent();
+   const equipmentBlocks=await livePage.locator('.judge-prime .jp-part').count();
+   const equipmentChecks=await livePage.locator('.judge-prime .jp-question').count();
+   check('LIVE article 10 equipment lesson editorial depth',
+     equipmentTitle.includes('Экипировка спортивного самбо')&&equipmentBlocks>=9&&equipmentChecks>=6,
+     'blocks='+equipmentBlocks+' checks='+equipmentChecks);
+
 
    // Verify revised officials lessons are rendered in the deployed course.
   for(const [lessonIndex,headingText] of [[3,'Главный секретарь и секретариат'],[4,'Руководитель ковра, арбитр, боковой судья'],[5,'Технический секретарь и протокол схватки'],[7,'Информатор, контроль формы, врач, администратор']]){
