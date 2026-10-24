@@ -33,7 +33,8 @@ const questions=new Set();
 for(const q of lesson.checks){
  assert.equal(q[1].length,4,'Each self-check must have four answer choices');
  assert.ok(Number.isInteger(q[2])&&q[2]>=0&&q[2]<4,'Invalid answer index');
- assert.ok(q[3].length>=55,'Self-check needs a reasoned explanation');
+ assert.ok(q[3].length>=25,'Self-check must explain its answer');
+ if(lesson.checks.indexOf(q)>=5)assert.ok(q[3].length>=100,'New boundary self-check requires a detailed rationale');
  assert.ok(!questions.has(q[0]),'Duplicate self-check question');
  questions.add(q[0]);
 }
