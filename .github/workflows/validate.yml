@@ -141,3 +141,6 @@ jobs:
 
       - name: Check 2026 sports-sambo activity amendment
         run: node scripts/check-activity-amendment.cjs
+
+      - name: Check integrated referee practicum normative structure
+        run: node scripts/check-practicum-normative.cjs
