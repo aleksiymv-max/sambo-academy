@@ -192,3 +192,6 @@ jobs:
 
       - name: Check athlete duties under article 9 and preserve participant exam
         run: node scripts/check-participants-duties-article9.cjs
+
+      - name: Check article 10 equipment, safety and original participant exam keys
+        run: node scripts/check-participants-equipment-article10.cjs
