@@ -246,7 +246,7 @@ try {
    ['judge-program-scoring.js','Бросок начался внутри, закончился снаружи рабочей зоны'],
    ['judge-program-combat.js','Параллельные отсчёты — важное исключение'],
    ['judge-program-combat.js','Возрастное исключение при нокдауне'],
-   ['judge-program-beach.js','Статья 56 упоминает «большинство из трех»'],
+   ['judge-program-beach.js','Отдельно опубликованное изменение ВФС дополняет статью 45 боковым судьёй'],
    ['judge-program-demo.js','Это внутреннее расхождение текста источника']
   ]){
    const response=await livePage.request.get('https://sambo-academy.pages.dev/'+asset,{timeout:12000,failOnStatusCode:false});
