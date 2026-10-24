@@ -245,6 +245,8 @@ try {
    ['judge-program-scoring.js','Шаг 5. Одновременные предупреждения'],
    ['judge-program-scoring.js','Бросок начался внутри, закончился снаружи рабочей зоны'],
    ['judge-program-bout.js','Официальные изменения и разъяснения ВФС от 1 сентября 2026 устанавливают оценку «Активность»'],
+   ['judge-program-infrastructure.js','Обязательный резерв при сбое'],
+   ['judge-program-infrastructure.js','50 сантиметров'],
    ['judge-program-combat.js','Параллельные отсчёты — важное исключение'],
    ['judge-program-combat.js','Возрастное исключение при нокдауне'],
    ['judge-program-beach.js','Отдельно опубликованное изменение ВФС дополняет статью 45 боковым судьёй'],
@@ -255,7 +257,7 @@ try {
    check('LIVE normative lesson asset '+asset+' matches current revision',response.ok()&&body.includes(marker),String(response.status()));
   }
 
-  for(const i of [1,6,8,9,11]){
+  for(const i of [1,6,7,8,9,11]){
    if(!liveModules[i])continue;
    await livePage.evaluate(()=>openCourse('judge'));
    const card=livePage.locator('#lessons .sambo-module-card').nth(i);
