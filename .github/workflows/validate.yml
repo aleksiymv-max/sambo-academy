@@ -171,3 +171,6 @@ jobs:
 
       - name: Check article 34 tie-breakers and article 29 timing
         run: node scripts/check-scoring-tiebreakers-normative.cjs
+
+      - name: Check hold scoring articles 19, 28 and 35 and the exact-ten-second discrepancy
+        run: node scripts/check-scoring-holds-19-28-35.cjs
