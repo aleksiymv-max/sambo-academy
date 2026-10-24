@@ -242,6 +242,8 @@ try {
    ['judge-program-participants.js','увеличили специальный лимит до 3 минут'],
    ['judge-program-officials.js','Оператор табло и секундометрист: время и сигналы'],
    ['judge-program-officials.js','Пределы полномочий главного судьи'],
+   ['judge-program-officials.js','Учебный алгоритм при расхождении'],
+   ['judge-program-officials.js','Медицинская помощь и различия дисциплин'],
    ['judge-program-sanctions.js','Две разные линии предупреждений'],
    ['judge-program-sanctions.js','Результат схватки и две процедуры протеста'],
    ['judge-program-scoring.js','Шаг 5. Одновременные предупреждения'],
@@ -268,6 +270,18 @@ try {
    await card.locator('.sambo-topic-link').first().click();
    const heading=await livePage.locator('.judge-prime h2').first().textContent();
    check('LIVE module '+(i+1)+' opens its authored lesson',heading.includes(liveModules[i].first)&&await livePage.locator('.judge-prime .jp-part').count()>=2,heading);
+  }
+
+  // Verify both newly revised officials lessons are rendered in the deployed course.
+  for(const [lessonIndex,headingText] of [[3,'Главный секретарь и секретариат'],[5,'Технический секретарь и протокол схватки']]){
+   await livePage.evaluate(()=>openCourse('judge'));
+   const officialsCard=livePage.locator('#lessons .sambo-module-card').nth(3);
+   await officialsCard.locator('summary').click();
+   await officialsCard.locator('.sambo-topic-link').nth(lessonIndex).click();
+   const title=await livePage.locator('.judge-prime h2').first().textContent();
+   const blocks=await livePage.locator('.judge-prime .jp-part').count();
+   const checks=await livePage.locator('.judge-prime .jp-question').count();
+   check('LIVE officials lesson '+(lessonIndex+1)+' revised editorial depth',title.includes(headingText)&&blocks>=8&&checks>=5,'blocks='+blocks+' checks='+checks);
   }
 
   await livePage.evaluate(()=>openCourse('judge'));
