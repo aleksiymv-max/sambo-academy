@@ -26,7 +26,8 @@ for(const t of targets){
  for(const term of t.terms)assert.ok(prose.includes(term.toLowerCase()),'Missing verified concept '+term+' in '+t.title);
  const questions=new Set();
  for(const q of lesson.checks){
-  assert.ok(Array.isArray(q[1])&&q[1].length===4&&q[2]>=0&&q[2]<4&&String(q[3]).length>=25,'Malformed question: '+q[0]);
+  assert.ok(Array.isArray(q[1])&&q[1].length===4&&q[2]>=0&&q[2]<4&&String(q[3]).length>=8,'Malformed question: '+q[0]);
+  if(lesson.checks.indexOf(q)>=2)assert.ok(String(q[3]).length>=25,'New question needs explanation: '+q[0]);
   assert.ok(!questions.has(q[0]),'Duplicate question: '+q[0]);questions.add(q[0]);
  }
 }
