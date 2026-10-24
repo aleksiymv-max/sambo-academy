@@ -249,6 +249,7 @@ try {
    ['judge-program-sanctions.js','Две разные линии предупреждений'],
    ['judge-program-sanctions.js','Результат схватки и две процедуры протеста'],
    ['judge-program-scoring.js','Шаг 5. Одновременные предупреждения'],
+   ['judge-program-scoring.js','Момент действия и момент показа оценки'],
    ['judge-program-scoring.js','Критерий для досрочного преимущества — разница счёта'],
    ['judge-program-scoring.js','Исключение: полный отрыв с вращением'],
    ['judge-program-scoring.js','Бросок начался внутри, закончился снаружи рабочей зоны'],
@@ -316,7 +317,8 @@ try {
   // Verify the revised scoring lessons on the deployed version, not only in checkout.
   for(const [lessonIndex,headingText] of [
    [0,'Досрочная чистая победа: пять оснований'],
-   [1,'Оценка броска: матрица без и с падением']
+   [1,'Оценка броска: матрица без и с падением'],
+   [3,'Как определить победителя после времени']
   ]){
    await livePage.evaluate(()=>openCourse('judge'));
    const scoringCard=livePage.locator('#lessons .sambo-module-card').nth(5);
@@ -326,7 +328,7 @@ try {
    const blocks=await livePage.locator('.judge-prime .jp-part').count();
    const checks=await livePage.locator('.judge-prime .jp-question').count();
    check('LIVE scoring lesson '+(lessonIndex+1)+' revised editorial depth',
-    heading.includes(headingText)&&blocks>=9&&checks===5,
+    heading.includes(headingText)&&blocks>=(lessonIndex===3?11:9)&&checks===(lessonIndex===3?7:5),
     'blocks='+blocks+' checks='+checks);
   }
 
