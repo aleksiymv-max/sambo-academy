@@ -251,6 +251,7 @@ try {
    ['judge-program-scoring.js','Шаг 5. Одновременные предупреждения'],
    ['judge-program-scoring.js','Бросок начался внутри, закончился снаружи рабочей зоны'],
    ['judge-program-bout.js','Официальные изменения и разъяснения ВФС от 1 сентября 2026 устанавливают оценку «Активность»'],
+   ['judge-program-bout.js','Статья 29(4–5) различает момент совершения действия и момент судейского жеста'],
    ['judge-program-infrastructure.js','Обязательный резерв при сбое'],
    ['judge-program-infrastructure.js','50 сантиметров'],
    ['judge-program-combat.js','Параллельные отсчёты — важное исключение'],
@@ -284,6 +285,24 @@ try {
    const blocks=await livePage.locator('.judge-prime .jp-part').count();
    const checks=await livePage.locator('.judge-prime .jp-question').count();
    check('LIVE officials lesson '+(lessonIndex+1)+' revised editorial depth',title.includes(headingText)&&blocks>=8&&checks>=5,'blocks='+blocks+' checks='+checks);
+  }
+
+  // Confirm all three newly expanded bout lessons on the actual published deployment.
+  for(const [lessonIndex,headingText,minBlocks] of [
+   [3,'Выход на ковёр, начало и окончание схватки',8],
+   [4,'Чистое время, перерывы и отдых',9],
+   [5,'Результат схватки и связь с оцениванием',8]
+  ]){
+   await livePage.evaluate(()=>openCourse('judge'));
+   const boutCard=livePage.locator('#lessons .sambo-module-card').nth(4);
+   await boutCard.locator('summary').click();
+   await boutCard.locator('.sambo-topic-link').nth(lessonIndex).click();
+   const title=await livePage.locator('.judge-prime h2').first().textContent();
+   const blocks=await livePage.locator('.judge-prime .jp-part').count();
+   const checks=await livePage.locator('.judge-prime .jp-question').count();
+   check('LIVE bout lesson '+(lessonIndex+1)+' revised editorial depth',
+    title.includes(headingText)&&blocks>=minBlocks&&checks===5,
+    'blocks='+blocks+' checks='+checks);
   }
 
   await livePage.evaluate(()=>openCourse('judge'));
