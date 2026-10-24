@@ -133,6 +133,9 @@ jobs:
       - name: Check beach sambo normative lesson coverage
         run: node scripts/check-beach-normative.cjs
 
+      - name: Check infrastructure and protocol normative lesson coverage
+        run: node scripts/check-infrastructure-normative.cjs
+
       - name: Check combat sambo normative lesson coverage
         run: node scripts/check-combat-normative.cjs
 
