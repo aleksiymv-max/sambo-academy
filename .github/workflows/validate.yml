@@ -174,3 +174,6 @@ jobs:
 
       - name: Check hold scoring articles 19, 28 and 35 and the exact-ten-second discrepancy
         run: node scripts/check-scoring-holds-19-28-35.cjs
+
+      - name: Check boundary decisions and scoring under articles 28, 35, 36 and 37
+        run: node scripts/check-scoring-boundary-36-normative.cjs
