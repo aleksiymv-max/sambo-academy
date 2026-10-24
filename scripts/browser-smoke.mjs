@@ -252,6 +252,7 @@ try {
    ['judge-program-scoring.js','Бросок начался внутри, закончился снаружи рабочей зоны'],
    ['judge-program-bout.js','Официальные изменения и разъяснения ВФС от 1 сентября 2026 устанавливают оценку «Активность»'],
    ['judge-program-bout.js','Статья 29(4–5) различает момент совершения действия и момент судейского жеста'],
+   ['judge-program-bout.js','Второе удержание после неполного'],
    ['judge-program-infrastructure.js','Обязательный резерв при сбое'],
    ['judge-program-infrastructure.js','50 сантиметров'],
    ['judge-program-combat.js','Параллельные отсчёты — важное исключение'],
@@ -287,8 +288,11 @@ try {
    check('LIVE officials lesson '+(lessonIndex+1)+' revised editorial depth',title.includes(headingText)&&blocks>=8&&checks>=5,'blocks='+blocks+' checks='+checks);
   }
 
-  // Confirm all three newly expanded bout lessons on the actual published deployment.
+  // Verify article 28 as well as the previously published articles 29–34 on Cloudflare.
   for(const [lessonIndex,headingText,minBlocks] of [
+   [0,'Положения спортсменов: стоя, лёжа и варианты приземления',8],
+   [1,'Бросок и контрбросок: установить инициатора',9],
+   [2,'Болевые приёмы и удержания: критерии начала и остановки',10],
    [3,'Выход на ковёр, начало и окончание схватки',8],
    [4,'Чистое время, перерывы и отдых',9],
    [5,'Результат схватки и связь с оцениванием',8]
