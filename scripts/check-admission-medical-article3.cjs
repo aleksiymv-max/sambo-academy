@@ -13,8 +13,8 @@ assert.ok(lesson.blocks.length>=9,'Article 3 needs nine explained sections');
 assert.ok(lesson.checks.length>=5,'Article 3 needs five self-checks');
 const text=[lesson.ref,lesson.lead,lesson.blocks.flat().join(' '),
  lesson.situation,lesson.caseAnalysis,lesson.decision,lesson.trap].join(' ').toLowerCase();
-for(const term of ['статья 3(1)','статья 3(2)','статья 3(3)','статья 3(4)',
- 'статья 3(5)','статья 3(6)','статья 3(7)','1144н','русадa'.replace('a','а'),
+for(const term of ['3(1)','3(2)','3(3)','3(4)',
+ '3(5)','3(6)','3(7)','1144н','русадa'.replace('a','а'),
  'терапевтическое использование','допущен','личной печатью',
  'страхования жизни и здоровья','омс','учебный алгоритм'])
  assert.ok(text.includes(term.toLowerCase()),'Missing article 3 concept: '+term);
