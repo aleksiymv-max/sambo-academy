@@ -153,3 +153,6 @@ jobs:
 
       - name: Check chief secretariat and technical protocol articles 17 and 21
         run: node scripts/check-secretariat-protocol-normative.cjs
+
+      - name: Check referee trio and support officials articles 18–20 and 24–27
+        run: node scripts/check-referee-trio-support-normative.cjs
