@@ -7,7 +7,7 @@ for(const f of ['judge-course-engine.js','judge-program-scoring.js'])vm.runInCon
 const m=ctx.window.samboJudgeCourseEngine.modules[0];
 assert.equal(m.lessons.length,5,'Preserve five progress positions and lesson order');
 const expected=['Досрочная чистая победа: пять оснований','Оценка броска: матрица без и с падением'];
-const markers=[['Критерий для досрочного преимущества','не менее двух судей','20 секунд','дисквалификация','время окончания'],['полном отрыве','неудавшемся броске','большинство голосов','зоне безопасности','атакуемый первоначально лежал']];
+const markers=[['Критерий для досрочного преимущества','не менее двух судей','20 секунд','дисквалификация','время окончания'],['полностью отрывает','неудавшемся броске','большинство голосов','зоне безопасности','атакуемый первоначально лежал']];
 for(let i=0;i<2;i++){
  const l=m.lessons[i];assert.equal(l.title,expected[i]);assert.ok(l.ref.includes(i===0?'33':'35'));
  assert.ok(l.blocks.length>=9,'Too few explanatory blocks in '+l.title);
