@@ -237,6 +237,7 @@ try {
   check('LIVE judge progress IDs are unique',new Set(liveModules.map(g=>g.progress)).size===liveModules.length);
   // Detect stale deployments of the actual normative lesson content, not just module registration.
   for(const [asset,marker] of [
+   ['judge-program-admission.js','Граница компетенции судьи'],
    ['judge-program-admission.js','Медицинская заявка: обязательные реквизиты'],
    ['judge-program-admission.js','Норма: участие несовершеннолетних без стартового взноса'],
    ['judge-program-admission.js','Шаг 7. Разобрать расхождение с сеткой'],
@@ -286,6 +287,7 @@ try {
 
   // Verify newly revised admission lessons, without changing progress keys or lesson order.
   for(const [lessonIndex,headingText] of [
+   [0,'Антидопинг и медицинское обеспечение'],
    [2,'Возрастные группы и весовые категории'],
    [4,'Сквозной алгоритм допуска']
   ]){
