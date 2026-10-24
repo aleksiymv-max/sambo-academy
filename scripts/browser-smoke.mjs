@@ -241,6 +241,7 @@ try {
    ['judge-program-participants.js','Куртка, рукав и пояс: измеряемые параметры'],
    ['judge-program-participants.js','увеличили специальный лимит до 3 минут'],
    ['judge-program-officials.js','Оператор табло и секундометрист: время и сигналы'],
+   ['judge-program-officials.js','Пределы полномочий главного судьи'],
    ['judge-program-sanctions.js','Две разные линии предупреждений'],
    ['judge-program-sanctions.js','Результат схватки и две процедуры протеста'],
    ['judge-program-scoring.js','Шаг 5. Одновременные предупреждения'],
@@ -259,7 +260,7 @@ try {
    check('LIVE normative lesson asset '+asset+' matches current revision',response.ok()&&body.includes(marker),String(response.status()));
   }
 
-  for(const i of [1,2,6,7,8,9,11]){
+  for(const i of [1,2,3,6,7,8,9,11]){
    if(!liveModules[i])continue;
    await livePage.evaluate(()=>openCourse('judge'));
    const card=livePage.locator('#lessons .sambo-module-card').nth(i);
