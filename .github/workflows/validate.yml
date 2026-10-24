@@ -195,3 +195,6 @@ jobs:
 
       - name: Check article 10 equipment, safety and original participant exam keys
         run: node scripts/check-participants-equipment-article10.cjs
+
+      - name: Check article 11 representatives, coaches and protest procedure
+        run: node scripts/check-participants-representatives-article11.cjs
