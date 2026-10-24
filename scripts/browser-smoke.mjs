@@ -246,6 +246,7 @@ try {
    ['judge-program-participants.js','Внешний вид: борода, ногти и волосы'],
    ['judge-program-participants.js','Куртка: цвет, материал, рукав и просвет'],
    ['judge-program-participants.js','Бандажи и тейпы: разрешение с условием'],
+   ['judge-program-participants.js','Срок подачи: расхождение источников'],
    ['judge-program-participants.js','увеличили специальный лимит до 3 минут'],
    ['judge-program-officials.js','Оператор табло и секундометрист: время и сигналы'],
    ['judge-program-officials.js','Пределы полномочий главного судьи'],
@@ -333,6 +334,18 @@ try {
      equipmentTitle.includes('Экипировка спортивного самбо')&&equipmentBlocks>=9&&equipmentChecks>=6,
      'blocks='+equipmentBlocks+' checks='+equipmentChecks);
 
+
+   // Article 11: verify the newly revised representative/coach lesson in production.
+   await livePage.evaluate(()=>openCourse('judge'));
+   const representativeCard=livePage.locator('#lessons .sambo-module-card').nth(2);
+   await representativeCard.locator('summary').click();
+   await representativeCard.locator('.sambo-topic-link').nth(3).click();
+   const representativeTitle=await livePage.locator('.judge-prime h2').first().textContent();
+   const representativeBlocks=await livePage.locator('.judge-prime .jp-part').count();
+   const representativeChecks=await livePage.locator('.judge-prime .jp-question').count();
+   check('LIVE article 11 representatives and coaches editorial depth',
+     representativeTitle.includes('Представитель команды и тренер')&&representativeBlocks>=11&&representativeChecks>=7,
+     'blocks='+representativeBlocks+' checks='+representativeChecks);
 
    // Verify revised officials lessons are rendered in the deployed course.
   for(const [lessonIndex,headingText] of [[3,'Главный секретарь и секретариат'],[4,'Руководитель ковра, арбитр, боковой судья'],[5,'Технический секретарь и протокол схватки'],[7,'Информатор, контроль формы, врач, администратор']]){
