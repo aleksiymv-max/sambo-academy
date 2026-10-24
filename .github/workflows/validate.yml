@@ -183,3 +183,6 @@ jobs:
 
       - name: Check article 3 anti-doping, medical admission and insurance lesson
         run: node scripts/check-admission-medical-article3.cjs
+
+      - name: Check article 4 integrity, betting scope and protests
+        run: node scripts/check-admission-integrity-article4.cjs

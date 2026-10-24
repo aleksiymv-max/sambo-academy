@@ -238,6 +238,7 @@ try {
   // Detect stale deployments of the actual normative lesson content, not just module registration.
   for(const [asset,marker] of [
    ['judge-program-admission.js','Граница компетенции судьи'],
+   ['judge-program-admission.js','Для каких лиц и видов спорта действует запрет пари'],
    ['judge-program-admission.js','Индивидуальная отметка «Допущен»'],
    ['judge-program-admission.js','Норма: участие несовершеннолетних без стартового взноса'],
    ['judge-program-admission.js','Шаг 7. Разобрать расхождение с сеткой'],
@@ -288,6 +289,7 @@ try {
   // Verify newly revised admission lessons, without changing progress keys or lesson order.
   for(const [lessonIndex,headingText] of [
    [0,'Антидопинг и медицинское обеспечение'],
+   [1,'Противоправное влияние на результаты'],
    [2,'Возрастные группы и весовые категории'],
    [4,'Сквозной алгоритм допуска']
   ]){
