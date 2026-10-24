@@ -238,7 +238,7 @@ try {
   // Detect stale deployments of the actual normative lesson content, not just module registration.
   for(const [asset,marker] of [
    ['judge-program-admission.js','Граница компетенции судьи'],
-   ['judge-program-admission.js','Медицинская заявка: обязательные реквизиты'],
+   ['judge-program-admission.js','Индивидуальная отметка «Допущен»'],
    ['judge-program-admission.js','Норма: участие несовершеннолетних без стартового взноса'],
    ['judge-program-admission.js','Шаг 7. Разобрать расхождение с сеткой'],
    ['judge-program-participants.js','Куртка, рукав и пояс: измеряемые параметры'],
