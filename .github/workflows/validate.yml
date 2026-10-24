@@ -162,3 +162,6 @@ jobs:
 
       - name: Check bout opening, timing and result articles 29–34
         run: node scripts/check-bout-29-34-normative.cjs
+
+      - name: Check article 19 activity procedure and 2026 clarifications
+        run: node scripts/check-bout-activity-2026.cjs
