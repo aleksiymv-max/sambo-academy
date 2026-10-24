@@ -11,7 +11,7 @@ for(const file of ['judge-course-engine.js','judge-program-demo.js']){
   vm.runInContext(fs.readFileSync(file,'utf8'),context,{filename:file});
 }
 const [demoModule]=context.window.samboJudgeCourseEngine.modules;
-assert(module && demoModule.title.includes('Демонстрационное самбо'));
+assert(demoModule && demoModule.title.includes('Демонстрационное самбо'));
 assert.equal(demoModule.lessons.length,5,'Preserve stable lesson order and progress');
 for(const [index,lesson] of demoModule.lessons.entries()){
   assert(lesson.blocks.length>=5,'Insufficient normative depth in demo lesson '+(index+1));
