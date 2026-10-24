@@ -247,6 +247,7 @@ try {
    ['judge-program-participants.js','Куртка: цвет, материал, рукав и просвет'],
    ['judge-program-participants.js','Бандажи и тейпы: разрешение с условием'],
    ['judge-program-participants.js','Срок подачи: расхождение источников'],
+    ['judge-program-participants.js','Пригодность ковра: совместная проверка'],
    ['judge-program-participants.js','увеличили специальный лимит до 3 минут'],
    ['judge-program-officials.js','Оператор табло и секундометрист: время и сигналы'],
    ['judge-program-officials.js','Пределы полномочий главного судьи'],
@@ -346,6 +347,18 @@ try {
    check('LIVE article 11 representatives and coaches editorial depth',
      representativeTitle.includes('Представитель команды и тренер')&&representativeBlocks>=11&&representativeChecks>=7,
      'blocks='+representativeBlocks+' checks='+representativeChecks);
+
+   // Articles 12–13: inspect the deployed fifth participant lesson, not just the source.
+   await livePage.evaluate(()=>openCourse('judge'));
+   const safetyCard=livePage.locator('#lessons .sambo-module-card').nth(2);
+   await safetyCard.locator('summary').click();
+   await safetyCard.locator('.sambo-topic-link').nth(4).click();
+   const safetyTitle=await livePage.locator('.judge-prime h2').first().textContent();
+   const safetyBlocks=await livePage.locator('.judge-prime .jp-part').count();
+   const safetyChecks=await livePage.locator('.judge-prime .jp-question').count();
+   check('LIVE articles 12–13 official persons and safety editorial depth',
+     safetyTitle.includes('Официальные лица и безопасность')&&safetyBlocks>=10&&safetyChecks>=7,
+     'blocks='+safetyBlocks+' checks='+safetyChecks);
 
    // Verify revised officials lessons are rendered in the deployed course.
   for(const [lessonIndex,headingText] of [[3,'Главный секретарь и секретариат'],[4,'Руководитель ковра, арбитр, боковой судья'],[5,'Технический секретарь и протокол схватки'],[7,'Информатор, контроль формы, врач, администратор']]){
