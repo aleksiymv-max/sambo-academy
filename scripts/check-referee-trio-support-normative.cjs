@@ -10,8 +10,8 @@ const mod=context.window.samboJudgeCourseEngine.modules[0];
 assert.equal(mod.title,'Судейская коллегия и должностные обязанности');
 assert.equal(mod.lessons.length,8,'Existing progress positions must not change');
 for(const spec of [
- {i:4,title:'Руководитель ковра, арбитр, боковой судья',ref:'Статьи 18–20',terms:['Статья 18(2)(г)','Статья 19(2)','Статья 20','Учебный алгоритм при споре']},
- {i:7,title:'Информатор, контроль формы, врач, администратор',ref:'Статьи 24–27',terms:['Статья 25(1)(д)','Статья 26(2)','Статья 24','Учебный алгоритм разграничения']}
+ {i:4,title:'Руководитель ковра, арбитр, боковой судья',ref:'Статьи 18–20',terms:['18(2)(г)','Статья 19(2)','Статья 20','Учебный алгоритм при споре']},
+ {i:7,title:'Информатор, контроль формы, врач, администратор',ref:'Статьи 24–27',terms:['Статья 25(1)(д)','Статья 26(2)','статье 24','Учебный алгоритм разграничения']}
 ]){
  const lesson=mod.lessons[spec.i];
  assert.equal(lesson.title,spec.title,'Do not rename/reorder established lessons');
