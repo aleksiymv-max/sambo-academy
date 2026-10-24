@@ -151,6 +151,9 @@ jobs:
       - name: Check referee officials arts 14-16 and editorial completeness
         run: node scripts/check-officials-normative.cjs
 
+      - name: Check article 14 appointments, neutral trio and auxiliary personnel
+        run: node scripts/check-officials-article14-composition.cjs
+
       - name: Check chief secretariat and technical protocol articles 17 and 21
         run: node scripts/check-secretariat-protocol-normative.cjs
 
