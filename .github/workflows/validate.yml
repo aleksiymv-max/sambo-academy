@@ -186,3 +186,6 @@ jobs:
 
       - name: Check article 4 integrity, betting scope and protests
         run: node scripts/check-admission-integrity-article4.cjs
+
+      - name: Check article 8 weighing, medical gate and signed protocol
+        run: node scripts/check-admission-weighing-article8.cjs
