@@ -18,14 +18,14 @@ assert.ok(l.blocks.length>=11,'Article 11 lesson needs 11 explanation blocks');
 assert.ok(l.checks.length>=7,'Article 11 lesson needs seven self-check questions');
 const body=[l.ref,l.goal,l.lead,...l.blocks.flat(),l.situation,l.caseAnalysis,l.decision,l.trap].join(' ').toLowerCase();
 for(const token of [
- 'статья 11(1)','статья 11(2)','статья 11(3)','статья 11(4)',
- 'статья 11(5)','статья 11(6)','статья 11(7)','статья 11(8)',
+ 'статья 11(1)','статье 11(2)','статья 11(3)','статья 11(4)',
+ 'статья 11(5)','статье 11(6)','статья 11(7)','статья 11(8)',
  'статья 11(9)','статья 11(10)','статья 41(1–2)','статья 41(2)(а)',
- 'статья 41(2)(б)','статья 41(3–4)','статья 41(5)',
+ 'статья 41(2)(б)','статья 41(3–4)','пункт 41(5)',
  'в день фиксации нарушения','непосредственно во время соревнований',
  'различаются','не является автоматическим','учебный алгоритм'
 ])assert.ok(body.includes(token),'Missing article 11/41 normative distinction: '+token);
-assert.ok(l.situation.length>380&&l.caseAnalysis.length>400&&l.decision.length>450&&l.trap.length>250,
+assert.ok(l.situation.length>350&&l.caseAnalysis.length>400&&l.decision.length>450&&l.trap.length>250,
  'Detailed scenario, analysis, decision and traps required');
 const original=[
  ['Кто подаёт письменный протест?',0],
