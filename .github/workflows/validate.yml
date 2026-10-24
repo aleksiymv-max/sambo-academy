@@ -180,3 +180,6 @@ jobs:
 
       - name: Check admission ages and documentary workflow
         run: node scripts/check-admission-ages-workflow-2026.cjs
+
+      - name: Check article 3 anti-doping, medical admission and insurance lesson
+        run: node scripts/check-admission-medical-article3.cjs
