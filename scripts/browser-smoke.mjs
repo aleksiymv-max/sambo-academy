@@ -250,7 +250,8 @@ try {
    ['judge-program-combat.js','Параллельные отсчёты — важное исключение'],
    ['judge-program-combat.js','Возрастное исключение при нокдауне'],
    ['judge-program-beach.js','Отдельно опубликованное изменение ВФС дополняет статью 45 боковым судьёй'],
-   ['judge-program-demo.js','Это внутреннее расхождение текста источника']
+   ['judge-program-demo.js','Это внутреннее расхождение текста источника'],
+   ['judge-program-practicum.js','Статьи 66 и 68 расходятся в количестве судей']
   ]){
    const response=await livePage.request.get('https://sambo-academy.pages.dev/'+asset,{timeout:12000,failOnStatusCode:false});
    const body=await response.text();
@@ -267,7 +268,13 @@ try {
    check('LIVE module '+(i+1)+' opens its authored lesson',heading.includes(liveModules[i].first)&&await livePage.locator('.judge-prime .jp-part').count()>=2,heading);
   }
 
-  check('LIVE judge typography stylesheet loaded',(await livePage.locator('.judge-prime').evaluate(el=>getComputedStyle(el).borderRadius))!=='0px');
+  await livePage.evaluate(()=>openCourse('judge'));
+  const practicumCard=livePage.locator('#lessons .sambo-module-card').nth(11);
+  await practicumCard.locator('summary').click();
+  await practicumCard.locator('.sambo-topic-link').first().click();
+  check('LIVE integrated practicum lesson has at least five teaching blocks',await livePage.locator('.judge-prime .jp-part').count()>=5);
+  check('LIVE integrated practicum has five self-check questions',await livePage.locator('.judge-prime .jp-question').count()===5);
+    check('LIVE judge typography stylesheet loaded',(await livePage.locator('.judge-prime').evaluate(el=>getComputedStyle(el).borderRadius))!=='0px');
   check('LIVE browser no uncaught errors',liveErrors.length===0,liveErrors.slice(0,4).join(' | '));
   await livePage.setViewportSize({width:390,height:844});
   check('LIVE mobile lesson within viewport',await livePage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+3));
