@@ -243,7 +243,8 @@ try {
    ['judge-program-sanctions.js','Две разные линии предупреждений'],
    ['judge-program-sanctions.js','Результат схватки и две процедуры протеста'],
    ['judge-program-scoring.js','Шаг 5. Одновременные предупреждения'],
-   ['judge-program-scoring.js','Бросок начался внутри, закончился снаружи рабочей зоны']
+   ['judge-program-scoring.js','Бросок начался внутри, закончился снаружи рабочей зоны'],
+   ['judge-program-demo.js','Это внутреннее расхождение текста источника']
   ]){
    const response=await livePage.request.get('https://sambo-academy.pages.dev/'+asset,{timeout:12000,failOnStatusCode:false});
    const body=await response.text();
