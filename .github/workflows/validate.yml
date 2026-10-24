@@ -165,3 +165,6 @@ jobs:
 
       - name: Check article 19 activity procedure and 2026 clarifications
         run: node scripts/check-bout-activity-2026.cjs
+
+      - name: Check scoring: early victory and throw matrix under articles 28, 33, 35, 36 and 40
+        run: node scripts/check-scoring-33-35-normative.cjs
