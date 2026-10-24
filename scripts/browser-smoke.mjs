@@ -238,6 +238,8 @@ try {
   // Detect stale deployments of the actual normative lesson content, not just module registration.
   for(const [asset,marker] of [
    ['judge-program-admission.js','Медицинская заявка: обязательные реквизиты'],
+   ['judge-program-admission.js','Норма: участие несовершеннолетних без стартового взноса'],
+   ['judge-program-admission.js','Шаг 7. Разобрать расхождение с сеткой'],
    ['judge-program-participants.js','Куртка, рукав и пояс: измеряемые параметры'],
    ['judge-program-participants.js','увеличили специальный лимит до 3 минут'],
    ['judge-program-officials.js','Оператор табло и секундометрист: время и сигналы'],
@@ -280,6 +282,23 @@ try {
    await card.locator('.sambo-topic-link').first().click();
    const heading=await livePage.locator('.judge-prime h2').first().textContent();
    check('LIVE module '+(i+1)+' opens its authored lesson',heading.includes(liveModules[i].first)&&await livePage.locator('.judge-prime .jp-part').count()>=2,heading);
+  }
+
+  // Verify newly revised admission lessons, without changing progress keys or lesson order.
+  for(const [lessonIndex,headingText] of [
+   [2,'Возрастные группы и весовые категории'],
+   [4,'Сквозной алгоритм допуска']
+  ]){
+   await livePage.evaluate(()=>openCourse('judge'));
+   const admissionCard=livePage.locator('#lessons .sambo-module-card').nth(1);
+   await admissionCard.locator('summary').click();
+   await admissionCard.locator('.sambo-topic-link').nth(lessonIndex).click();
+   const title=await livePage.locator('.judge-prime h2').first().textContent();
+   const blocks=await livePage.locator('.judge-prime .jp-part').count();
+   const checks=await livePage.locator('.judge-prime .jp-question').count();
+   check('LIVE admission lesson '+(lessonIndex+1)+' revised editorial depth',
+    title.includes(headingText)&&blocks>=8&&checks>=5,
+    'blocks='+blocks+' checks='+checks);
   }
 
   // Verify revised officials lessons are rendered in the deployed course.
