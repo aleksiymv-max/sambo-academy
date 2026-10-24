@@ -135,3 +135,6 @@ jobs:
 
       - name: Check combat sambo normative lesson coverage
         run: node scripts/check-combat-normative.cjs
+
+      - name: Check 2026 sports-sambo activity amendment
+        run: node scripts/check-activity-amendment.cjs
