@@ -244,6 +244,8 @@ try {
    ['judge-program-officials.js','Пределы полномочий главного судьи'],
    ['judge-program-officials.js','Учебный алгоритм при расхождении'],
    ['judge-program-officials.js','Медицинская помощь и различия дисциплин'],
+   ['judge-program-officials.js','Учебный алгоритм при споре'],
+   ['judge-program-officials.js','Учебный алгоритм разграничения'],
    ['judge-program-sanctions.js','Две разные линии предупреждений'],
    ['judge-program-sanctions.js','Результат схватки и две процедуры протеста'],
    ['judge-program-scoring.js','Шаг 5. Одновременные предупреждения'],
@@ -272,8 +274,8 @@ try {
    check('LIVE module '+(i+1)+' opens its authored lesson',heading.includes(liveModules[i].first)&&await livePage.locator('.judge-prime .jp-part').count()>=2,heading);
   }
 
-  // Verify both newly revised officials lessons are rendered in the deployed course.
-  for(const [lessonIndex,headingText] of [[3,'Главный секретарь и секретариат'],[5,'Технический секретарь и протокол схватки']]){
+  // Verify revised officials lessons are rendered in the deployed course.
+  for(const [lessonIndex,headingText] of [[3,'Главный секретарь и секретариат'],[4,'Руководитель ковра, арбитр, боковой судья'],[5,'Технический секретарь и протокол схватки'],[7,'Информатор, контроль формы, врач, администратор']]){
    await livePage.evaluate(()=>openCourse('judge'));
    const officialsCard=livePage.locator('#lessons .sambo-module-card').nth(3);
    await officialsCard.locator('summary').click();
