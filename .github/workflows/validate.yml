@@ -168,3 +168,6 @@ jobs:
 
       - name: Check scoring early victory and throw matrix under articles 28, 33, 35, 36 and 40
         run: node scripts/check-scoring-33-35-normative.cjs
+
+      - name: Check article 34 tie-breakers and article 29 timing
+        run: node scripts/check-scoring-tiebreakers-normative.cjs
