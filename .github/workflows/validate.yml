@@ -148,6 +148,9 @@ jobs:
       - name: Verify combat sambo exam items 57-64 and September 2026 knockdown and medical amendments
         run: node scripts/check-exam-combat-2026.cjs
 
+      - name: Verify beach sambo exam items 65-72, article 45/56 discrepancy and historical keys
+        run: node scripts/check-exam-beach-2026.cjs
+
       - name: Check demonstration sambo normative lesson coverage
         run: node scripts/check-demo-normative.cjs
 
