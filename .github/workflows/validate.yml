@@ -142,6 +142,9 @@ jobs:
       - name: Check combat knockdown and age-specific referee decisions
         run: node scripts/check-combat-knockdown-19-28-33.cjs
 
+      - name: Check combat submissions, youth restrictions and concurrent timing arts 19/28
+        run: node scripts/check-combat-submissions-19-28.cjs
+
       - name: Check combat eligibility and protective equipment articles 5 and 10
         run: node scripts/check-combat-eligibility-equipment-5-10.cjs
 
