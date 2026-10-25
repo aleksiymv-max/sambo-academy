@@ -78,7 +78,7 @@ try {
  check('LOCAL sanctions exam 41–48 audited with stable keys',await page.evaluate(()=>
    window.samboJudgeCourseEngine.modules[5].questions.length===8&&
    window.samboJudgeCourseEngine.modules[5].questions.every(q=>q.body.length>250)&&
-   window.samboJudgeCourseEngine.modules[5].questions[0].body.includes('Статья 38(1)')&&
+   window.samboJudgeCourseEngine.modules[5].questions[0].body.includes('статья 38(1)')&&
    window.samboJudgeCourseEngine.modules[5].questions[4].body.includes('Председателем ВКС')));
  check('LOCAL sanctions exam flags ambiguous warning tie-break item 47',await page.evaluate(()=>
    window.samboJudgeCourseEngine.modules[5].questions[6].body.includes('ситуация требует уточнения перед окончательной нормативной приёмкой')));
