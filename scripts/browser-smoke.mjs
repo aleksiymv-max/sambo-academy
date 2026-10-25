@@ -836,6 +836,8 @@ try {
      const examBody=await examAsset.text();
      check('Cloudflare Pages serves audited independent exam bank',examAsset.ok()&&examBody.includes('Сам рецепт не подменяет соответствующее разрешение.'),examAsset.status().toString());
      check('Cloudflare Pages includes participant safety feedback',examAsset.ok()&&examBody.includes('тугую косу или хвост длиной не более 20 см'),examAsset.status().toString());
+     check('Cloudflare Pages serves officials venue-acceptance explanation',examAsset.ok()&&examBody.includes('акт приёма места соревнований (приложение № 11)'),examAsset.status().toString());
+     check('Cloudflare Pages flags unresolved submission-timer exam key',examAsset.ok()&&examBody.includes('Отдельное согласие большинства на запуск отсчёта'),examAsset.status().toString());
    }
  }catch(e){check('Cloudflare Pages reachable from CI',false,String(e).slice(0,220));}
 } catch(e) {check('smoke test execution',false,e.stack||String(e));} finally {if(browser)await browser.close();await new Promise(resolve=>server.close(resolve));}
