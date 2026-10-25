@@ -133,6 +133,9 @@ jobs:
       - name: Check beach sambo normative lesson coverage
         run: node scripts/check-beach-normative.cjs
 
+      - name: Check beach results, medical removal and disqualification articles 49, 51, 53–55
+        run: node scripts/check-beach-results-53-55.cjs
+
       - name: Check infrastructure and protocol normative lesson coverage
         run: node scripts/check-infrastructure-normative.cjs
 
