@@ -15,5 +15,5 @@ for(const word of ['Активность','вместо предупрежден
 }
 if(txt.includes('сопернику объявляют очередное предупреждение'))throw Error('Obsolete activity-as-warning instruction persists');
 const exam=fs.readFileSync('judge-exam-independent.js','utf8');
-if(!exam.includes('ему записывается оценка «Активность»')||exam.includes('определяется активный спортсмен и предупреждается соперник'))throw Error('Independent exam activity explanation outdated');
+if(!exam.includes('записывать оценку «Активность» («А») вместо предупреждения')||exam.includes('определяется активный спортсмен и предупреждается соперник'))throw Error('Independent exam activity explanation outdated');
 console.log('PASS: official 2026 activity assessment in lesson and independent exam, no obsolete warning');
