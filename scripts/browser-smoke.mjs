@@ -427,6 +427,33 @@ try {
    }
   }
 
+  // Timekeeping lesson: verify the deployed revision only after merge to main.
+  if(process.env.GITHUB_EVENT_NAME!=='pull_request'){
+   let timekeepingReady=false,timekeepingStatus='not fetched';
+   for(let attempt=0;attempt<6;attempt++){
+    try{
+     const response=await livePage.request.get('https://sambo-academy.pages.dev/judge-program-officials.js',{timeout:12000,failOnStatusCode:false});
+     timekeepingStatus=String(response.status());
+     timekeepingReady=response.ok()&&(await response.text()).includes('Оборудование на случай отказа питания');
+     if(timekeepingReady)break;
+    }catch(e){timekeepingStatus=String(e).slice(0,120);}
+    await new Promise(resolve=>setTimeout(resolve,5000));
+   }
+   check('LIVE article 22–23 timekeeping source published',timekeepingReady,timekeepingStatus);
+   if(timekeepingReady){
+    await livePage.evaluate(()=>openCourse('judge'));
+    const officialsCard=livePage.locator('#lessons .sambo-module-card').nth(3);
+    await officialsCard.locator('summary').click();
+    await officialsCard.locator('.sambo-topic-link').nth(6).click();
+    const title=await livePage.locator('.judge-prime h2').first().textContent();
+    const blocks=await livePage.locator('.judge-prime .jp-part').count();
+    const checks=await livePage.locator('.judge-prime .jp-question').count();
+    check('LIVE article 22–23 timekeeping editorial depth',
+     title.includes('Оператор табло и секундометрист')&&blocks>=9&&checks>=7,
+     'blocks='+blocks+' checks='+checks);
+   }
+  }
+
   // Verify article 28 as well as the previously published articles 29–34 on Cloudflare.
   for(const [lessonIndex,headingText,minBlocks] of [
    [0,'Положения спортсменов: стоя, лёжа и варианты приземления',8],
