@@ -508,6 +508,33 @@ try {
    }
   }
 
+  // Combat eligibility and protective equipment: verify publication after merge, not just local checkout.
+  if(process.env.GITHUB_EVENT_NAME!=='pull_request'){
+   let equipmentReady=false,equipmentStatus='not fetched';
+   for(let attempt=0;attempt<6;attempt++){
+    try{
+     const response=await livePage.request.get('https://sambo-academy.pages.dev/judge-program-combat.js',{timeout:12000,failOnStatusCode:false});
+     equipmentStatus=String(response.status());
+     equipmentReady=response.ok()&&(await response.text()).includes('Разграничение несоответствия и наказания');
+     if(equipmentReady)break;
+    }catch(e){equipmentStatus=String(e).slice(0,120);}
+    await new Promise(resolve=>setTimeout(resolve,5000));
+   }
+   check('LIVE combat eligibility/equipment lesson source published',equipmentReady,equipmentStatus);
+   if(equipmentReady){
+    await livePage.evaluate(()=>openCourse('judge'));
+    const combatCard=livePage.locator('#lessons .sambo-module-card').nth(8);
+    await combatCard.locator('summary').click();
+    await combatCard.locator('.sambo-topic-link').first().click();
+    const title=await livePage.locator('.judge-prime h2').first().textContent();
+    const blocks=await livePage.locator('.judge-prime .jp-part').count();
+    const checks=await livePage.locator('.judge-prime .jp-question').count();
+    check('LIVE combat eligibility/equipment editorial depth',
+     title.includes('Что меняется в боевом самбо')&&blocks>=9&&checks>=7,
+     'blocks='+blocks+' checks='+checks);
+   }
+  }
+
   // Verify article 28 as well as the previously published articles 29–34 on Cloudflare.
   for(const [lessonIndex,headingText,minBlocks] of [
    [0,'Положения спортсменов: стоя, лёжа и варианты приземления',8],
