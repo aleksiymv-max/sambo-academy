@@ -63,6 +63,12 @@ try {
  check('expanded judge modules contain fifty-four authored lessons',judgeModules.slice(1).reduce((n,g)=>n+g.lessons,0)===54);
   check('independent exam bank loaded',await page.evaluate(()=>window.samboJudgeIndependentExamLoaded===true));
   check('all revised judge exams use independent questions',await page.evaluate(()=>window.samboJudgeCourseEngine.modules.every(m=>m.examRevision===2&&m.questions.length>=8&&!m.questions.some(q=>m.lessons.some(l=>l.checks.some(c=>c[0].trim().toLowerCase()===q.q.trim().toLowerCase()))))));
+ check('LOCAL VFS 2026 submission timer majority explanation',await page.evaluate(()=>
+   window.samboJudgeCourseEngine.modules[2].questions[5].body.includes('Это два голоса из трёх')));
+ check('LOCAL independent bout exam source explanations',await page.evaluate(()=>
+   window.samboJudgeCourseEngine.modules[3].questions.length===8&&
+   window.samboJudgeCourseEngine.modules[3].questions.every(q=>q.body.length>180)&&
+   window.samboJudgeCourseEngine.modules[3].questions[4].body.includes('Различие сводного текста')));
  check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.progress)).size===judgeModules.length);
  for(const g of judgeModules.slice(1)){
   await page.evaluate(()=>openCourse('judge'));
@@ -837,7 +843,22 @@ try {
      check('Cloudflare Pages serves audited independent exam bank',examAsset.ok()&&examBody.includes('Сам рецепт не подменяет соответствующее разрешение.'),examAsset.status().toString());
      check('Cloudflare Pages includes participant safety feedback',examAsset.ok()&&examBody.includes('тугую косу или хвост длиной не более 20 см'),examAsset.status().toString());
      check('Cloudflare Pages serves officials venue-acceptance explanation',examAsset.ok()&&examBody.includes('акт приёма места соревнований (приложение № 11)'),examAsset.status().toString());
-     check('Cloudflare Pages flags unresolved submission-timer exam key',examAsset.ok()&&examBody.includes('Отдельное согласие большинства на запуск отсчёта'),examAsset.status().toString());
+     if(process.env.GITHUB_EVENT_NAME!=='pull_request'){
+       let publishedTimer=false,publishedBout=false,liveExamStatus='not fetched';
+       for(let attempt=0;attempt<10;attempt++){
+         try{
+           const fresh=await page.request.get('https://sambo-academy.pages.dev/judge-exam-independent.js',{timeout:12000,failOnStatusCode:false});
+           const source=await fresh.text();
+           liveExamStatus=String(fresh.status());
+           publishedTimer=fresh.ok()&&source.includes('Это два голоса из трёх');
+           publishedBout=fresh.ok()&&source.includes('Различие сводного текста и документа разъяснений 2026 года')&&source.includes('параллельные отсчёты удержания');
+           if(publishedTimer&&publishedBout)break;
+         }catch(e){liveExamStatus=String(e).slice(0,120);}
+         await new Promise(resolve=>setTimeout(resolve,5000));
+       }
+       check('Cloudflare Pages publishes reconciled VFS submission timer key',publishedTimer,liveExamStatus);
+       check('Cloudflare Pages publishes audited independent bout questions 25–32',publishedBout,liveExamStatus);
+     }
    }
  }catch(e){check('Cloudflare Pages reachable from CI',false,String(e).slice(0,220));}
 } catch(e) {check('smoke test execution',false,e.stack||String(e));} finally {if(browser)await browser.close();await new Promise(resolve=>server.close(resolve));}
