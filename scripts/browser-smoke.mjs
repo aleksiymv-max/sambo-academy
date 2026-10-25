@@ -69,6 +69,12 @@ try {
    window.samboJudgeCourseEngine.modules[3].questions.length===8&&
    window.samboJudgeCourseEngine.modules[3].questions.every(q=>q.body.length>180)&&
    window.samboJudgeCourseEngine.modules[3].questions[4].body.includes('Различие сводного текста')));
+ check('LOCAL scoring exam 33–40 source explanations',await page.evaluate(()=>
+   window.samboJudgeCourseEngine.modules[4].questions.length===8&&
+   window.samboJudgeCourseEngine.modules[4].questions.every(q=>q.body.length>220)&&
+   window.samboJudgeCourseEngine.modules[4].questions[4].body.includes('туловище атакуемого полностью')));
+ check('LOCAL exact-ten-second hold conflict retained',await page.evaluate(()=>
+   window.samboJudgeCourseEngine.modules[4].questions[2].body.includes('Для ровно 10 секунд тексты расходятся')));
  check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.progress)).size===judgeModules.length);
  for(const g of judgeModules.slice(1)){
   await page.evaluate(()=>openCourse('judge'));
@@ -858,6 +864,20 @@ try {
        }
        check('Cloudflare Pages publishes reconciled VFS submission timer key',publishedTimer,liveExamStatus);
        check('Cloudflare Pages publishes audited independent bout questions 25–32',publishedBout,liveExamStatus);
+       let publishedScoring=false,publishedHoldNote=false,scoringStatus='not fetched';
+       for(let attempt=0;attempt<10;attempt++){
+         try{
+           const fresh=await page.request.get('https://sambo-academy.pages.dev/judge-exam-independent.js',{timeout:12000,failOnStatusCode:false});
+           const source=await fresh.text();
+           scoringStatus=String(fresh.status());
+           publishedScoring=fresh.ok()&&source.includes('туловище атакуемого полностью осталось в пределах зоны безопасности ковра')&&source.includes('два совпадающих судейских решения');
+           publishedHoldNote=fresh.ok()&&source.includes('Для ровно 10 секунд тексты расходятся');
+           if(publishedScoring&&publishedHoldNote)break;
+         }catch(e){scoringStatus=String(e).slice(0,120);}
+         await new Promise(resolve=>setTimeout(resolve,5000));
+       }
+       check('Cloudflare Pages publishes scoring exam audit 33–40',publishedScoring,scoringStatus);
+       check('Cloudflare Pages publishes unresolved exact-ten-second hold warning',publishedHoldNote,scoringStatus);
      }
    }
  }catch(e){check('Cloudflare Pages reachable from CI',false,String(e).slice(0,220));}

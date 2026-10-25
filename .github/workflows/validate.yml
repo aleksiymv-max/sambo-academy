@@ -136,6 +136,9 @@ jobs:
       - name: Verify independent bout exam items 25-32 and reconcile VFS 2026 activity guidance
         run: node scripts/check-exam-bout-2026.cjs
 
+      - name: Verify scoring exam items 33-40 and exact-ten-second hold discrepancy
+        run: node scripts/check-exam-scoring-2026.cjs
+
       - name: Check demonstration sambo normative lesson coverage
         run: node scripts/check-demo-normative.cjs
 
