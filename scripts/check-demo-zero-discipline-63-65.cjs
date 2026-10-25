@@ -5,7 +5,7 @@ for(const file of ['judge-course-engine.js','judge-program-admission.js','judge-
 const mods=ctx.window.samboJudgeCourseEngine.modules,demo=mods[9],l=demo.lessons[2];
 assert.equal(mods.length,11);assert.equal(demo.lessons.length,5);
 assert.equal(l.title,'Нулевая оценка, дисциплина и перечни техник');
-assert.ok(l.ref.includes('63')&&l.ref.includes('64')&&l.ref.includes('65'));
+assert.ok(l.ref.includes('63')&&l.ref.includes('65'),'Reference must cover article range 63–65');
 assert.ok(l.blocks.length>=10&&l.checks.length>=7);
 const body=[l.ref,...l.blocks.map(b=>b.join(' ')),l.situation,l.caseAnalysis,l.decision,l.trap,...l.checks.map(q=>q[3])].join(' ').toLowerCase();
 for(const marker of ['статья 62','статья 63','статья 64','статья 65','три ошибки','более чем','может быть дисквалифицирован','протокол','место не присуж','боковая подсечка','бросок через бедро','по фазам','незаконченное'])assert.ok(body.includes(marker.toLowerCase()),'Missing normative anchor: '+marker);
