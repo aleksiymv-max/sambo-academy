@@ -107,6 +107,14 @@ try {
 check('LOCAL demonstration exam preserves article 66/68 discrepancy',await page.evaluate(()=>
   window.samboJudgeCourseEngine.modules[9].questions[4].body.includes('статья 68(2)')&&
   window.samboJudgeCourseEngine.modules[9].questions[4].body.includes('разночтение')));
+check('LOCAL practicum exam 81–88 has detailed article-level explanations',await page.evaluate(()=>
+  window.samboJudgeCourseEngine.modules[10].questions.length===8&&
+  window.samboJudgeCourseEngine.modules[10].questions.every(q=>q.body.length>=450)&&
+  window.samboJudgeCourseEngine.modules[10].questions[1].body.includes('статья 36(3, 6–7)')&&
+  window.samboJudgeCourseEngine.modules[10].questions[4].body.includes('статья 3(7)')));
+check('LOCAL practicum exam preserves protest outcome and tie-break exceptions',await page.evaluate(()=>
+  window.samboJudgeCourseEngine.modules[10].questions[7].body.includes('не влияет на конечный результат схватки')&&
+  window.samboJudgeCourseEngine.modules[10].questions[2].body.includes('универсальным')));
 check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.progress)).size===judgeModules.length);
  for(const g of judgeModules.slice(1)){
   await page.evaluate(()=>openCourse('judge'));
@@ -980,6 +988,20 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
        }
        check('Cloudflare Pages publishes demonstration exam audit 73–80',demoPublished,demoStatus);
        check('Cloudflare Pages publishes article 66/68 judging discrepancy',demoCaveat,demoStatus);
+       let practicumPublished=false,protestCaveat=false,practicumStatus='not fetched';
+       for(let attempt=0;attempt<10;attempt++){
+         try{
+           const fresh=await page.request.get('https://sambo-academy.pages.dev/judge-exam-independent.js',{timeout:12000,failOnStatusCode:false});
+           const source=await fresh.text();
+           practicumStatus=String(fresh.status());
+           practicumPublished=fresh.ok()&&source.includes('Статья 8(5–6) и приложение 9')&&source.includes('статья 36(3, 6–7)')&&source.includes('Пункты 34(5–6) утратили силу');
+           protestCaveat=fresh.ok()&&source.includes('статья 41(5) прямо устанавливает')&&source.includes('не влияет на конечный результат схватки');
+           if(practicumPublished&&protestCaveat)break;
+         }catch(e){practicumStatus=String(e).slice(0,120);}
+         await new Promise(resolve=>setTimeout(resolve,5000));
+       }
+       check('Cloudflare Pages publishes practicum exam audit 81–88',practicumPublished,practicumStatus);
+       check('Cloudflare Pages publishes article 41(5) protest outcome limitation',protestCaveat,practicumStatus);
 
      }
    }
