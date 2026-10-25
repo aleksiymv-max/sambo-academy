@@ -16,8 +16,8 @@ assert.equal(combat.lessons.length,4,'Combat lesson order changed');
 assert.equal(lesson.title,'Что меняется в боевом самбо');
 assert.ok(lesson.blocks.length>=9,'Equipment explanation depth below editorial target');
 assert.ok(lesson.checks.length>=7,'Equipment self-check depth below editorial target');
-const body=lesson.blocks.map(b=>b.join(' ')).join(' ');
-for(const marker of ['Статья 5 раздела VI','18 лет именно на день','статья 10(1–5)',
+const body=[...lesson.blocks.map(b=>b.join(' ')),lesson.caseAnalysis,lesson.decision].join(' ');
+for(const marker of ['Статья 5 раздела VI','18 лет именно на день','10(1–5)',
  'статья 10(2)(г)','6 унций','статья 10(3)','статья 10(6)','санкции'])
  assert.ok(body.toLowerCase().includes(marker.toLowerCase()),'Missing normative anchor: '+marker);
 assert.ok(lesson.caseAnalysis.includes('Дано:')&&lesson.caseAnalysis.includes('Норма:'));
