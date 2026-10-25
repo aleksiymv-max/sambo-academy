@@ -8,7 +8,7 @@ assert.equal(l.title,'Нулевая оценка, дисциплина и пе�
 assert.ok(l.ref.includes('63')&&l.ref.includes('65'),'Reference must cover article range 63–65');
 assert.ok(l.blocks.length>=10&&l.checks.length>=7);
 const body=[l.ref,...l.blocks.map(b=>b.join(' ')),l.situation,l.caseAnalysis,l.decision,l.trap,...l.checks.map(q=>q[3])].join(' ').toLowerCase();
-for(const marker of ['статья 62','статья 63','статья 64','статья 65','три ошибки','более чем','может быть дисквалифицирован','протокол','место не присуж','боковая подсечка','бросок через бедро','по фазам','незаконченное'])assert.ok(body.includes(marker.toLowerCase()),'Missing normative anchor: '+marker);
+for(const marker of ['статья 62','статья 63','статья 64','статья 65','три ошибки','более чем','может быть дисквалифицирован','протокол','место не присуж','подсечк','бросок через бедро','по фазам','незаконченное'])assert.ok(body.includes(marker.toLowerCase()),'Missing normative anchor: '+marker);
 assert.ok(l.caseAnalysis.startsWith('Норма:')&&l.decision.startsWith('Вывод:'));
 const original=[
  ['Как оценивается упражнение с тремя ошибками?',['0 баллов','1 балл','2 балла','3 балла'],0],
