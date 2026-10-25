@@ -132,6 +132,12 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
  check('judge foundation has six curated sequential lessons',judgeInfo.premium&&judgeInfo.lessons===6&&judgeInfo.sections===8,JSON.stringify(judgeInfo));
  check('judge foundation has 24 verified questions',judgeInfo.questions===24);
  check('updated judge module has separate progress version',judgeInfo.progress===1100);
+ check('LOCAL foundation exam 1–8 explanations follow appendix 1 and articles 1–2',await page.evaluate(()=>{
+   const m=window.samboJudgeFoundations,q=m.questions;
+   return m.progressIndex===1100&&q.length===24&&q.slice(0,8).every(x=>x.body.length>=450)&&
+     q[0].body.includes('Приложение 1, пункт 1')&&q[2].body.includes('Приложение 1, пункт 4')&&
+     q[7].body.includes('Статья 2(3)');
+ }));
  await page.locator('#lessons .sambo-module-card').first().locator('.sambo-topic-link').first().click();
  check('judge first lesson opens directly',await page.locator('#lessonTitle').textContent()!=='');
  check('judge first lesson contains clear sequence',await page.locator('.judge-prime .jp-part').count()>=4);
@@ -283,6 +289,12 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
   check('LIVE new judge course shown',(await judgeFirst.textContent()).includes('Нормативная основа и способы проведения'));
   await judgeFirst.locator('.sambo-topic-link').first().click();
   check('LIVE detailed judge lesson has ordered sections',await livePage.locator('.judge-prime .jp-part').count()>=4);
+  check('LIVE foundation exam 1–8 audited explanations loaded',await livePage.evaluate(()=>{
+    const m=window.samboJudgeFoundations;
+    return m?.progressIndex===1100&&m.questions.length===24&&
+      m.questions.slice(0,8).every(q=>q.body.length>=450)&&
+      m.questions[5].body.includes('Статья 1, пункт 3');
+  }));
   // Verify the published Cloudflare version, not just the checked-out source.
   // Earlier smoke coverage exercised the expanded modules only on localhost.
   await livePage.evaluate(()=>openCourse('judge'));
@@ -1002,6 +1014,20 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
        }
        check('Cloudflare Pages publishes practicum exam audit 81–88',practicumPublished,practicumStatus);
        check('Cloudflare Pages publishes article 41(5) protest outcome limitation',protestCaveat,practicumStatus);
+       let foundationPublished=false,foundationStatus='not fetched';
+       for(let attempt=0;attempt<10;attempt++){
+         try{
+           const fresh=await page.request.get('https://sambo-academy.pages.dev/judge-foundations.js',{timeout:12000,failOnStatusCode:false});
+           const source=await fresh.text();
+           foundationStatus=String(fresh.status());
+           foundationPublished=fresh.ok()&&source.includes('foundationExamAuditBodies')&&
+             source.includes('Статья 1, пункты 1–5 Правил регулирует')&&
+             source.includes('Приложение 1, пункт 4 Правил прямо ограничивает');
+           if(foundationPublished)break;
+         }catch(e){foundationStatus=String(e).slice(0,120);}
+         await new Promise(resolve=>setTimeout(resolve,5000));
+       }
+       check('Cloudflare Pages publishes foundation exam audit 1–8',foundationPublished,foundationStatus);
 
      }
    }
