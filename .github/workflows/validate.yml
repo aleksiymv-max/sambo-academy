@@ -151,6 +151,9 @@ jobs:
       - name: Verify beach sambo exam items 65-72, article 45/56 discrepancy and historical keys
         run: node scripts/check-exam-beach-2026.cjs
 
+      - name: Verify demonstration sambo exam items 73–80, appendix 10.3 and article 66/68 caveat
+        run: node scripts/check-exam-demo-2026.cjs
+
       - name: Check demonstration sambo normative lesson coverage
         run: node scripts/check-demo-normative.cjs
 
