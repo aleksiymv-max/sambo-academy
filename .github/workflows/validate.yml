@@ -139,6 +139,9 @@ jobs:
       - name: Check demonstration zero, discipline and age lists arts 63–65
         run: node scripts/check-demo-zero-discipline-63-65.cjs
 
+      - name: Check demonstration team composition, judging crew and unresolved 66/68 discrepancy
+        run: node scripts/check-demo-team-composition-66-67.cjs
+
       - name: Check beach sambo normative lesson coverage
         run: node scripts/check-beach-normative.cjs
 
