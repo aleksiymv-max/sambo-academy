@@ -562,6 +562,33 @@ try {
    }
   }
 
+  // Demonstration sambo arts 59–60: check deployed content and first lesson after merge.
+  if(process.env.GITHUB_EVENT_NAME!=='pull_request'){
+   let demoReady=false,demoStatus='not fetched';
+   for(let attempt=0;attempt<6;attempt++){
+    try{
+     const response=await livePage.request.get('https://sambo-academy.pages.dev/judge-program-demo.js',{timeout:12000,failOnStatusCode:false});
+     demoStatus=String(response.status());
+     demoReady=response.ok()&&(await response.text()).includes('Возраст в календарном году — не возраст в день выхода');
+     if(demoReady)break;
+    }catch(e){demoStatus=String(e).slice(0,120);}
+    await new Promise(resolve=>setTimeout(resolve,5000));
+   }
+   check('LIVE demonstration arts 59–60 revised source published',demoReady,demoStatus);
+   if(demoReady){
+    await livePage.evaluate(()=>openCourse('judge'));
+    const demoCard=livePage.locator('#lessons .sambo-module-card').nth(10);
+    await demoCard.locator('summary').click();
+    await demoCard.locator('.sambo-topic-link').first().click();
+    const title=await livePage.locator('.judge-prime h2').first().textContent();
+    const blocks=await livePage.locator('.judge-prime .jp-part').count();
+    const checks=await livePage.locator('.judge-prime .jp-question').count();
+    check('LIVE demonstration personal judging lesson editorial depth',
+      title.includes('Возрастные группы и судейская коллегия личной демонстрации')&&blocks>=10&&checks>=7,
+      'blocks='+blocks+' checks='+checks);
+   }
+  }
+
   // Beach sambo: confirm the revised result/disqualification lesson is deployed and rendered.
   if(process.env.GITHUB_EVENT_NAME!=='pull_request'){
    let beachReady=false,beachStatus='not fetched';
