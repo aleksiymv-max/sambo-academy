@@ -75,6 +75,13 @@ try {
    window.samboJudgeCourseEngine.modules[4].questions[4].body.includes('туловище атакуемого полностью')));
  check('LOCAL exact-ten-second hold conflict retained',await page.evaluate(()=>
    window.samboJudgeCourseEngine.modules[4].questions[2].body.includes('Для ровно 10 секунд тексты расходятся')));
+ check('LOCAL sanctions exam 41–48 audited with stable keys',await page.evaluate(()=>
+   window.samboJudgeCourseEngine.modules[5].questions.length===8&&
+   window.samboJudgeCourseEngine.modules[5].questions.every(q=>q.body.length>250)&&
+   window.samboJudgeCourseEngine.modules[5].questions[0].body.includes('Статья 38(1)')&&
+   window.samboJudgeCourseEngine.modules[5].questions[4].body.includes('Председателем ВКС')));
+ check('LOCAL sanctions exam flags ambiguous warning tie-break item 47',await page.evaluate(()=>
+   window.samboJudgeCourseEngine.modules[5].questions[6].body.includes('ситуация требует уточнения перед окончательной нормативной приёмкой')));
  check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.progress)).size===judgeModules.length);
  for(const g of judgeModules.slice(1)){
   await page.evaluate(()=>openCourse('judge'));
@@ -878,6 +885,20 @@ try {
        }
        check('Cloudflare Pages publishes scoring exam audit 33–40',publishedScoring,scoringStatus);
        check('Cloudflare Pages publishes unresolved exact-ten-second hold warning',publishedHoldNote,scoringStatus);
+       let publishedSanctions=false,publishedTieCaveat=false,sanctionsStatus='not fetched';
+       for(let attempt=0;attempt<10;attempt++){
+         try{
+           const fresh=await page.request.get('https://sambo-academy.pages.dev/judge-exam-independent.js',{timeout:12000,failOnStatusCode:false});
+           const source=await fresh.text();
+           sanctionsStatus=String(fresh.status());
+           publishedSanctions=fresh.ok()&&source.includes('неустранённое разночтение требует официального разъяснения')&&source.includes('Статья 41(3)(а): протест');
+           publishedTieCaveat=fresh.ok()&&source.includes('ситуация требует уточнения перед окончательной нормативной приёмкой');
+           if(publishedSanctions&&publishedTieCaveat)break;
+         }catch(e){sanctionsStatus=String(e).slice(0,120);}
+         await new Promise(resolve=>setTimeout(resolve,5000));
+       }
+       check('Cloudflare Pages publishes sanctions exam audit 41–48',publishedSanctions,sanctionsStatus);
+       check('Cloudflare Pages publishes item 47 normative caveat',publishedTieCaveat,sanctionsStatus);
      }
    }
  }catch(e){check('Cloudflare Pages reachable from CI',false,String(e).slice(0,220));}
