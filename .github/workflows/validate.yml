@@ -136,6 +136,9 @@ jobs:
       - name: Check personal demonstration scoring and disputed marks arts 61–63
         run: node scripts/check-demo-personal-scoring-61-62.cjs
 
+      - name: Check demonstration zero, discipline and age lists arts 63–65
+        run: node scripts/check-demo-zero-discipline-63-65.cjs
+
       - name: Check beach sambo normative lesson coverage
         run: node scripts/check-beach-normative.cjs
 
