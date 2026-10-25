@@ -899,6 +899,20 @@ try {
        }
        check('Cloudflare Pages publishes sanctions exam audit 41–48',publishedSanctions,sanctionsStatus);
        check('Cloudflare Pages publishes item 47 normative caveat',publishedTieCaveat,sanctionsStatus);
+       let publishedInfrastructure=false,publishedForms=false,infraStatus='not fetched';
+       for(let attempt=0;attempt<10;attempt++){
+         try{
+           const fresh=await page.request.get('https://sambo-academy.pages.dev/judge-exam-independent.js',{timeout:12000,failOnStatusCode:false});
+           const source=await fresh.text();
+           infraStatus=String(fresh.status());
+           publishedInfrastructure=fresh.ok()&&source.includes('Статья 43(6): для каждого ковра')&&source.includes('четыре руководителя ковра, шесть арбитров');
+           publishedForms=fresh.ok()&&source.includes('Приложение 13 описывает жесты судей')&&source.includes('не задаёт отдельного универсального числового размера');
+           if(publishedInfrastructure&&publishedForms)break;
+         }catch(e){infraStatus=String(e).slice(0,120);}
+         await new Promise(resolve=>setTimeout(resolve,5000));
+       }
+       check('Cloudflare Pages publishes infrastructure exam audit 49–56',publishedInfrastructure,infraStatus);
+       check('Cloudflare Pages publishes verified forms and safety-zone caveats',publishedForms,infraStatus);
      }
    }
  }catch(e){check('Cloudflare Pages reachable from CI',false,String(e).slice(0,220));}
