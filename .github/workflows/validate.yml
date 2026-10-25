@@ -127,6 +127,9 @@ jobs:
       - name: Report editorial gaps without treating them as a validated course
         run: node scripts/audit-judge-content.cjs
 
+      - name: Verify 16 independent exam keys and article-specific explanations (arts 3, 5, 7–11)
+        run: node scripts/check-exam-admission-participants-2026.cjs
+
       - name: Check demonstration sambo normative lesson coverage
         run: node scripts/check-demo-normative.cjs
 
