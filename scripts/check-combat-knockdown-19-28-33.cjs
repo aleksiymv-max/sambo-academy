@@ -18,7 +18,7 @@ assert.ok(lesson.blocks.length>=9,'Knockdown explanation depth below editorial t
 assert.ok(lesson.checks.length>=7,'Knockdown self-check depth below editorial target');
 const body=lesson.blocks.map(b=>b.join(' ')).join(' ');
 for(const anchor of ['Статья 19(1, 11)','Статья 28, пункт 9','статья 33(1)(д)',
- 'Статья 19(10)','Статья 19(2)','статья 35(2)(в)','Статья 33(2)',
+ 'Статья 19(10)','Статья 19(2)','статья 35(2)(в)','статье 33(2)',
  'два нокдауна','первого нокдауна','не право арбитра ставить диагноз'])
  assert.ok(body.toLowerCase().includes(anchor.toLowerCase()),'Missing normative anchor: '+anchor);
 assert.ok(lesson.caseAnalysis.includes('Дано:')&&lesson.caseAnalysis.includes('Норма:'));
