@@ -139,6 +139,9 @@ jobs:
       - name: Check combat sambo normative lesson coverage
         run: node scripts/check-combat-normative.cjs
 
+      - name: Check combat knockdown and age-specific referee decisions
+        run: node scripts/check-combat-knockdown-19-28-33.cjs
+
       - name: Check athlete rights and 2026 medical-time discipline exception
         run: node scripts/check-athlete-rights-medical-2026.cjs
 
