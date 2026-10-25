@@ -616,6 +616,33 @@ try {
    }
   }
 
+  // Published demonstration sambo arts 63–65: third lesson and editorial depth.
+  if(process.env.GITHUB_EVENT_NAME!=='pull_request'){
+   let zeroReady=false,zeroStatus='not fetched';
+   for(let attempt=0;attempt<6;attempt++){
+    try{
+     const response=await livePage.request.get('https://sambo-academy.pages.dev/judge-program-demo.js',{timeout:12000,failOnStatusCode:false});
+     zeroStatus=String(response.status());
+     zeroReady=response.ok()&&(await response.text()).includes('Строгая граница двух минут');
+     if(zeroReady)break;
+    }catch(e){zeroStatus=String(e).slice(0,120);}
+    await new Promise(resolve=>setTimeout(resolve,5000));
+   }
+   check('LIVE demonstration arts 63–65 revised source published',zeroReady,zeroStatus);
+   if(zeroReady){
+    await livePage.evaluate(()=>openCourse('judge'));
+    const card=livePage.locator('#lessons .sambo-module-card').nth(10);
+    await card.locator('summary').click();
+    await card.locator('.sambo-topic-link').nth(2).click();
+    const title=await livePage.locator('.judge-prime h2').first().textContent();
+    const blocks=await livePage.locator('.judge-prime .jp-part').count();
+    const checks=await livePage.locator('.judge-prime .jp-question').count();
+    check('LIVE demonstration zero and discipline editorial depth',
+      title.includes('Нулевая оценка, дисциплина и перечни техник')&&blocks>=10&&checks>=7,
+      'blocks='+blocks+' checks='+checks);
+   }
+  }
+
   // Beach sambo: confirm the revised result/disqualification lesson is deployed and rendered.
   if(process.env.GITHUB_EVENT_NAME!=='pull_request'){
    let beachReady=false,beachStatus='not fetched';
