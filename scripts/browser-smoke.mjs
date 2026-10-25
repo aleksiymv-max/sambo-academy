@@ -99,7 +99,15 @@ try {
  check('LOCAL beach exam preserves explicit article 45/56 judging-crew caveat',await page.evaluate(()=>
    window.samboJudgeCourseEngine.modules[8].questions[5].body.includes('официального разъяснения')&&
    window.samboJudgeCourseEngine.modules[8].questions[7].body.includes('разночтение')));
- check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.progress)).size===judgeModules.length);
+ check('LOCAL demonstration exam 73–80 has article-level explanations',await page.evaluate(()=>
+  window.samboJudgeCourseEngine.modules[9].questions.length===8&&
+  window.samboJudgeCourseEngine.modules[9].questions.every(q=>q.body.length>=450)&&
+  window.samboJudgeCourseEngine.modules[9].questions[0].body.includes('десяти упражнений')&&
+  window.samboJudgeCourseEngine.modules[9].questions[6].body.includes('статье 64')));
+check('LOCAL demonstration exam preserves article 66/68 discrepancy',await page.evaluate(()=>
+  window.samboJudgeCourseEngine.modules[9].questions[4].body.includes('статья 68(2)')&&
+  window.samboJudgeCourseEngine.modules[9].questions[4].body.includes('разночтение')));
+check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.progress)).size===judgeModules.length);
  for(const g of judgeModules.slice(1)){
   await page.evaluate(()=>openCourse('judge'));
   const card=page.locator('#lessons .sambo-module-card').nth(g.index);
@@ -958,6 +966,21 @@ try {
        }
        check('Cloudflare Pages publishes beach exam audit 65–72',beachPublished,beachStatus);
        check('Cloudflare Pages publishes article 45/56 discrepancy warning',beachCaveat,beachStatus);
+       let demoPublished=false,demoCaveat=false,demoStatus='not fetched';
+       for(let attempt=0;attempt<10;attempt++){
+         try{
+           const fresh=await page.request.get('https://sambo-academy.pages.dev/judge-exam-independent.js',{timeout:12000,failOnStatusCode:false});
+           const source=await fresh.text();
+           demoStatus=String(fresh.status());
+           demoPublished=fresh.ok()&&source.includes('десяти упражнений своей возрастной группы')&&source.includes('Дополнительной жеребьёвки')&&source.includes('Само по себе изменение порядка');
+           demoCaveat=fresh.ok()&&source.includes('Это неустранённое разночтение статей 66 и 68')&&source.includes('Приложение 10.3 устанавливает расчёт');
+           if(demoPublished&&demoCaveat)break;
+         }catch(e){demoStatus=String(e).slice(0,120);}
+         await new Promise(resolve=>setTimeout(resolve,5000));
+       }
+       check('Cloudflare Pages publishes demonstration exam audit 73–80',demoPublished,demoStatus);
+       check('Cloudflare Pages publishes article 66/68 judging discrepancy',demoCaveat,demoStatus);
+
      }
    }
  }catch(e){check('Cloudflare Pages reachable from CI',false,String(e).slice(0,220));}
