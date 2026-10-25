@@ -145,6 +145,9 @@ jobs:
       - name: Verify infrastructure and protocol exam items 49-56, including article 42 safety and appendix 13 distinction
         run: node scripts/check-exam-infrastructure-2026.cjs
 
+      - name: Verify combat sambo exam items 57-64 and September 2026 knockdown and medical amendments
+        run: node scripts/check-exam-combat-2026.cjs
+
       - name: Check demonstration sambo normative lesson coverage
         run: node scripts/check-demo-normative.cjs
 
