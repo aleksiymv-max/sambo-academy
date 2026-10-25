@@ -154,6 +154,9 @@ jobs:
       - name: Verify demonstration sambo exam items 73–80, appendix 10.3 and article 66/68 caveat
         run: node scripts/check-exam-demo-2026.cjs
 
+      - name: Verify comprehensive practicum exam items 81–88 and article 41 protest limitations
+        run: node scripts/check-exam-practicum-2026.cjs
+
       - name: Check demonstration sambo normative lesson coverage
         run: node scripts/check-demo-normative.cjs
 
