@@ -193,6 +193,13 @@ try {
  width=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,viewport:innerWidth}));
  check('mobile lesson no horizontal overflow',width.scroll<=width.viewport+3,JSON.stringify(width));
  check('no uncaught JS errors',errors.length===0,errors.slice(0,5).join(' | '));
+ // Final practicum: verify revised third lesson on local test server.
+ await page.evaluate(()=>openCourse('judge'));
+ const localPracticumCard=page.locator('#lessons .sambo-module-card').nth(11);
+ await localPracticumCard.locator('summary').click();
+ await localPracticumCard.locator('.sambo-topic-link').nth(2).click();
+ check('LOCAL practicum results editorial depth',await page.locator('.judge-prime .jp-part').count()>=13&&await page.locator('.judge-prime .jp-question').count()>=9);
+ check('LOCAL practicum article 34 exception visible',(await page.locator('.judge-prime').textContent()).includes('Статья 34(8)'));
  // Real published-page browser check (no credentials, no account mutations).
  try {
   const liveCtx=await browser.newContext({viewport:{width:1280,height:800}});
@@ -694,6 +701,31 @@ try {
     check('LIVE demonstration team results editorial depth',
       title.includes('Определение победителей командной демонстрации')&&blocks>=12&&checks>=7,
       'blocks='+blocks+' checks='+checks);
+   }
+  }
+
+  // Final practicum: verify that the deployed source and third lesson are current.
+  if(process.env.GITHUB_EVENT_NAME!=='pull_request'){
+   let finalReady=false,finalStatus='not fetched';
+   for(let attempt=0;attempt<6;attempt++){
+    try{
+     const response=await livePage.request.get('https://sambo-academy.pages.dev/judge-program-practicum.js',{timeout:12000,failOnStatusCode:false});
+     finalStatus=String(response.status());
+     finalReady=response.ok()&&(await response.text()).includes('Особые случаи предупреждений');
+     if(finalReady)break;
+    }catch(e){finalStatus=String(e).slice(0,120);}
+    await new Promise(resolve=>setTimeout(resolve,5000));
+   }
+   check('LIVE practicum results arts 34–41 source published',finalReady,finalStatus);
+   if(finalReady){
+    await livePage.evaluate(()=>openCourse('judge'));
+    const finalCard=livePage.locator('#lessons .sambo-module-card').nth(11);
+    await finalCard.locator('summary').click();
+    await finalCard.locator('.sambo-topic-link').nth(2).click();
+    const title=await livePage.locator('.judge-prime h2').first().textContent();
+    const blocks=await livePage.locator('.judge-prime .jp-part').count();
+    const checks=await livePage.locator('.judge-prime .jp-question').count();
+    check('LIVE practicum results editorial depth',title.includes('Сценарий итогов: равенство, нарушения, протокол')&&blocks>=13&&checks>=9,'blocks='+blocks+' checks='+checks);
    }
   }
 

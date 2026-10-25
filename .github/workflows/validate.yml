@@ -175,6 +175,9 @@ jobs:
       - name: Check integrated referee practicum normative structure
         run: node scripts/check-practicum-normative.cjs
 
+      - name: Check final practicum result tie-breaks, sanctions and protocol arts 34–41
+        run: node scripts/check-practicum-results-34-41.cjs
+
       - name: Check referee officials arts 14-16 and editorial completeness
         run: node scripts/check-officials-normative.cjs
 
