@@ -1,7 +1,7 @@
 'use strict';
 // Normative audit of foundation exam items 1–8, 26.10.2026.
 // Official source: order 892, amended by order 860 of 14.09.2026; arts 1–2, appendix 1.
-// Explanations alone are revised: 24 historical questions/keys and progress index 1100 stay intact.
+// Explanations 1–8 are checked here; items 9–16 have a separate test. All historical questions/keys and progress index 1100 stay intact.
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const sandbox={window:{}};vm.createContext(sandbox);
 vm.runInContext(fs.readFileSync('judge-foundations.js','utf8'),sandbox,{filename:'judge-foundations.js'});
@@ -16,7 +16,7 @@ assert.equal(qs.filter(q=>q.kind==='Судейская ситуация').length
 function fnv(text){let h=2166136261;for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h.toString(16);}
 const stable=qs.map(({q,a,correct,kind})=>({q,a,correct,kind}));
 assert.equal(fnv(JSON.stringify(stable)),'4910eed2','Original 24 exam questions/options/keys/order changed');
-assert.equal(fnv(JSON.stringify(qs.slice(8).map(q=>q.body))),'dd485668','Later foundation exam explanations were modified');
+assert.equal(fnv(JSON.stringify(qs.slice(16).map(q=>q.body))),'c0e3eef3','Foundation exam explanations 17–24 were modified');
 assert.equal(fnv(JSON.stringify(mod.lessons.map(l=>l.questions))),'c41346d9','Lesson self-checks were modified');
 const expected=[
  ['На что следует опираться в спорной или неописанной в Положении ситуации?',1,'На Правила вида спорта «самбо»',['Приложение 1, пункт 1','Правилами','судейская коллегия']],
@@ -39,6 +39,6 @@ for(let i=0;i<8;i++){
 }
 assert.ok(qs.slice(12).every(q=>!self.has(q.q.trim().toLowerCase())),'Independent situational questions must not duplicate self-checks');
 console.log('PASS: foundation exam 1–8 source explanations and stable 24-item historical fingerprint');
-console.log('PASS: appendix 1(1,4), articles 1(1–5), 2(1,3–4); untouched self-checks and exam items 9–24');
+console.log('PASS: appendix 1(1,4), articles 1(1–5), 2(1,3–4); untouched self-checks and exam items 17–24 (items 9–16 audited separately)');
 console.log('KNOWN DESIGN: first 12 normative recall items reuse lesson self-check questions; 12 new scenarios do not');
 console.log('NOT VERIFIED: authenticated progress restoration, external referee-methodologist sign-off, unresolved cross-article conflicts');
