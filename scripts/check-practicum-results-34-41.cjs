@@ -13,7 +13,7 @@ assert.ok(lesson.ref.includes('34')&&lesson.ref.includes('41'));
 assert.ok(lesson.blocks.length>=13&&lesson.checks.length>=9,'Editorial threshold');
 assert.ok(lesson.caseAnalysis.startsWith('Норма:')&&lesson.decision.startsWith('Вывод:'));
 const full=[lesson.ref,...lesson.blocks.flat(),lesson.situation,lesson.caseAnalysis,lesson.decision,lesson.trap,...lesson.checks.map(q=>q[3])].join(' ').toLowerCase();
-for(const marker of ['статья 34(4)','статья 34(8)','статья 34(9)','статья 37','статья 38','статья 39','статья 40(2)','статья 41(5)','техническ','предупрежден','протокол','дисквалификац','утратили силу','неординарн'])
+for(const marker of ['статья 34(4)','статья 34(8)','статья 34(9)','статья 37','статья 38','статья 39','статья 40(2)','статье 41(5)','техническ','предупрежден','протокол','дисквалификац','утратили силу','неординарн'])
  assert.ok(full.includes(marker.toLowerCase()),'Missing normative marker: '+marker);
 const originals=[
  ['Какой критерий применяют в конце цепочки равенства?',['Последнее оценённое действие','Алфавит','Вес тренера','Болельщики'],0],
@@ -34,7 +34,7 @@ assert.equal(practicum.questions.length,8);
 const self=new Set(practicum.lessons.flatMap(l=>l.checks.map(q=>q[0].trim().toLowerCase())));
 assert.ok(practicum.questions.every(q=>!self.has(q.q.trim().toLowerCase())),'Independent exam questions must remain separate');
 const shallow=mods.flatMap(m=>m.lessons.filter(l=>l.blocks.length<6||l.checks.length<5).map(l=>m.title+': '+l.title));
-assert.deepEqual(shallow,[],'Every expanded lesson must reach quantitative editorial threshold');
+assert.equal(shallow.length,0,'Every expanded lesson must reach quantitative editorial threshold: '+shallow.join('; '));
 console.log('PASS practicum arts 32–34, 37–41: '+lesson.blocks.length+' blocks, '+lesson.checks.length+' questions; five original answer keys preserved');
 console.log('PASS 54 expanded lessons / 88 independent exam questions; no shallow expanded lessons');
 console.log('NOTE: quantitative threshold does not prove normative accuracy, methodical acceptance or real-account progress restoration');
