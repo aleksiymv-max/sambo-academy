@@ -133,6 +133,9 @@ jobs:
       - name: Check demonstration sambo age groups and personal judging crew arts 59–60
         run: node scripts/check-demo-personal-age-crew-59-60.cjs
 
+      - name: Check personal demonstration scoring and disputed marks arts 61–63
+        run: node scripts/check-demo-personal-scoring-61-62.cjs
+
       - name: Check beach sambo normative lesson coverage
         run: node scripts/check-beach-normative.cjs
 
