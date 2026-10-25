@@ -832,6 +832,10 @@ try {
      const pr=await page.request.get('https://sambo-academy.pages.dev/progress.js',{timeout:12000,failOnStatusCode:false});
      const liveProgress=await pr.text();
      check('Cloudflare Pages has latest progress saving',pr.ok()&&liveProgress.includes('return true;'),pr.status().toString());
+     const examAsset=await page.request.get('https://sambo-academy.pages.dev/judge-exam-independent.js',{timeout:12000,failOnStatusCode:false});
+     const examBody=await examAsset.text();
+     check('Cloudflare Pages serves audited independent exam bank',examAsset.ok()&&examBody.includes('Сам рецепт не подменяет соответствующее разрешение.'),examAsset.status().toString());
+     check('Cloudflare Pages includes participant safety feedback',examAsset.ok()&&examBody.includes('тугую косу или хвост длиной не более 20 см'),examAsset.status().toString());
    }
  }catch(e){check('Cloudflare Pages reachable from CI',false,String(e).slice(0,220));}
 } catch(e) {check('smoke test execution',false,e.stack||String(e));} finally {if(browser)await browser.close();await new Promise(resolve=>server.close(resolve));}
