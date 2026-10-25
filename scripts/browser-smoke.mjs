@@ -82,6 +82,15 @@ try {
    window.samboJudgeCourseEngine.modules[5].questions[4].body.includes('Председателем ВКС')));
  check('LOCAL sanctions exam flags ambiguous warning tie-break item 47',await page.evaluate(()=>
    window.samboJudgeCourseEngine.modules[5].questions[6].body.includes('ситуация требует уточнения перед окончательной нормативной приёмкой')));
+ check('LOCAL combat exam 57–64 explains equipment and age restrictions',await page.evaluate(()=>
+   window.samboJudgeCourseEngine.modules[7].questions.length===8&&
+   window.samboJudgeCourseEngine.modules[7].questions.every(q=>q.body.length>=260)&&
+   window.samboJudgeCourseEngine.modules[7].questions[1].body.includes('6 унций')&&
+   window.samboJudgeCourseEngine.modules[7].questions[3].body.includes('14–16')));
+ check('LOCAL combat exam includes VFS medical amendment and knockdown majority caveat',await page.evaluate(()=>
+   window.samboJudgeCourseEngine.modules[7].questions[5].body.includes('3 минуты')&&
+   window.samboJudgeCourseEngine.modules[7].questions[5].body.includes('статье 38(1)(г)')&&
+   window.samboJudgeCourseEngine.modules[7].questions[7].body.includes('различие формулировок')));
  check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.progress)).size===judgeModules.length);
  for(const g of judgeModules.slice(1)){
   await page.evaluate(()=>openCourse('judge'));
@@ -913,6 +922,20 @@ try {
        }
        check('Cloudflare Pages publishes infrastructure exam audit 49–56',publishedInfrastructure,infraStatus);
        check('Cloudflare Pages publishes verified forms and safety-zone caveats',publishedForms,infraStatus);
+       let combatPublished=false,combatClarification=false,combatStatus='not fetched';
+       for(let attempt=0;attempt<10;attempt++){
+         try{
+           const fresh=await page.request.get('https://sambo-academy.pages.dev/judge-exam-independent.js',{timeout:12000,failOnStatusCode:false});
+           const source=await fresh.text();
+           combatStatus=String(fresh.status());
+           combatPublished=fresh.ok()&&source.includes('статье 10(1–3)')&&source.includes('6 унций')&&source.includes('Статья 19(6–9)');
+           combatClarification=fresh.ok()&&source.includes('статье 38(1)(г)')&&source.includes('3 минуты')&&source.includes('различие формулировок');
+           if(combatPublished&&combatClarification)break;
+         }catch(e){combatStatus=String(e).slice(0,120);}
+         await new Promise(resolve=>setTimeout(resolve,5000));
+       }
+       check('Cloudflare Pages publishes combat exam audit 57–64',combatPublished,combatStatus);
+       check('Cloudflare Pages publishes VFS 2026 medical and knockdown caveats',combatClarification,combatStatus);
      }
    }
  }catch(e){check('Cloudflare Pages reachable from CI',false,String(e).slice(0,220));}
