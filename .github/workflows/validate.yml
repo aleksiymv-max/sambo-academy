@@ -160,6 +160,9 @@ jobs:
       - name: Verify foundation exam items 1–8, appendix 1 and historical progress index
         run: node scripts/check-exam-foundations-01-08-2026.cjs
 
+      - name: Verify foundation exam items 9–16, competition formats and historical keys
+        run: node scripts/check-exam-foundations-09-16-2026.cjs
+
       - name: Check demonstration sambo normative lesson coverage
         run: node scripts/check-demo-normative.cjs
 

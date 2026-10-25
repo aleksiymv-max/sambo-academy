@@ -138,6 +138,15 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
      q[0].body.includes('Приложение 1, пункт 1')&&q[2].body.includes('Приложение 1, пункт 4')&&
      q[7].body.includes('Статья 2(3)');
  }));
+ check('LOCAL foundation exam 9–16 source explanations and stable keys',await page.evaluate(()=>{
+   const m=window.samboJudgeFoundations,q=m.questions;
+   return m.progressIndex===1100&&m.version==='2026-10-23-1'&&q.length===24&&
+     q.slice(8,16).every(x=>x.body.length>=600)&&
+     q[8].body.includes('Приложение 2, раздел I, пункт 1')&&
+     q[9].body.includes('приложении 6')&&
+     q[14].body.includes('Приложение 1, пункт 4')&&
+     q[15].body.includes('Статья 2, пункт 4');
+ }));
  await page.locator('#lessons .sambo-module-card').first().locator('.sambo-topic-link').first().click();
  check('judge first lesson opens directly',await page.locator('#lessonTitle').textContent()!=='');
  check('judge first lesson contains clear sequence',await page.locator('.judge-prime .jp-part').count()>=4);
@@ -1028,6 +1037,21 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
          await new Promise(resolve=>setTimeout(resolve,5000));
        }
        check('Cloudflare Pages publishes foundation exam audit 1–8',foundationPublished,foundationStatus);
+       let foundationNextPublished=false,nextFoundationStatus='not fetched';
+       for(let attempt=0;attempt<10;attempt++){
+         try{
+           const fresh=await page.request.get('https://sambo-academy.pages.dev/judge-foundations.js',{timeout:12000,failOnStatusCode:false});
+           const source=await fresh.text();
+           nextFoundationStatus=String(fresh.status());
+           foundationNextPublished=fresh.ok()&&source.includes('foundationExamAuditBodies09to16')&&
+             source.includes('Приложение 2, раздел I, пункт 1')&&
+             source.includes('разделы: VI — боевое самбо')&&
+             source.includes('Статья 2, пункт 4 Правил требует указывать');
+           if(foundationNextPublished)break;
+         }catch(e){nextFoundationStatus=String(e).slice(0,120);}
+         await new Promise(resolve=>setTimeout(resolve,5000));
+       }
+       check('Cloudflare Pages publishes foundation exam audit 9–16',foundationNextPublished,nextFoundationStatus);
 
      }
    }
