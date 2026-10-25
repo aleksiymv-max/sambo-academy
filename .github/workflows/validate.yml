@@ -142,6 +142,9 @@ jobs:
       - name: Check demonstration team composition, judging crew and unresolved 66/68 discrepancy
         run: node scripts/check-demo-team-composition-66-67.cjs
 
+      - name: Check demonstration team results, tie-break order and article 68 safety exclusions
+        run: node scripts/check-demo-team-results-68-69.cjs
+
       - name: Check beach sambo normative lesson coverage
         run: node scripts/check-beach-normative.cjs
 
