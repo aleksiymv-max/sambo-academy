@@ -91,6 +91,14 @@ try {
    window.samboJudgeCourseEngine.modules[7].questions[5].body.includes('3 минуты')&&
    window.samboJudgeCourseEngine.modules[7].questions[5].body.includes('статье 38(1)(г)')&&
    window.samboJudgeCourseEngine.modules[7].questions[7].body.includes('различие формулировок')));
+ check('LOCAL beach exam 65–72 covers activity, victory, duration and field size',await page.evaluate(()=>
+   window.samboJudgeCourseEngine.modules[8].questions.length===8&&
+   window.samboJudgeCourseEngine.modules[8].questions.every(q=>q.body.length>=320)&&
+   window.samboJudgeCourseEngine.modules[8].questions[1].body.includes('Статьи 47(3) и 51(3)')&&
+   window.samboJudgeCourseEngine.modules[8].questions[6].body.includes('два жёлтых')));
+ check('LOCAL beach exam preserves explicit article 45/56 judging-crew caveat',await page.evaluate(()=>
+   window.samboJudgeCourseEngine.modules[8].questions[5].body.includes('официального разъяснения')&&
+   window.samboJudgeCourseEngine.modules[8].questions[7].body.includes('разночтение')));
  check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.progress)).size===judgeModules.length);
  for(const g of judgeModules.slice(1)){
   await page.evaluate(()=>openCourse('judge'));
@@ -936,6 +944,20 @@ try {
        }
        check('Cloudflare Pages publishes combat exam audit 57–64',combatPublished,combatStatus);
        check('Cloudflare Pages publishes VFS 2026 medical and knockdown caveats',combatClarification,combatStatus);
+       let beachPublished=false,beachCaveat=false,beachStatus='not fetched';
+       for(let attempt=0;attempt<10;attempt++){
+         try{
+           const fresh=await page.request.get('https://sambo-academy.pages.dev/judge-exam-independent.js',{timeout:12000,failOnStatusCode:false});
+           const source=await fresh.text();
+           beachStatus=String(fresh.status());
+           beachPublished=fresh.ok()&&source.includes('Статьи 47(3) и 51(3)')&&source.includes('два жёлтых')&&source.includes('Статья 52 прямо требует');
+           beachCaveat=fresh.ok()&&source.includes('статья 45(4) одновременно называет')&&source.includes('разночтение о составе');
+           if(beachPublished&&beachCaveat)break;
+         }catch(e){beachStatus=String(e).slice(0,120);}
+         await new Promise(resolve=>setTimeout(resolve,5000));
+       }
+       check('Cloudflare Pages publishes beach exam audit 65–72',beachPublished,beachStatus);
+       check('Cloudflare Pages publishes article 45/56 discrepancy warning',beachCaveat,beachStatus);
      }
    }
  }catch(e){check('Cloudflare Pages reachable from CI',false,String(e).slice(0,220));}
