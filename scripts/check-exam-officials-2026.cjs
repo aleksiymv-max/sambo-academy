@@ -1,6 +1,6 @@
 'use strict';
 // Narrow, article-by-article editorial regression for independent exam items 17–24.
-// Item 22 is explicitly flagged, not counted as source-verified.
+// Item 22 is checked against the separate VFS 2026 amendment; PDF discrepancy remains documented.
 require('./check-exam-admission-participants-2026.cjs');
 const fs=require('node:fs');
 const vm=require('node:vm');
@@ -34,11 +34,13 @@ for(const [i,answer,explanation] of verified){
  assert.equal(q.a[q.correct],answer,'Exam key changed at item '+(17+i));
  assert.match(q.body,explanation,'Source-specific explanation missing at item '+(17+i));
 }
-const disputed=qs[5];
-assert.equal(disputed.a[disputed.correct],'Поддержку большинства судейской тройки');
-assert.match(disputed.body,/Редакторское предупреждение.*Статья 19\(6\).*статья 35\(6\).*Отдельное согласие большинства на запуск отсчёта.*Не использовать этот вопрос как подтверждённую норму/s);
+const reconciled=qs[5];
+assert.equal(reconciled.a[reconciled.correct],'Поддержку большинства судейской тройки');
+assert.match(reconciled.body,/Статья 19\(6\).*«Изменения в правилах с 01\.09\.2026».*статья 18\(6\).*поддержке хотя бы одного другого судьи.*два голоса из трёх/s,
+ 'Item 22 must cite the separate official VFS amendment, not infer majority from scoring rules');
+assert.match(reconciled.body,/Расхождение формулировок и нумерации.*зафиксировано/s);
 const self=new Set(mods[2].lessons.flatMap(l=>l.checks.map(q=>q[0].trim().toLowerCase())));
 assert.ok(qs.every(q=>!self.has(q.q.trim().toLowerCase())),'Exam/self-check independence changed');
-console.log('PASS: 7 officials exam explanations verified against arts 14, 15, 18–22, 26, 41; 16 earlier verified; 88 original stems/options/keys protected');
-console.log('FLAGGED: item 22 (start of submission timer) is NOT source-verified; majority requirement needs official clarification');
-console.log('NOT VERIFIED: 65 other independent questions, 24 foundation questions, real-account progress E2E');
+console.log('PASS: 8 officials exam explanations checked against arts 14, 15, 18–22, 26, 41 and VFS September 2026 amendment; 16 earlier verified; 88 original stems/options/keys protected');
+console.log('SOURCE NOTE: item 22 majority requirement appears in separate VFS 2026 amendment, absent from consolidated art.19(6); discrepancy documented');
+console.log('NOT VERIFIED: 64 other independent questions before the bout audit, 24 foundation questions, real-account progress E2E');

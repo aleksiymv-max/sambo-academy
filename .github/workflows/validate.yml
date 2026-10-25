@@ -130,8 +130,11 @@ jobs:
       - name: Verify 16 independent exam keys and article-specific explanations (arts 3, 5, 7–11)
         run: node scripts/check-exam-admission-participants-2026.cjs
 
-      - name: Verify seven referee officials exam explanations and flag unverified submission clock key
+      - name: Verify eight referee officials exam explanations with September 2026 amendment
         run: node scripts/check-exam-officials-2026.cjs
+
+      - name: Verify independent bout exam items 25-32 and reconcile VFS 2026 activity guidance
+        run: node scripts/check-exam-bout-2026.cjs
 
       - name: Check demonstration sambo normative lesson coverage
         run: node scripts/check-demo-normative.cjs

@@ -13,5 +13,5 @@ const prose=l.blocks.map(b=>b.join(' ')).join(' ').toLowerCase();
 for(const token of ['одинаковое количество','большинство судейской тройки','«а»','не является наказанием','техническая оценка или предупреждение','болевой приём','удержание','сводный pdf'])assert.ok(prose.includes(token),'Missing concept: '+token);
 const seen=new Set();
 for(const q of l.checks){assert.equal(q[1].length,4);assert.ok(q[2]>=0&&q[2]<4);assert.ok(q[3].length>=50);assert.ok(!seen.has(q[0]));seen.add(q[0]);}
-assert.ok(fs.readFileSync('judge-exam-independent.js','utf8').includes('ему записывается оценка «Активность»'));
+assert.ok(fs.readFileSync('judge-exam-independent.js','utf8').includes('записывать оценку «Активность» («А») вместо предупреждения'));
 console.log('PASS: art.19(7) activity lesson; 10 blocks, 5 questions, seven stable lessons');
