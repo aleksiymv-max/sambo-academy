@@ -157,6 +157,9 @@ jobs:
       - name: Verify comprehensive practicum exam items 81–88 and article 41 protest limitations
         run: node scripts/check-exam-practicum-2026.cjs
 
+      - name: Verify foundation exam items 1–8, appendix 1 and historical progress index
+        run: node scripts/check-exam-foundations-01-08-2026.cjs
+
       - name: Check demonstration sambo normative lesson coverage
         run: node scripts/check-demo-normative.cjs
 
