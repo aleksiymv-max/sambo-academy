@@ -160,6 +160,9 @@ jobs:
       - name: Check timekeeping roles and reserve systems articles 22–23
         run: node scripts/check-officials-timekeeping-22-23.cjs
 
+      - name: Check results and both protest routes under articles 40–41
+        run: node scripts/check-sanctions-results-protests-40-41.cjs
+
       - name: Check chief secretariat and technical protocol articles 17 and 21
         run: node scripts/check-secretariat-protocol-normative.cjs
 
