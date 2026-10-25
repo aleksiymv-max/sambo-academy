@@ -589,6 +589,33 @@ try {
    }
   }
 
+  // Personal demonstration arts 61–63: verify deployed second lesson, not just checkout.
+  if(process.env.GITHUB_EVENT_NAME!=='pull_request'){
+   let scoringReady=false,scoringStatus='not fetched';
+   for(let attempt=0;attempt<6;attempt++){
+    try{
+     const response=await livePage.request.get('https://sambo-academy.pages.dev/judge-program-demo.js',{timeout:12000,failOnStatusCode:false});
+     scoringStatus=String(response.status());
+     scoringReady=response.ok()&&(await response.text()).includes('Десять отдельных действий — десять отдельных наблюдений');
+     if(scoringReady)break;
+    }catch(e){scoringStatus=String(e).slice(0,120);}
+    await new Promise(resolve=>setTimeout(resolve,5000));
+   }
+   check('LIVE demonstration arts 61–63 personal scoring source published',scoringReady,scoringStatus);
+   if(scoringReady){
+    await livePage.evaluate(()=>openCourse('judge'));
+    const demoCard=livePage.locator('#lessons .sambo-module-card').nth(10);
+    await demoCard.locator('summary').click();
+    await demoCard.locator('.sambo-topic-link').nth(1).click();
+    const title=await livePage.locator('.judge-prime h2').first().textContent();
+    const blocks=await livePage.locator('.judge-prime .jp-part').count();
+    const checks=await livePage.locator('.judge-prime .jp-question').count();
+    check('LIVE demonstration personal scoring lesson editorial depth',
+     title.includes('Личный комплекс и порядок выставления баллов')&&blocks>=10&&checks>=7,
+     'blocks='+blocks+' checks='+checks);
+   }
+  }
+
   // Beach sambo: confirm the revised result/disqualification lesson is deployed and rendered.
   if(process.env.GITHUB_EVENT_NAME!=='pull_request'){
    let beachReady=false,beachStatus='not fetched';
