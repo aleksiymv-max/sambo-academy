@@ -481,6 +481,33 @@ try {
    }
   }
 
+  // Combat-sambo article 19/28/33: verify publication and rendered lesson after merge.
+  if(process.env.GITHUB_EVENT_NAME!=='pull_request'){
+   let combatReady=false,combatStatus='not fetched';
+   for(let attempt=0;attempt<6;attempt++){
+    try{
+     const response=await livePage.request.get('https://sambo-academy.pages.dev/judge-program-combat.js',{timeout:12000,failOnStatusCode:false});
+     combatStatus=String(response.status());
+     combatReady=response.ok()&&(await response.text()).includes('Разграничение оценки и исхода');
+     if(combatReady)break;
+    }catch(e){combatStatus=String(e).slice(0,120);}
+    await new Promise(resolve=>setTimeout(resolve,5000));
+   }
+   check('LIVE combat knockdown revised lesson published',combatReady,combatStatus);
+   if(combatReady){
+    await livePage.evaluate(()=>openCourse('judge'));
+    const combatCard=livePage.locator('#lessons .sambo-module-card').nth(8);
+    await combatCard.locator('summary').click();
+    await combatCard.locator('.sambo-topic-link').nth(1).click();
+    const title=await livePage.locator('.judge-prime h2').first().textContent();
+    const blocks=await livePage.locator('.judge-prime .jp-part').count();
+    const checks=await livePage.locator('.judge-prime .jp-question').count();
+    check('LIVE combat knockdown editorial depth',
+      title.includes('Удары, нокдаун и нокаут')&&blocks>=9&&checks>=7,
+      'blocks='+blocks+' checks='+checks);
+   }
+  }
+
   // Verify article 28 as well as the previously published articles 29–34 on Cloudflare.
   for(const [lessonIndex,headingText,minBlocks] of [
    [0,'Положения спортсменов: стоя, лёжа и варианты приземления',8],
