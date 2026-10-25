@@ -400,6 +400,33 @@ try {
    }
   }
 
+  // Article 16: check the actual published lesson only after deployment, not on PR.
+  if(process.env.GITHUB_EVENT_NAME!=='pull_request'){
+   let article16Ready=false,article16Status='not fetched';
+   for(let attempt=0;attempt<6;attempt++){
+    try{
+     const response=await livePage.request.get('https://sambo-academy.pages.dev/judge-program-officials.js',{timeout:12000,failOnStatusCode:false});
+     article16Status=String(response.status());
+     article16Ready=response.ok()&&(await response.text()).includes('Распределение ответственности: снятие и дисквалификация');
+     if(article16Ready)break;
+    }catch(e){article16Status=String(e).slice(0,120);}
+    await new Promise(resolve=>setTimeout(resolve,5000));
+   }
+   check('LIVE article 16 deputy lesson source published',article16Ready,article16Status);
+   if(article16Ready){
+    await livePage.evaluate(()=>openCourse('judge'));
+    const deputyCard=livePage.locator('#lessons .sambo-module-card').nth(3);
+    await deputyCard.locator('summary').click();
+    await deputyCard.locator('.sambo-topic-link').nth(2).click();
+    const title=await livePage.locator('.judge-prime h2').first().textContent();
+    const blocks=await livePage.locator('.judge-prime .jp-part').count();
+    const checks=await livePage.locator('.judge-prime .jp-question').count();
+    check('LIVE article 16 deputy lesson editorial depth',
+     title.includes('Заместитель главного судьи')&&blocks>=9&&checks>=7,
+     'blocks='+blocks+' checks='+checks);
+   }
+  }
+
   // Verify article 28 as well as the previously published articles 29–34 on Cloudflare.
   for(const [lessonIndex,headingText,minBlocks] of [
    [0,'Положения спортсменов: стоя, лёжа и варианты приземления',8],
