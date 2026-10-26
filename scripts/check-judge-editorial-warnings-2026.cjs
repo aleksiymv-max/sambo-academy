@@ -28,7 +28,7 @@ assert.equal(engine.modules.reduce((n,m)=>n+m.questions.length,0),88);
 assert.ok(engine.modules.every(m=>m.examRevision===2));
 const expected=new Map([
  [5,['Статья 28(6)','статья 35(3)(д)','ровно 10 секунд']],
- [6,['вопроса № 47','статьи 34(9)','Статьи 38(1) и 40(3)']],
+ [6,['вопрос № 47','статьи 34(9)','Статьи 38(1) и 40(3)','judge:1306']],
  [9,['Статья 45(4)','статья 56','большинство из трёх']],
  [10,['Статья 66','статья 68(2)','трёх судей']]
 ]);
@@ -59,4 +59,4 @@ assert.equal(basic.questions.length,24);
 console.log('PASS: editorial warnings precede exams for scoring, sanctions, beach and team demonstration modules');
 console.log('PASS: source article references and unresolved status displayed in module introductions');
 console.log('PASS: 112 historical exam questions/keys, 54 expanded lessons and progress identifiers preserved');
-console.log('OPEN: ambiguous item 47, source conflicts, 12 repeated foundation items and authenticated E2E restoration');
+console.log('OPEN: historical item 47 remains archived, source conflicts, 12 repeated foundation items and authenticated E2E restoration');
