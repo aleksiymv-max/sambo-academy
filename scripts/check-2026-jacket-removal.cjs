@@ -35,6 +35,6 @@ const exam=engine.sections(mod,6).at(-1).html;
 for(const html of [intro,exam]){
  assert.ok(html.includes('снятие куртки'),'Plan and exam must disclose the 2026 consequence');
  assert.ok(html.includes('data-amendment-sources="2026"'),'Official amendment links must remain visible');
- assert.ok(html.includes('не заменяет официальной')||html.includes('не официальный'),'No official qualification claim');
+ assert.ok(html.includes('не заменяет официальную')||html.includes('не официальный'),'No official qualification claim');
 }
 console.log('PASS 2026 jacket-removal: sourced lesson, preserved 5 keys, pre-exam warning, official PDF caveat');
