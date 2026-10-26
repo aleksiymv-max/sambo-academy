@@ -455,7 +455,7 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
    ['judge-program-scoring.js','Шаг 5. Одновременные предупреждения'],
    ['judge-program-scoring.js','Момент действия и момент показа оценки'],
    ['judge-program-scoring.js','Время, оценка и граница ровно 10 секунд'],
-   ['judge-program-scoring.js','Критерий для досрочного преимущества — разница счёта'],
+   ['judge-program-scoring.js','Статья 33(1)(в) говорит одновременно'],
    ['judge-program-scoring.js','Исключение: полный отрыв с вращением'],
    ['judge-program-scoring.js','Бросок начался внутри, закончился снаружи рабочей зоны'],
    ['judge-program-scoring.js','Положение лёжа: рабочая зона и зона безопасности'],
