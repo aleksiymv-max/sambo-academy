@@ -233,9 +233,9 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
    await page.locator('#answers button.btn').first().click();
   }
   await page.waitForTimeout(200);
-  check('new judge exam persists versioned completion',await page.evaluate(()=>localStorage.getItem('sambo-demo-judge-1100')==='done'));
+  check('new judge exam persists versioned completion',await page.evaluate(()=>localStorage.getItem('sambo-demo-judge-2100')==='done'&&localStorage.getItem('sambo-demo-judge-1100')!=='done'));
   await page.reload({waitUntil:'domcontentloaded'});
-  check('new judge completion survives reload',await page.evaluate(()=>progressDone('judge',1100)));
+  check('new judge completion survives reload',await page.evaluate(()=>progressDone('judge',2100)&&!progressDone('judge',1100)));
   await page.evaluate(()=>{openCourse('judge');openLesson(0);samboSectionIndex=samboLessonSections(samboModuleData(currentCourse)[0]).length-1;renderSamboSection();startModuleQuiz();});
   for(let j=0;j<24;j++){
    const correct=await page.evaluate(()=>samboActiveQuiz[currentQuestion].correct);
