@@ -4,7 +4,8 @@
 const fs=require('node:fs');
 const vm=require('node:vm');
 const assert=require('node:assert/strict');
-const amendment='https://sambo.ru/wp-content/uploads/2025/09/izmeneniya_v_pravila_vida_sporta_sambo_bez_utesheniya.pdf';
+const amendment='https://sambo.ru/wp-content/uploads/2026/08/izmeneniya_v_pravila_vida_sporta_sambo_bez_utesheniya.pdf';
+const obsolete='https://sambo.ru/wp-content/uploads/2025/09/izmeneniya_v_pravila_vida_sporta_sambo_bez_utesheniya.pdf';
 const clarification='https://sambo.ru/wp-content/uploads/2025/09/razyasneniya_pravil_vida_sporta_sambo_sentyabr_2026_god.pdf';
 const files=['judge-course-engine.js','judge-program-admission.js','judge-program-participants.js',
  'judge-program-officials.js','judge-program-bout.js','judge-program-scoring.js',
@@ -13,6 +14,7 @@ const files=['judge-course-engine.js','judge-program-admission.js','judge-progra
 const sandbox={window:{}};vm.createContext(sandbox);
 for(const file of files)vm.runInContext(fs.readFileSync(file,'utf8'),sandbox,{filename:file});
 const engine=sandbox.window.samboJudgeCourseEngine;
+assert.ok(!fs.readFileSync('judge-course-engine.js','utf8').includes(obsolete),'Obsolete amendment PDF path must never be published');
 assert.equal(engine.modules.length,11);
 const rules='https://sambo.ru/wp-content/uploads/2025/09/pravila-vida-sporta-sambo-s-izm.-i-dopolneniyami.pdf';
 for(let i=0;i<engine.modules.length;i++){
