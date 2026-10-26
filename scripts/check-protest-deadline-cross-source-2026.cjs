@@ -34,7 +34,7 @@ for(const [name,text] of [
  assert.match(text,/непосредственно во время соревнований/,name+': missing consolidated text');
  assert.match(text,/в день фиксации нарушения/,name+': missing September 2026 amendment');
  assert.match(text,/расхождени/i,name+': missing source-conflict caveat');
- assert.match(text,/не (?:разрешает|позволяет|считать)/i,name+': missing caution against unconditional deferral');
+ assert.match(text,/(?:не (?:разрешает|позволяет)|нельзя считать)/i,name+': missing caution against unconditional deferral');
 }
 const engine=fs.readFileSync('judge-course-engine.js','utf8');
 assert.ok(engine.includes('https://sambo.ru/wp-content/uploads/2025/09/pravila-vida-sporta-sambo-s-izm.-i-dopolneniyami.pdf'));
