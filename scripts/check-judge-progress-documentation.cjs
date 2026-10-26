@@ -23,7 +23,8 @@ const context={
 vm.createContext(context);
 for(const file of [
  'judge-course-engine.js',...moduleFiles,'judge-foundations.js',
- 'judge-exam-foundations-v2.js','judge-exam-sanctions-v3.js',
+ 'judge-exam-foundations-v2.js','judge-exam-independent.js',
+ 'judge-exam-sanctions-v3.js',
  'progress.js','judge-program-bridge.js'
 ]){
  vm.runInContext(fs.readFileSync(file,'utf8'),context,{filename:file});
