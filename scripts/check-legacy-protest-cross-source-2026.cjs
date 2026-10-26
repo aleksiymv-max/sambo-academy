@@ -27,4 +27,10 @@ assert.ok(excerpt[2].includes('в день фиксации нарушения')
   'The article excerpt needs a cross-source warning');
 assert.ok(excerpt[2].includes('неординарной ситуации'),
   'Keep the exceptional situation separate');
+const active=html.match(/41:\{title:'Протесты',partial:false,text:`([\s\S]*?)`,note:'([^']*)'\}/);
+assert.ok(active,'Full article 41 excerpt must exist and supersedes the partial entry');
+assert.ok(active[1].includes('непосредственно во время соревнований'),
+  'Preserve the full consolidated source text');
+assert.ok(active[2].includes('в день фиксации нарушения'),
+  'The active full excerpt needs the 2026 cross-source warning');
 console.log('PASS: legacy protest masterclass and article 41 excerpt disclose the unresolved 2026 deadline conflict');
