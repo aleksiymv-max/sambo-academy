@@ -75,6 +75,14 @@ try {
       const marker='data-editorial-warning="'+index+'"';
       return sections[0].html.includes(marker)&&sections.at(-1).html.includes(marker);
     })));
+  check('LOCAL unresolved Rules notices are visible in affected lessons',await page.evaluate(()=>
+    [5,6,9,10].every(index=>{
+      const mod=window.samboJudgeCourseEngine.modules[index-1];
+      const lesson=window.samboJudgeCourseEngine.sections(mod,index)[1]?.html||'';
+      const notice='data-editorial-warning="'+index+'"';
+      return lesson.includes(notice)&&lesson.includes('pravila-vida-sporta-sambo-s-izm.-i-dopolneniyami.pdf')&&
+        ((index!==6&&index!==9)||lesson.includes('data-amendment-sources="2026"'));
+    })));
   check('LOCAL sanctions lesson explains article 34(9) first-warning boundary',await page.evaluate(()=>
     window.samboJudgeCourseEngine.modules[5].lessons.some(lesson=>lesson.blocks.some(block=>
       block[0].includes('Пограничный случай статьи 34(9)')&&block[1].includes('01:10')&&
@@ -340,6 +348,7 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
  await localPracticumCard.locator('.sambo-topic-link').nth(2).click();
  check('LOCAL practicum results editorial depth',await page.locator('.judge-prime .jp-part').count()>=13&&await page.locator('.judge-prime .jp-question').count()>=9);
  check('LOCAL practicum article 34 exception visible',(await page.locator('.judge-prime').textContent()).includes('Статья 34(8)'));
+ if(process.env.SAMBO_SMOKE_LOCAL_ONLY!=='1') {
  // Real published-page browser check (no credentials, no account mutations).
  try {
   const liveCtx=await browser.newContext({viewport:{width:1280,height:800}});
@@ -1155,7 +1164,7 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
          await new Promise(resolve=>setTimeout(resolve,5000));
        }
        check('Cloudflare Pages publishes foundation exam audit 17–24',foundationFinalPublished,foundationFinalStatus);
-       let caveatsPublished=false,protestSourcePublished=false,beachSourcePublished=false,caveatsStatus='not fetched';
+       let caveatsPublished=false,protestSourcePublished=false,beachSourcePublished=false,lessonWarningPublished=false,caveatsStatus='not fetched';
        for(let attempt=0;attempt<10;attempt++){
          try{
            const fresh=await page.request.get('https://sambo-academy.pages.dev/judge-course-engine.js',{timeout:12000,failOnStatusCode:false});
@@ -1168,16 +1177,18 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
            protestSourcePublished=fresh.ok()&&source.includes('в день фиксации нарушения')&&
              source.includes('непосредственно во время соревнований')&&
              source.includes('izmeneniya_v_pravila_vida_sporta_sambo_bez_utesheniya.pdf');
+           lessonWarningPublished=fresh.ok()&&source.includes('editorialWarning(moduleIndex)')&&source.includes('html:render(mod,x,i,index)');
            beachSourcePublished=fresh.ok()&&source.includes('бокового судью')&&
              source.includes('несогласованность опубликованных текстов')&&
              source.includes('razyasneniya_pravil_vida_sporta_sambo_sentyabr_2026_god.pdf');
-           if(caveatsPublished&&protestSourcePublished&&beachSourcePublished)break;
+           if(caveatsPublished&&protestSourcePublished&&beachSourcePublished&&lessonWarningPublished)break;
          }catch(e){caveatsStatus=String(e).slice(0,120);}
          await new Promise(resolve=>setTimeout(resolve,5000));
        }
        check('Cloudflare Pages publishes pre-exam normative caveats',caveatsPublished,caveatsStatus);
        check('Cloudflare Pages publishes protest timing cross-source warning',protestSourcePublished,caveatsStatus);
        check('Cloudflare Pages publishes beach side-judge cross-source warning',beachSourcePublished,caveatsStatus);
+       check('Cloudflare Pages publishes lesson-level normative caveats',lessonWarningPublished,caveatsStatus);
 
        let officialRulesPublished=false,officialRulesStatus='not fetched';
        for(let attempt=0;attempt<10;attempt++){
@@ -1256,6 +1267,7 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
      }
    }
  }catch(e){check('Cloudflare Pages reachable from CI',false,String(e).slice(0,220));}
+ } else {console.log('MODE: pull-request local browser checks only; deployed checks remain on main');}
 } catch(e) {check('smoke test execution',false,e.stack||String(e));} finally {if(browser)await browser.close();await new Promise(resolve=>server.close(resolve));}
 console.log('\nSUMMARY '+results.filter(x=>x.ok).length+'/'+results.length+' passed');
 if(process.exitCode)process.exit(process.exitCode);
