@@ -169,6 +169,9 @@ jobs:
       - name: Check cross-module normative warnings and unchanged 112 historical exam keys
         run: node scripts/check-judge-editorial-warnings-2026.cjs
 
+      - name: Verify simulated judge progress restore, historical results and article 34(9) worked case
+        run: node scripts/check-judge-progress-history-2026.cjs
+
       - name: Check demonstration sambo normative lesson coverage
         run: node scripts/check-demo-normative.cjs
 

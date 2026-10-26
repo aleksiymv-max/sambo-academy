@@ -13,10 +13,11 @@ window.loadSamboProgress = async function(user) {
   try {
     const {data,error}=await window.samboAuthClient.from('lesson_progress').select('course_key,lesson_index').eq('user_id',userId);
     if(error)throw error;
-    if(p.userId!==userId)return;
+    if(p.userId!==userId)return false;
     p.completed=new Set((data||[]).map(row=>progressKey(row.course_key,row.lesson_index)));
   } catch(e) {if(p.userId===userId)p.error=true;}
-  if(p.userId===userId){p.ready=true;renderStudentDashboard();}
+  if(p.userId===userId){p.ready=true;renderStudentDashboard();return !p.error;}
+  return false;
 };
 window.saveSamboProgress = async function(course,index) {
   const p=window.samboProgress;
