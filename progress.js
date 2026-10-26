@@ -1,5 +1,5 @@
 // Cloud progress is isolated by Supabase Auth user id and protected by database RLS.
-window.samboProgress = {userId:null,completed:new Set(),ready:false,error:false};
+window.samboProgress = {userId:null,completed:new Set(),ready:false,error:false,loadId:0};
 window.progressKey = (course,index) => course + ':' + index;
 window.progressDone = (course,index) => {
   if (window.samboProgress.userId) return window.samboProgress.completed.has(progressKey(course,index));
@@ -7,16 +7,19 @@ window.progressDone = (course,index) => {
 };
 window.loadSamboProgress = async function(user) {
   const p=window.samboProgress;
+  // Reject stale responses, including overlapping loads for the SAME account.
+  const loadId=++p.loadId;
   p.userId=user?.id||null;p.completed=new Set();p.ready=false;p.error=false;
   if (!user || !window.samboAuthClient){p.ready=true;renderStudentDashboard();return true;}
   const userId=user.id;
   try {
     const {data,error}=await window.samboAuthClient.from('lesson_progress').select('course_key,lesson_index').eq('user_id',userId);
     if(error)throw error;
-    if(p.userId!==userId)return false;
-    p.completed=new Set((data||[]).map(row=>progressKey(row.course_key,row.lesson_index)));
-  } catch(e) {if(p.userId===userId)p.error=true;}
-  if(p.userId===userId){p.ready=true;renderStudentDashboard();return !p.error;}
+    if(p.userId!==userId||p.loadId!==loadId)return false;
+    // Preserve a successful save that finished while this read was in flight.
+    p.completed=new Set([...p.completed,...(data||[]).map(row=>progressKey(row.course_key,row.lesson_index))]);
+  } catch(e) {if(p.userId===userId&&p.loadId===loadId)p.error=true;}
+  if(p.userId===userId&&p.loadId===loadId){p.ready=true;renderStudentDashboard();return !p.error;}
   return false;
 };
 window.saveSamboProgress = async function(course,index) {
