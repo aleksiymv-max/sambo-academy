@@ -1176,7 +1176,7 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
              source.includes('Статья 66 предусматривает');
            protestSourcePublished=fresh.ok()&&source.includes('в день фиксации нарушения')&&
              source.includes('непосредственно во время соревнований')&&
-             source.includes('izmeneniya_v_pravila_vida_sporta_sambo_bez_utesheniya.pdf');
+             source.includes('https://sambo.ru/wp-content/uploads/2026/08/izmeneniya_v_pravila_vida_sporta_sambo_bez_utesheniya.pdf');
            lessonWarningPublished=fresh.ok()&&source.includes('editorialWarning(moduleIndex)')&&source.includes('html:render(mod,x,i,index)');
            beachSourcePublished=fresh.ok()&&source.includes('бокового судью')&&
              source.includes('несогласованность опубликованных текстов')&&
