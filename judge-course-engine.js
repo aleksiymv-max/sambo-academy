@@ -16,8 +16,20 @@ function register(title,lead,lessons,extras=[]){
  if(!exam.length)throw Error('Empty examination: '+title);
  modules.push({title,lead,lessons,questions:exam,updated:'2026-10-23'});
 }
+// Editorial caveats are visible before the exam, not only after an answer is graded.
+// Keys are expanded-module display indices (1-based); do not alter progress indices.
+const editorialWarnings=Object.freeze({
+  5:{heading:"Удержание ровно 10 секунд",body:"Статья 28(6) указывает диапазон от 10 до 19 секунд, а статья 35(3)(д) — неоконченное удержание более 10 секунд. Граничный случай ровно 10 секунд требует официального разъяснения; учебный курс не устанавливает новую норму."},
+  6:{heading:"Вопрос № 47 и процедура снятия",body:"Условие вопроса № 47 не сообщает время первых предупреждений обоих спортсменов, необходимое для применения статьи 34(9). Исторический ключ сохранён, но вопрос пока не прошёл окончательную методическую приёмку. Статьи 38(1) и 40(3) также различаются в описании процедуры снятия со схватки."},
+  9:{heading:"Судейская бригада пляжного самбо",body:"Статья 45(4) описывает бригаду из руководителя площадки и судьи, а статья 56 ссылается на большинство из трёх. Это разночтение требует официального разъяснения; учебный текст не назначает дополнительного судью."},
+  10:{heading:"Оценка исполнительского мастерства",body:"Статья 66 предусматривает трёх судей исполнительского мастерства в бригаде, а статья 68(2) — двух. Количество судей и порядок расчёта оценки нельзя считать окончательно согласованными без официального разъяснения."}
+});
+function editorialWarning(index){
+ const w=editorialWarnings[index];
+ return w?'<aside class="jp-mistake" role="note" data-editorial-warning="'+index+'"><strong>Редакторское предупреждение: '+clean(w.heading)+'</strong><p>'+clean(w.body)+'</p></aside>':'';
+}
 function introduction(mod,index){
- return '<article class="judge-prime"><div class="jp-kicker">ШКОЛА СУДЕЙ · МОДУЛЬ '+(index+1)+'</div><h2>'+clean(mod.title)+'</h2><p class="jp-lead">'+clean(mod.lead)+'</p><div class="jp-goal"><strong>Как проходит обучение</strong><p>Уроки идут последовательно: суть нормы → условия и исключения → порядок действий судьи → практический эпизод → ошибки → самопроверка. Завершает модуль итоговый тест.</p></div><ol>'+mod.lessons.map(x=>'<li>'+clean(x.title)+'</li>').join('')+'</ol><div class="jp-mistake"><strong>Важно:</strong> материал составлен на основании российской редакции Правил самбо с изменениями до 14.09.2026 № 860; сам по себе курс не заменяет официальную практическую аттестацию. При подготовке к реальному турниру проверяйте Положение и действующую редакцию Правил.</div></article>';
+ return '<article class="judge-prime"><div class="jp-kicker">ШКОЛА СУДЕЙ · МОДУЛЬ '+(index+1)+'</div><h2>'+clean(mod.title)+'</h2><p class="jp-lead">'+clean(mod.lead)+'</p><div class="jp-goal"><strong>Как проходит обучение</strong><p>Уроки идут последовательно: суть нормы → условия и исключения → порядок действий судьи → практический эпизод → ошибки → самопроверка. Завершает модуль итоговый тест.</p></div><ol>'+mod.lessons.map(x=>'<li>'+clean(x.title)+'</li>').join('')+'</ol><div class="jp-mistake"><strong>Важно:</strong> материал составлен на основании российской редакции Правил самбо с изменениями до 14.09.2026 № 860; сам по себе курс не заменяет официальную практическую аттестацию. При подготовке к реальному турниру проверяйте Положение и действующую редакцию Правил.</div>'+editorialWarning(index)+'</article>';
 }
 function render(mod,x,index){
  const sections=x.blocks.map((pair,k)=>'<section class="jp-part"><h3>'+clean((k+1)+'. '+pair[0])+'</h3>'+paragraphs(pair[1])+'</section>').join('');
@@ -30,7 +42,7 @@ function render(mod,x,index){
  '<p class="jp-source">Нормативная основа: '+clean(x.ref)+'. Для окончательного решения используйте полный текст Правил, условия Положения и актуальные указания уполномоченных органов.</p></article>';
 }
 function sections(mod,index){
- return [{title:'План модуля',html:introduction(mod,index)},...mod.lessons.map((x,i)=>({title:x.title,topicIndex:i,html:render(mod,x,i)})),{title:'Экзамен по модулю',quiz:true,html:'<div class="jp-panel"><h3>Итоговая проверка знаний</h3><p>'+mod.questions.length+' вопросов по этому модулю. Для зачёта необходимо 85% правильных ответов. Ошибки разбираются после завершения. Это учебный, а не официальный квалификационный экзамен.</p></div>'}];
+ return [{title:'План модуля',html:introduction(mod,index)},...mod.lessons.map((x,i)=>({title:x.title,topicIndex:i,html:render(mod,x,i)})),{title:'Экзамен по модулю',quiz:true,html:'<div class="jp-panel"><h3>Итоговая проверка знаний</h3><p>'+mod.questions.length+' вопросов по этому модулю. Для зачёта необходимо 85% правильных ответов. Ошибки разбираются после завершения. Это учебный, а не официальный квалификационный экзамен.</p>'+editorialWarning(index)+'</div>'}];
 }
 window.samboJudgeCourseEngine={modules,lesson,register,sections,clean};
 })();
