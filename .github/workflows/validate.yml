@@ -82,6 +82,8 @@ jobs:
             'judge-program-bridge.js'
           ];
           const sandbox={window:{}};vm.createContext(sandbox);
+          vm.runInContext(judgeSource,sandbox,{filename:'judge-foundations.js'});
+          programFiles.unshift('judge-exam-foundations-v2.js');
           for(const name of programFiles){
             const code=fs.readFileSync(name,'utf8');
             new vm.Script(code,{filename:name});
@@ -160,6 +162,9 @@ jobs:
 
       - name: Verify comprehensive practicum exam items 81–88 and article 41 protest limitations
         run: node scripts/check-exam-practicum-2026.cjs
+
+      - name: Verify independent foundation exam revision 2 and archived progress keys
+        run: node scripts/check-exam-foundations-v2-2026.cjs
 
       - name: Verify foundation exam items 1–8, appendix 1 and historical progress index
         run: node scripts/check-exam-foundations-01-08-2026.cjs
