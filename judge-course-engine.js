@@ -39,12 +39,12 @@ function introduction(mod,index){
 function render(mod,x,index,moduleIndex){
  const sections=x.blocks.map((pair,k)=>'<section class="jp-part"><h3>'+clean((k+1)+'. '+pair[0])+'</h3>'+paragraphs(pair[1])+'</section>').join('');
  const questions=x.checks.map((q,k)=>'<details class="jp-question"><summary><span>'+(k+1)+'</span>'+clean(q[0])+'</summary><div class="jp-answer"><strong>Ответ: </strong>'+clean(q[1][q[2]])+'<p>'+clean(q[3])+'</p></div></details>').join('');
- return '<article class="judge-prime"><div class="jp-kicker">УРОК '+(index+1)+' ИЗ '+mod.lessons.length+'</div><h2>'+clean(x.title)+'</h2><p class="jp-lead">'+clean(x.lead)+'</p><div class="jp-goal"><strong>Практическая цель:</strong><p>'+clean(x.goal)+'</p></div>'+sections+
+ return '<article class="judge-prime"><div class="jp-kicker">УРОК '+(index+1)+' ИЗ '+mod.lessons.length+'</div><h2>'+clean(x.title)+'</h2><p class="jp-lead">'+clean(x.lead)+'</p>'+editorialWarning(moduleIndex)+'<div class="jp-goal"><strong>Практическая цель:</strong><p>'+clean(x.goal)+'</p></div>'+sections+
  '<section class="jp-case"><div class="jp-kicker">СУДЕЙСКАЯ СИТУАЦИЯ</div><h3>От условия к решению</h3><p><strong>Что произошло:</strong> '+clean(x.situation)+'</p><p><strong>Что проверить:</strong> '+clean(x.caseAnalysis)+'</p><p><strong>Обоснованный вывод:</strong> '+clean(x.decision)+'</p></section>'+
  '<div class="jp-mistake"><strong>Типичная ошибка:</strong> '+clean(x.trap)+'</div>'+
  '<div class="jp-summary"><strong>Алгоритм:</strong> Факты → применимый пункт '+clean(x.ref)+' → необходимое действие → фиксация решения.</div>'+
  '<section class="jp-self"><h3>Самопроверка</h3><p>Сначала сформулируйте ответ самостоятельно, затем раскройте пояснение.</p>'+questions+'</section>'+
- '<p class="jp-source">Нормативная основа: '+clean(x.ref)+'. Для окончательного решения используйте полный текст Правил, условия Положения и актуальные указания уполномоченных органов.</p>'+sourceLink()+editorialWarning(moduleIndex)+'</article>';
+ '<p class="jp-source">Нормативная основа: '+clean(x.ref)+'. Для окончательного решения используйте полный текст Правил, условия Положения и актуальные указания уполномоченных органов.</p>'+sourceLink()+'</article>';
 }
 function sections(mod,index){
  return [{title:'План модуля',html:introduction(mod,index)},...mod.lessons.map((x,i)=>({title:x.title,topicIndex:i,html:render(mod,x,i,index)})),{title:'Экзамен по модулю',quiz:true,html:'<div class="jp-panel"><h3>Итоговая проверка знаний</h3><p>'+mod.questions.length+' вопросов по этому модулю. Для зачёта необходимо 85% правильных ответов. Ошибки разбираются после завершения. Это учебный, а не официальный квалификационный экзамен.</p><p>Редакция экзамена: '+clean(mod.examRevision||1)+'. Предыдущие результаты не засчитываются за новую редакцию автоматически.</p>'+editorialWarning(index)+sourceLink()+'</div>'}];
