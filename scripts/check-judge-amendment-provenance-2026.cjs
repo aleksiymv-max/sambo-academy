@@ -30,12 +30,15 @@ for(let i=0;i<engine.modules.length;i++){
  for(const page of [pages[0],pages.at(-1)]){
   const html=page.html;
   assert.ok(html.includes('href="'+rules+'"'),'Consolidated Rules link missing');
-  if(moduleIndex===6||moduleIndex===9){
+  if([4,6,9].includes(moduleIndex)){
    assert.ok(html.includes('data-editorial-warning="'+moduleIndex+'"'),'Pre-exam warning missing');
    assert.ok(html.includes('data-amendment-sources="2026"'),'Source comparison missing');
    for(const url of [amendment,clarification])
     assert.ok(html.includes('href="'+url+'" target="_blank" rel="noopener noreferrer"'),'Missing safe source '+url);
-   if(moduleIndex===6){
+   if(moduleIndex===4){
+    for(const marker of ['статья 28','статья 27','11–12','12–14','14–16','плеч'])
+     assert.ok(html.toLowerCase().includes(marker.toLowerCase()),'Youth armbar cross-source caveat missing: '+marker);
+   }else if(moduleIndex===6){
     for(const marker of ['41(2)(а)','непосредственно во время соревнований','в день фиксации нарушения','остаётся открытым'])
      assert.ok(html.includes(marker),'Protest source discrepancy not explained: '+marker);
    }else{
@@ -45,6 +48,6 @@ for(let i=0;i<engine.modules.length;i++){
   }else assert.ok(!html.includes('data-amendment-sources='),'Unexpected source notice in '+moduleIndex);
  }
 }
-console.log('PASS: articles 41 and 45/56 have cross-source notices BEFORE their exams');
+console.log('PASS: youth armbar, article 41 and articles 45/56 have cross-source notices BEFORE exams');
 console.log('PASS: consolidated Rules, separate 2026 changes and VFS explanations are linked safely');
 console.log('OPEN: source wording conflicts require authorised interpretation; no exam keys or progress indices changed');

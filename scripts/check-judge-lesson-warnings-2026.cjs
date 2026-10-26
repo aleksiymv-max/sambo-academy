@@ -15,7 +15,7 @@ let checked=0;
 for(let i=0;i<modules.length;i++){
  const index=i+1,mod=modules[i],sections=ctx.window.samboJudgeCourseEngine.sections(mod,index);
  assert.equal(sections.length,mod.lessons.length+2);
- const affected=[5,6,9,10].includes(index);
+ const affected=[4,5,6,9,10].includes(index);
  for(const page of sections.slice(1,-1)){
   const html=page.html;
   const marker='data-editorial-warning="'+index+'"';
@@ -23,7 +23,7 @@ for(let i=0;i<modules.length;i++){
   if(affected){
    assert.ok(html.indexOf(marker)<html.indexOf('class="jp-goal"'),'Warning must precede the lesson body: '+page.title);
    assert.ok(html.includes('Открыть полный текст Правил'),'Missing source in '+page.title);
-   if(index===6||index===9){
+   if([4,6,9].includes(index)){
     assert.ok(html.includes('data-amendment-sources="2026"'),'Missing amendment evidence in '+page.title);
     assert.ok(html.includes('razyasneniya_pravil_vida_sporta_sambo_sentyabr_2026_god.pdf'));
    }
