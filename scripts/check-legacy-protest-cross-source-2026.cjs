@@ -21,7 +21,7 @@ for(const flag of ['не устанавливает приоритет','не г
 }
 const active=html.match(/41:\{title:'Протесты',partial:false,text:`([\s\S]*?)`,note:'([^']*)'\}/);
 assert.ok(active,'The unique active full article 41 excerpt must exist');
-assert.doesNotMatch(html,/41:\\{title:'Протесты',partial:true,text:/,
+assert.doesNotMatch(html,/41:\{title:'Протесты',partial:true,text:/,
   'Shadowed partial article 41 excerpt must not be reintroduced');
 assert.ok(active[1].includes('непосредственно во время соревнований'),
   'Preserve the full consolidated source text');
