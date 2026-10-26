@@ -51,7 +51,7 @@ const foundation=context.window.samboJudgeFoundations;
 const foundationActive=context.window.samboJudgeFoundationsExamV2;
 const sanctionsActive=context.window.samboJudgeSanctionsExamV3;
 if(!foundation||!foundationActive||!sanctionsActive)throw Error('Active versioned exams missing');
-const normalized=q=>q.trim().toLowerCase().replace(/\\s+/g,' ');
+const normalized=q=>q.trim().toLowerCase().replace(/\s+/g,' ');
 const foundationChecks=new Set(foundation.lessons.flatMap(l=>l.questions.map(q=>normalized(q[0]))));
 const sanctionsChecks=new Set(modules[5].lessons.flatMap(l=>l.checks.map(q=>normalized(q[0]))));
 const repeatedFoundation=foundationActive.questions.filter(q=>foundationChecks.has(normalized(q.q))).length;
