@@ -3,7 +3,7 @@
 // presentation and key stability, NOT official interpretation of ambiguous text.
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const ctx={window:{}};vm.createContext(ctx);
-for(const file of ['judge-course-engine.js','judge-program-bout.js']){
+for(const file of ['judge-course-engine.js','judge-program-bout.js','judge-exam-independent.js']){
  vm.runInContext(fs.readFileSync(file,'utf8'),ctx,{filename:file});
 }
 const engine=ctx.window.samboJudgeCourseEngine,mod=engine.modules[0];
@@ -31,7 +31,7 @@ for(const page of [pages[0],pages[3],pages.at(-1)]){
  ])assert.ok(page.html.includes('href="'+url+'"'),'Missing source '+url);
 }
 assert.equal(mod.questions.length,8,'Existing active exam length must remain unchanged');
-assert.equal(mod.examRevision,undefined===mod.examRevision?undefined:mod.examRevision); // do not assign a new revision here
+assert.equal(mod.examRevision,2,'Keep active independent exam revision 2');
 console.log('PASS: age-specific 2026 armbar amendment explained in lesson, with uncertainty and source links');
 console.log('PASS: module plan, lesson and exam disclose caveat; seven lessons and eight exam questions preserved');
 console.log('OPEN: exact interpretation of ambiguous amendment wording requires authorised clarification');
