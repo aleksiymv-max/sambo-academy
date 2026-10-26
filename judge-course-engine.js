@@ -10,7 +10,7 @@ const clean=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':
 const rulesUrl='https://sambo.ru/wp-content/uploads/2025/09/pravila-vida-sporta-sambo-s-izm.-i-dopolneniyami.pdf';
 const sourceLink=()=>'<p class="jp-source"><a href="'+rulesUrl+'" target="_blank" rel="noopener noreferrer">Открыть полный текст Правил вида спорта «самбо» (PDF; приказ № 892, изменения по 14.09.2026 № 860)</a></p>';
 const amendmentsUrl='https://sambo.ru/wp-content/uploads/2026/08/izmeneniya_v_pravila_vida_sporta_sambo_bez_utesheniya.pdf';
-const clarificationsUrl='https://sambo.ru/wp-content/uploads/2025/09/razyasneniya_pravil_vida_sporta_sambo_sentyabr_2026_god.pdf';
+const clarificationsUrl='https://sambo.ru/wp-content/uploads/2026/08/razyasneniya_pravil_vida_sporta_sambo_sentyabr_2026_god.pdf';
 const amendmentSourceLinks=()=>'<p class="jp-source" data-amendment-sources="2026"><a href="'+amendmentsUrl+'" target="_blank" rel="noopener noreferrer">Изменения Правил с 1 сентября 2026 (PDF)</a> · <a href="'+clarificationsUrl+'" target="_blank" rel="noopener noreferrer">Разъяснения ВФС по изменениям 2026 (PDF)</a></p>';
 const paragraphs=s=>String(s).split(/¶/).filter(Boolean).map(p=>'<p>'+clean(p.trim())+'</p>').join('');
 const lesson=(title,ref,goal,lead,blocks,situation,caseAnalysis,decision,trap,checks)=>

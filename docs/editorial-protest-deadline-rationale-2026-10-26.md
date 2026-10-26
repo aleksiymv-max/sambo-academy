@@ -8,7 +8,7 @@
 
 1. Сводный текст Правил, приказ Минспорта № 892, изменения по 14.09.2026 № 860, статья 41(2)(а): https://sambo.ru/wp-content/uploads/2025/09/pravila-vida-sporta-sambo-s-izm.-i-dopolneniyami.pdf
 2. Отдельные изменения с 1 сентября 2026: https://sambo.ru/wp-content/uploads/2026/08/izmeneniya_v_pravila_vida_sporta_sambo_bez_utesheniya.pdf
-3. Разъяснения ВФС 2026: https://sambo.ru/wp-content/uploads/2025/09/razyasneniya_pravil_vida_sporta_sambo_sentyabr_2026_god.pdf
+3. Разъяснения ВФС 2026: https://sambo.ru/wp-content/uploads/2026/08/razyasneniya_pravil_vida_sporta_sambo_sentyabr_2026_god.pdf
 4. Публикация ВФС от 31.08.2026 о сроке «в день фиксации нарушения»: https://old.sambo.ru/press/news/2026/12181/
 
 Сводный текст использует «непосредственно во время соревнований», изменения и разъяснения — «в день фиксации нарушения». Редакционный курс не определяет приоритет документов вместо компетентных органов и не гарантирует возможность отложить подачу. Отдельное требование о немедленном протесте по неординарной ситуации (статья 41(2)(б)) сохранено.
