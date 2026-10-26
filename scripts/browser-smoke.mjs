@@ -74,24 +74,35 @@ try {
       block[0].includes('Пограничный случай статьи 34(9)')&&block[1].includes('01:10')&&
       block[1].includes('01:40')&&block[1].includes('проигравшим считается синий')&&
       block[1].includes('специальное условие статьи 34(9) не выполнено')))));
-  check('LOCAL archived judge pass displayed separately from current exam',await page.evaluate(()=>{
-    const oldKey='sambo-demo-judge-1106',newKey='sambo-demo-judge-1206';
-    const oldValue=localStorage.getItem(oldKey),newValue=localStorage.getItem(newKey);
+  check('LOCAL archived sanctions results do not grant revision 3',await page.evaluate(()=>{
+    const keys=['1106','1206','1306'].map(i=>'sambo-demo-judge-'+i);
+    const saved=keys.map(key=>localStorage.getItem(key));
     try{
-      localStorage.setItem(oldKey,'done');localStorage.removeItem(newKey);
+      localStorage.setItem(keys[0],'done');
+      localStorage.setItem(keys[1],'done');
+      localStorage.removeItem(keys[2]);
       openCourse('judge');
       const card=document.querySelectorAll('#lessons .sambo-module-card')[6];
       const archived=card?.querySelector('.sambo-archive-note');
       const state=card?.querySelector('.sambo-module-state')?.textContent||'';
-      return archived?.dataset.historyProgress==='1106'&&
+      return samboModuleProgressIndex('judge',6)===1306&&
+        archived?.dataset.historyProgress==='1206,1106'&&
         archived.textContent.includes('отдельный зачёт')&&
-        !state.includes('Пройден')&&!progressDone('judge',1206)&&
-        samboJudgeHistoricalCompletions(1206).join(',')==='1106';
+        !state.includes('Пройден')&&!progressDone('judge',1306)&&
+        samboJudgeHistoricalCompletions(1306).join(',')==='1206,1106';
     }finally{
-      if(oldValue===null)localStorage.removeItem(oldKey);else localStorage.setItem(oldKey,oldValue);
-      if(newValue===null)localStorage.removeItem(newKey);else localStorage.setItem(newKey,newValue);
+      keys.forEach((key,i)=>saved[i]===null?localStorage.removeItem(key):localStorage.setItem(key,saved[i]));
       openCourse('judge');
     }
+  }));
+  check('LOCAL revised sanctions question 47 has all article 34(9) conditions',await page.evaluate(()=>{
+    const group=samboModuleData('judge')[6],q=samboQuizQuestions(group)[6];
+    const exam=samboLessonSections(group).at(-1).html;
+    return window.samboJudgeSanctionsExamV3Loaded===true&&group.examRevision===3&&
+      group.progressIndex===1306&&q.correct===1&&q.q.includes('01:10')&&
+      q.q.includes('01:40')&&q.q.includes('03:00')&&
+      q.a[1].includes('Синий')&&exam.includes('Редакция экзамена: 3')&&
+      window.samboJudgeCourseEngine.modules[5].questions[6].correct===2;
   }));
   check('all revised judge exams use independent questions',await page.evaluate(()=>window.samboJudgeCourseEngine.modules.every(m=>m.examRevision===2&&m.questions.length>=8&&!m.questions.some(q=>m.lessons.some(l=>l.checks.some(c=>c[0].trim().toLowerCase()===q.q.trim().toLowerCase()))))));
  check('LOCAL VFS 2026 submission timer majority explanation',await page.evaluate(()=>
@@ -347,13 +358,20 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
   // Verify the published Cloudflare version, not just the checked-out source.
   // Earlier smoke coverage exercised the expanded modules only on localhost.
   await livePage.evaluate(()=>openCourse('judge'));
+  // Cloudflare Pages may deploy after the main push workflow has already started.
+  for(let attempt=0;attempt<12;attempt++){
+    if(await livePage.evaluate(()=>window.samboJudgeSanctionsExamV3Loaded===true))break;
+    await new Promise(resolve=>setTimeout(resolve,5000));
+    await livePage.reload({waitUntil:'domcontentloaded',timeout:20000});
+    await livePage.waitForFunction(()=>!document.querySelector('.nav-actions')?.classList.contains('auth-pending'),{timeout:15000});
+  }
   const liveModules=await livePage.evaluate(()=>samboModuleData('judge').map((g,i)=>({
    index:i,title:g.title,first:g.parts[0]?.title,questions:samboQuizQuestions(g).length,
    progress:samboModuleProgressIndex('judge',i)
   })));
   check('LIVE all twelve judge modules deployed',liveModules.length===12,'modules='+liveModules.length);
   check('LIVE revised judge modules have eight independent exam questions',liveModules.slice(1).every(g=>g.questions===8));
-   check('LIVE independent exam bank and new result keys deployed',await livePage.evaluate(()=>window.samboJudgeIndependentExamLoaded===true)&&liveModules.slice(1).every((g,i)=>g.progress===1201+i));
+   check('LIVE independent exam bank and new result keys deployed',await livePage.evaluate(()=>window.samboJudgeIndependentExamLoaded===true&&window.samboJudgeSanctionsExamV3Loaded===true)&&liveModules.slice(1).every((g,i)=>g.progress===(i===5?1306:1201+i)));
   check('LIVE judge progress IDs are unique',new Set(liveModules.map(g=>g.progress)).size===liveModules.length);
   if(process.env.GITHUB_EVENT_NAME!=='pull_request'){
     check('LIVE article 34(9) worked case published in sanctions module',await livePage.evaluate(()=>
@@ -1122,7 +1140,7 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
            const source=await fresh.text();
            caveatsStatus=String(fresh.status());
            caveatsPublished=fresh.ok()&&source.includes('data-editorial-warning=')&&
-             source.includes('Условие вопроса № 47')&&
+             source.includes('В редакции экзамена № 3 вопрос № 47')&&
              source.includes('Статья 45(4)')&&
              source.includes('Статья 66 предусматривает');
            if(caveatsPublished)break;
@@ -1147,6 +1165,26 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
          await new Promise(resolve=>setTimeout(resolve,5000));
        }
        check('Cloudflare Pages publishes archived judge result display',archivedPublished,archivedStatus);
+
+       let revisionPublished=false,revisionStatus='not fetched';
+       for(let attempt=0;attempt<10;attempt++){
+         try{
+           const [exam,bridge,home]=await Promise.all([
+             page.request.get('https://sambo-academy.pages.dev/judge-exam-sanctions-v3.js',{timeout:12000,failOnStatusCode:false}),
+             page.request.get('https://sambo-academy.pages.dev/judge-program-bridge.js',{timeout:12000,failOnStatusCode:false}),
+             page.request.get('https://sambo-academy.pages.dev/',{timeout:12000,failOnStatusCode:false})
+           ]);
+           revisionStatus=exam.status()+'/'+bridge.status()+'/'+home.status();
+           revisionPublished=exam.ok()&&bridge.ok()&&home.ok()&&
+             (await exam.text()).includes('первое предупреждение на 01:10')&&
+             (await exam.text()).includes('на 01:40')&&
+             (await bridge.text()).includes('progressIndex:i===5?1306:1201+i')&&
+             (await home.text()).includes('judge-exam-sanctions-v3.js');
+           if(revisionPublished)break;
+         }catch(e){revisionStatus=String(e).slice(0,120);}
+         await new Promise(resolve=>setTimeout(resolve,5000));
+       }
+       check('Cloudflare Pages publishes sanctions exam revision 3 and progress key 1306',revisionPublished,revisionStatus);
 
 
 
