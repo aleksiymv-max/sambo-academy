@@ -1164,7 +1164,7 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
          await new Promise(resolve=>setTimeout(resolve,5000));
        }
        check('Cloudflare Pages publishes foundation exam audit 17–24',foundationFinalPublished,foundationFinalStatus);
-       let caveatsPublished=false,protestSourcePublished=false,beachSourcePublished=false,caveatsStatus='not fetched';
+       let caveatsPublished=false,protestSourcePublished=false,beachSourcePublished=false,lessonWarningPublished=false,caveatsStatus='not fetched';
        for(let attempt=0;attempt<10;attempt++){
          try{
            const fresh=await page.request.get('https://sambo-academy.pages.dev/judge-course-engine.js',{timeout:12000,failOnStatusCode:false});
@@ -1177,16 +1177,18 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
            protestSourcePublished=fresh.ok()&&source.includes('в день фиксации нарушения')&&
              source.includes('непосредственно во время соревнований')&&
              source.includes('izmeneniya_v_pravila_vida_sporta_sambo_bez_utesheniya.pdf');
+           lessonWarningPublished=fresh.ok()&&source.includes('editorialWarning(moduleIndex)')&&source.includes('html:render(mod,x,i,index)');
            beachSourcePublished=fresh.ok()&&source.includes('бокового судью')&&
              source.includes('несогласованность опубликованных текстов')&&
              source.includes('razyasneniya_pravil_vida_sporta_sambo_sentyabr_2026_god.pdf');
-           if(caveatsPublished&&protestSourcePublished&&beachSourcePublished)break;
+           if(caveatsPublished&&protestSourcePublished&&beachSourcePublished&&lessonWarningPublished)break;
          }catch(e){caveatsStatus=String(e).slice(0,120);}
          await new Promise(resolve=>setTimeout(resolve,5000));
        }
        check('Cloudflare Pages publishes pre-exam normative caveats',caveatsPublished,caveatsStatus);
        check('Cloudflare Pages publishes protest timing cross-source warning',protestSourcePublished,caveatsStatus);
        check('Cloudflare Pages publishes beach side-judge cross-source warning',beachSourcePublished,caveatsStatus);
+       check('Cloudflare Pages publishes lesson-level normative caveats',lessonWarningPublished,caveatsStatus);
 
        let officialRulesPublished=false,officialRulesStatus='not fetched';
        for(let attempt=0;attempt<10;attempt++){
