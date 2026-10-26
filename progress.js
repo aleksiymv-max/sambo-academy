@@ -38,7 +38,7 @@ window.saveSamboProgress = async function(course,index) {
 window.samboJudgeHistoricalIndices = function(currentIndex) {
   if(currentIndex===1100)return [100];
   if(currentIndex>=1201&&currentIndex<=1211)return [currentIndex-100];
-  // Reserved for a future revised sanctions exam; do not activate a new key here.
+  // Sanctions exam revision 3 uses 1306; earlier 1206/1106 remain read-only history.
   if(currentIndex===1306)return [1206,1106];
   return [];
 };
