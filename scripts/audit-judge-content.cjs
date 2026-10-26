@@ -42,6 +42,32 @@ for(const r of rows){
  for(const issue of r.issues)console.log('  WARNING '+issue);
 }
 console.log('TOTAL: '+modules.length+' expanded modules, '+lessonTotal+' lessons, '+examTotal+' exam questions; '+duplicateTotal+' repeated, '+independentTotal+' independent.');
+
+// Audit the ACTIVE versioned banks, not only the preserved historical exam data.
+for(const file of ['judge-foundations.js','judge-exam-foundations-v2.js','judge-exam-sanctions-v3.js']){
+ vm.runInContext(fs.readFileSync(file,'utf8'),context,{filename:file});
+}
+const foundation=context.window.samboJudgeFoundations;
+const foundationActive=context.window.samboJudgeFoundationsExamV2;
+const sanctionsActive=context.window.samboJudgeSanctionsExamV3;
+if(!foundation||!foundationActive||!sanctionsActive)throw Error('Active versioned exams missing');
+const normalized=q=>q.trim().toLowerCase().replace(/\\s+/g,' ');
+const foundationChecks=new Set(foundation.lessons.flatMap(l=>l.questions.map(q=>normalized(q[0]))));
+const sanctionsChecks=new Set(modules[5].lessons.flatMap(l=>l.checks.map(q=>normalized(q[0]))));
+const repeatedFoundation=foundationActive.questions.filter(q=>foundationChecks.has(normalized(q.q))).length;
+const repeatedSanctions=sanctionsActive.questions.filter(q=>sanctionsChecks.has(normalized(q.q))).length;
+const activeCount=foundationActive.questions.length+examTotal-modules[5].questions.length+sanctionsActive.questions.length;
+console.log('ACTIVE: '+activeCount+' exam questions; foundation revision '+foundationActive.examRevision+
+ ' (progress '+foundationActive.progressIndex+', repeated '+repeatedFoundation+'); sanctions revision '+
+ sanctionsActive.examRevision+' (progress '+sanctionsActive.progressIndex+', repeated '+repeatedSanctions+')');
+if(foundationActive.examRevision!==2||foundationActive.progressIndex!==2100||
+ sanctionsActive.examRevision!==3||sanctionsActive.progressIndex!==1306||
+ foundationActive.questions.length!==24||sanctionsActive.questions.length!==8||
+ activeCount!==112||repeatedFoundation||repeatedSanctions){
+ console.error('EDITORIAL GAP: active versioned exam is incomplete or repeats self-check');
+ process.exitCode=1;
+}
+
 if(duplicateTotal)console.log('EDITORIAL GAP: final tests repeat lesson self-checks; add independent scenario questions before treating them as qualifying exams.');
 console.log('EDITORIAL GAP: normative point-by-point verification against the uploaded PDF, original illustrations and real-account progress E2E require separate evidence.');
 if(modules.length!==11||lessonTotal<50||duplicateTotal!==0||rows.some(r=>r.independent<Math.max(8,r.lessons)))process.exitCode=1;
