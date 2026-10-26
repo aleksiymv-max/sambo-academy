@@ -21,6 +21,7 @@ for(let i=0;i<modules.length;i++){
   const marker='data-editorial-warning="'+index+'"';
   assert.equal(html.includes(marker),affected,'Lesson warning missing or misplaced: '+mod.title+' / '+page.title);
   if(affected){
+   assert.ok(html.indexOf(marker)<html.indexOf('class="jp-goal"'),'Warning must precede the lesson body: '+page.title);
    assert.ok(html.includes('Открыть полный текст Правил'),'Missing source in '+page.title);
    if(index===6||index===9){
     assert.ok(html.includes('data-amendment-sources="2026"'),'Missing amendment evidence in '+page.title);
