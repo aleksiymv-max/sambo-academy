@@ -14,7 +14,7 @@ const filenames = [
 const base = 'https://sambo.ru/wp-content/uploads/';
 const targets = [
   ...fs.readdirSync('docs').filter(name => name.endsWith('.md')).map(name => path.join('docs', name)),
-  ...fs.readdirSync('.').filter(name => /^judge.*\\.js$/.test(name)),
+  ...fs.readdirSync('.').filter(name => /^judge.*[.]js$/.test(name)),
   'index.html'
 ];
 let checked = 0;
