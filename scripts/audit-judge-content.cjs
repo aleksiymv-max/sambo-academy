@@ -1,4 +1,4 @@
-/* Non-blocking editorial quality report for the judge curriculum.
+/* Editorial structure gate for the judge curriculum (source-based approval remains separate).
  * Passing JavaScript tests is not evidence of normative or pedagogical approval.
  * Usage: node scripts/audit-judge-content.cjs
  */
@@ -29,8 +29,8 @@ for(const mod of modules){
  for(const l of mod.lessons){
   if(!l.ref?.trim())issues.push('no reference: '+l.title);
   if(!l.goal?.trim()||!l.situation?.trim()||!l.caseAnalysis?.trim()||!l.decision?.trim()||!l.trap?.trim())issues.push('missing lesson element: '+l.title);
-  if(l.blocks.length<2)issues.push('few explanation blocks: '+l.title);
-  if(l.checks.length<2)issues.push('few self-check questions: '+l.title);
+  if(l.blocks.length<6)issues.push('fewer than six explanation blocks ('+l.blocks.length+'): '+l.title);
+  if(l.checks.length<5)issues.push('fewer than five self-check questions ('+l.checks.length+'): '+l.title);
  }
  lessonTotal+=mod.lessons.length;examTotal+=mod.questions.length;
  duplicateTotal+=repeated;independentTotal+=independent;
@@ -70,4 +70,4 @@ if(foundationActive.examRevision!==2||foundationActive.progressIndex!==2100||
 
 if(duplicateTotal)console.log('EDITORIAL GAP: final tests repeat lesson self-checks; add independent scenario questions before treating them as qualifying exams.');
 console.log('EDITORIAL GAP: normative point-by-point verification against the uploaded PDF, original illustrations and real-account progress E2E require separate evidence.');
-if(modules.length!==11||lessonTotal<50||duplicateTotal!==0||rows.some(r=>r.independent<Math.max(8,r.lessons)))process.exitCode=1;
+if(modules.length!==11||lessonTotal!==54||duplicateTotal!==0||rows.some(r=>r.issues.length>0||r.independent<Math.max(8,r.lessons)))process.exitCode=1;
