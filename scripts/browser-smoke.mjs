@@ -173,7 +173,23 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
  const judgeInfo=await page.evaluate(()=>{const g=samboModuleData('judge')[0];return {name:g.title,lessons:g.parts.length,premium:g.premiumFoundations,questions:samboQuizQuestions(g).length,progress:samboModuleProgressIndex('judge',0),sections:samboLessonSections(g).length}});
  check('judge foundation has six curated sequential lessons',judgeInfo.premium&&judgeInfo.lessons===6&&judgeInfo.sections===8,JSON.stringify(judgeInfo));
  check('judge foundation has 24 verified questions',judgeInfo.questions===24);
- check('updated judge module has separate progress version',judgeInfo.progress===1100);
+ check('updated judge module has separate progress version',judgeInfo.progress===2100);
+ check('LOCAL foundation exam v2 has independent cases and preserves historical bank',await page.evaluate(()=>{
+   const old=window.samboJudgeFoundations,v2=window.samboJudgeFoundationsExamV2;
+   const group=samboModuleData('judge')[0];
+   const self=new Set(old.lessons.flatMap(l=>l.questions.map(q=>q[0].trim().toLowerCase())));
+   return v2?.examRevision===2&&v2.progressIndex===2100&&v2.questions.length===24&&
+     v2.questions.slice(0,12).every(q=>q.kind==='Судейская ситуация'&&!self.has(q.q.trim().toLowerCase()))&&
+     v2.questions.slice(12).every((q,i)=>q===old.questions[12+i])&&
+     samboQuizQuestions(group)===v2.questions&&
+     samboModuleProgressIndex('judge',0)===2100&&
+     samboJudgeHistoricalIndices(2100).join(',')==='1100,100'&&
+     !progressDone('judge',2100);
+ }));
+ check('LOCAL foundation exam v2 discloses revision before quiz',await page.evaluate(()=>{
+   const sections=samboLessonSections(samboModuleData('judge')[0]);
+   return sections.at(-1)?.quiz&&sections.at(-1).html.includes('Редакция экзамена: 2');
+ }));
  check('LOCAL foundation exam 1–8 explanations follow appendix 1 and articles 1–2',await page.evaluate(()=>{
    const m=window.samboJudgeFoundations,q=m.questions;
    return m.progressIndex===1100&&q.length===24&&q.slice(0,8).every(x=>x.body.length>=450)&&
@@ -1185,6 +1201,28 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
          await new Promise(resolve=>setTimeout(resolve,5000));
        }
        check('Cloudflare Pages publishes sanctions exam revision 3 and progress key 1306',revisionPublished,revisionStatus);
+       let foundationsV2Published=false,foundationsV2Status='not fetched';
+       for(let attempt=0;attempt<10;attempt++){
+         try{
+           const [exam,bridge,progress,home]=await Promise.all([
+             page.request.get('https://sambo-academy.pages.dev/judge-exam-foundations-v2.js',{timeout:12000,failOnStatusCode:false}),
+             page.request.get('https://sambo-academy.pages.dev/judge-program-bridge.js',{timeout:12000,failOnStatusCode:false}),
+             page.request.get('https://sambo-academy.pages.dev/progress.js',{timeout:12000,failOnStatusCode:false}),
+             page.request.get('https://sambo-academy.pages.dev/',{timeout:12000,failOnStatusCode:false})
+           ]);
+           foundationsV2Status=[exam.status(),bridge.status(),progress.status(),home.status()].join('/');
+           foundationsV2Published=exam.ok()&&bridge.ok()&&progress.ok()&&home.ok()&&
+             (await exam.text()).includes('progressIndex:2100')&&
+             (await exam.text()).includes('В весовой категории шесть спортсменов')&&
+             (await bridge.text()).includes('progressIndex:2100,examRevision:2')&&
+             (await progress.text()).includes('if(currentIndex===2100)return [1100,100]')&&
+             (await home.text()).includes('judge-exam-foundations-v2.js');
+           if(foundationsV2Published)break;
+         }catch(e){foundationsV2Status=String(e).slice(0,120);}
+         await new Promise(resolve=>setTimeout(resolve,5000));
+       }
+       check('Cloudflare Pages publishes foundation exam v2 and archived result key 2100',foundationsV2Published,foundationsV2Status);
+
 
 
 
