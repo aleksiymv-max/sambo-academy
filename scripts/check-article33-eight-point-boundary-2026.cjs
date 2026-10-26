@@ -12,7 +12,7 @@ const scoring=engine.modules[0];
 assert.equal(scoring.title,'Оценивание действий и определение победителя');
 const pages=engine.sections(scoring,5);
 for(const page of [pages[0],pages[1],pages.at(-1)]){
- for(const phrase of ['свыше 8 баллов','8 (и более)','официального уточнения','Статья 28(6)']){
+ for(const phrase of ['свыше 8 баллов','8 (и более)','официальное уточнение','Статья 28(6)']){
   assert.ok(page.html.includes(phrase),'Missing boundary caveat in '+page.title+': '+phrase);
  }
 }
