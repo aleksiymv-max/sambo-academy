@@ -17,9 +17,14 @@ jobs:
           node-version: '22'
       - name: Install Playwright browser driver
         run: npm install --no-save --no-package-lock playwright@1.57.0
+      - name: Self-test deployment revision checker
+        run: node scripts/check-deployment-parity.mjs --self-test
       - name: Run browser checks
         env:
           SAMBO_SMOKE_LOCAL_ONLY: ${{ github.event_name == 'pull_request' && '1' || '0' }}
         run: |
           google-chrome --version
           node scripts/browser-smoke.mjs
+      - name: Verify deployed judge assets match checked-out main
+        if: github.event_name != 'pull_request'
+        run: node scripts/check-deployment-parity.mjs
