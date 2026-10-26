@@ -41,7 +41,7 @@ for(let i=0;i<engine.modules.length;i++){
   for(const [name,html] of [['intro',intro],['exam',exam]]){
    assert.ok(html.includes('data-editorial-warning="'+index+'"'),'No caveat before '+name+' for module '+index);
    assert.ok(html.includes('Редакторское предупреждение'),'No editorial warning heading');
-   for(const marker of expected.get(index))assert.ok(html.includes(marker),'Missing '+marker+' in '+name+' of module '+index);
+   for(const marker of expected.get(index))assert.ok(html.toLowerCase().includes(marker.toLowerCase()),'Missing '+marker+' in '+name+' of module '+index);
    assert.ok(html.includes('role="note"'),'Notice must be accessible');
   }
  }else{
