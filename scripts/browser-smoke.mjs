@@ -76,6 +76,7 @@ try {
   return [s[0],s[1],s.at(-1)].every(x=>x.html.includes('href="'+url+'"')&&x.html.includes('rel="noopener noreferrer"'));
  });
  check('judge plan, lesson and exam link to amended official rules',officialSourceVisible);
+ check('LOCAL 2026 VFS clarification PDF link is official',await page.evaluate(()=>{const e=window.samboJudgeCourseEngine,official='https://sambo.ru/wp-content/uploads/2026/08/razyasneniya_pravil_vida_sporta_sambo_sentyabr_2026_god.pdf',stale='https://sambo.ru/wp-content/uploads/2025/09/razyasneniya_pravil_vida_sporta_sambo_sentyabr_2026_god.pdf';return [6,9].every(i=>{const s=e.sections(e.modules[i-1],i);return [s[0],s[1],s.at(-1)].every(p=>p.html.includes('href="'+official+'"')&&!p.html.includes(stale));});}));
  // Every expanded module must be reachable from the visible course and render its own first lesson.
  const judgeModules=await page.evaluate(()=>samboModuleData('judge').map((g,i)=>({
   index:i,title:g.title,lessons:g.parts.length,first:g.parts[0]?.title,questions:samboQuizQuestions(g).length,
@@ -420,6 +421,7 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
   check('LIVE revised judge modules have eight independent exam questions',liveModules.slice(1).every(g=>g.questions===8));
    check('LIVE independent exam bank and new result keys deployed',await livePage.evaluate(()=>window.samboJudgeIndependentExamLoaded===true&&window.samboJudgeSanctionsExamV3Loaded===true)&&liveModules.slice(1).every((g,i)=>g.progress===(i===5?1306:1201+i)));
   check('LIVE judge progress IDs are unique',new Set(liveModules.map(g=>g.progress)).size===liveModules.length);
+  check('LIVE 2026 VFS clarification PDF link is official',await livePage.evaluate(()=>{const e=window.samboJudgeCourseEngine,official='https://sambo.ru/wp-content/uploads/2026/08/razyasneniya_pravil_vida_sporta_sambo_sentyabr_2026_god.pdf',stale='https://sambo.ru/wp-content/uploads/2025/09/razyasneniya_pravil_vida_sporta_sambo_sentyabr_2026_god.pdf';return [6,9].every(i=>{const s=e.sections(e.modules[i-1],i);return [s[0],s[1],s.at(-1)].every(p=>p.html.includes('href="'+official+'"')&&!p.html.includes(stale));});}));
   if(process.env.GITHUB_EVENT_NAME!=='pull_request'){
     check('LIVE article 34(9) worked case published in sanctions module',await livePage.evaluate(()=>
       window.samboJudgeCourseEngine.modules[5].lessons.some(lesson=>lesson.blocks.some(block=>

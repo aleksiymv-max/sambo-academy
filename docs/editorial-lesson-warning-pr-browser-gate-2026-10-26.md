@@ -14,8 +14,8 @@
 
 ## Источники и ограничения
 1. [Сводные Правила вида спорта «самбо», приказ № 892, изменения по № 860 от 14.09.2026](https://sambo.ru/wp-content/uploads/2025/09/pravila-vida-sporta-sambo-s-izm.-i-dopolneniyami.pdf).
-2. [Отдельные изменения 2026 года](https://sambo.ru/wp-content/uploads/2025/09/izmeneniya_v_pravila_vida_sporta_sambo_bez_utesheniya.pdf).
-3. [Разъяснения ВФС, сентябрь 2026 года](https://sambo.ru/wp-content/uploads/2025/09/razyasneniya_pravil_vida_sporta_sambo_sentyabr_2026_god.pdf).
+2. [Отдельные изменения 2026 года](https://sambo.ru/wp-content/uploads/2026/08/izmeneniya_v_pravila_vida_sporta_sambo_bez_utesheniya.pdf).
+3. [Разъяснения ВФС, сентябрь 2026 года](https://sambo.ru/wp-content/uploads/2026/08/razyasneniya_pravil_vida_sporta_sambo_sentyabr_2026_god.pdf).
 
 Оговорки сохраняют открытый статус по удержанию ровно 10 секунд, процедуре снятия, сроку протеста, составу судей пляжного и демонстрационного самбо. Изменение **не устанавливает новые нормы**.
 

@@ -6,7 +6,7 @@
 
 1. Consolidated *Правила вида спорта «самбо»*, order of the Ministry of Sport No. 892 of 04.12.2020, amended through order No. 860 of 14.09.2026: https://sambo.ru/wp-content/uploads/2025/09/pravila-vida-sporta-sambo-s-izm.-i-dopolneniyami.pdf
 2. Federation's separate *Изменения от 1 сентября 2026 в правилах*: https://sambo.ru/wp-content/uploads/2026/08/izmeneniya_v_pravila_vida_sporta_sambo_bez_utesheniya.pdf
-3. Federation's *Разъяснения по изменениям с 1 сентября 2026*: https://sambo.ru/wp-content/uploads/2025/09/razyasneniya_pravil_vida_sporta_sambo_sentyabr_2026_god.pdf
+3. Federation's *Разъяснения по изменениям с 1 сентября 2026*: https://sambo.ru/wp-content/uploads/2026/08/razyasneniya_pravil_vida_sporta_sambo_sentyabr_2026_god.pdf
 4. Federation announcement of 31.08.2026: https://old.sambo.ru/press/news/2026/12181/
 
 These files are linked by the Federation's documents listing: https://sambo.ru/documents/ (Rules package dated 15.09.2026).

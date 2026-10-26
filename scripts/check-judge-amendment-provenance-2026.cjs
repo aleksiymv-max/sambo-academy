@@ -6,7 +6,8 @@ const vm=require('node:vm');
 const assert=require('node:assert/strict');
 const amendment='https://sambo.ru/wp-content/uploads/2026/08/izmeneniya_v_pravila_vida_sporta_sambo_bez_utesheniya.pdf';
 const obsolete='https://sambo.ru/wp-content/uploads/2025/09/izmeneniya_v_pravila_vida_sporta_sambo_bez_utesheniya.pdf';
-const clarification='https://sambo.ru/wp-content/uploads/2025/09/razyasneniya_pravil_vida_sporta_sambo_sentyabr_2026_god.pdf';
+const obsoleteClarification='https://sambo.ru/wp-content/uploads/2025/09/razyasneniya_pravil_vida_sporta_sambo_sentyabr_2026_god.pdf';
+const clarification='https://sambo.ru/wp-content/uploads/2026/08/razyasneniya_pravil_vida_sporta_sambo_sentyabr_2026_god.pdf';
 const files=['judge-course-engine.js','judge-program-admission.js','judge-program-participants.js',
  'judge-program-officials.js','judge-program-bout.js','judge-program-scoring.js',
  'judge-program-sanctions.js','judge-program-infrastructure.js','judge-program-combat.js',
@@ -15,6 +16,12 @@ const sandbox={window:{}};vm.createContext(sandbox);
 for(const file of files)vm.runInContext(fs.readFileSync(file,'utf8'),sandbox,{filename:file});
 const engine=sandbox.window.samboJudgeCourseEngine;
 assert.ok(!fs.readFileSync('judge-course-engine.js','utf8').includes(obsolete),'Obsolete amendment PDF path must never be published');
+assert.ok(!fs.readFileSync('judge-course-engine.js','utf8').includes(obsoleteClarification),'Obsolete VFS clarification PDF path must never be published');
+for(const path of ['docs/editorial-cross-source-protests-beach-2026-10-26.md','docs/editorial-protest-deadline-rationale-2026-10-26.md','docs/editorial-lesson-warning-pr-browser-gate-2026-10-26.md']){
+ const doc=fs.readFileSync(path,'utf8');
+ assert.ok(!doc.includes(obsoleteClarification),'Obsolete clarification link in '+path);
+ assert.ok(!doc.includes(obsolete),'Obsolete amendment link in '+path);
+}
 assert.equal(engine.modules.length,11);
 const rules='https://sambo.ru/wp-content/uploads/2025/09/pravila-vida-sporta-sambo-s-izm.-i-dopolneniyami.pdf';
 for(let i=0;i<engine.modules.length;i++){
