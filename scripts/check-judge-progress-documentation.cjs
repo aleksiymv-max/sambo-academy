@@ -15,7 +15,7 @@ const moduleFiles=[
 const context={
  window:{},
  samboModuleData:key=>key==='judge'
-  ?[{title:'Основы правил, Положение и системы соревнований'},...Array.from({length:11},()=>({}))]
+  ?[{title:context.window.samboJudgeFoundations.title},...Array.from({length:11},()=>({}))]
   :[],
  samboQuizQuestions:()=>[],
  samboLessonSections:()=>[]
