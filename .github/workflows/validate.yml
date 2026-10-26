@@ -166,6 +166,9 @@ jobs:
       - name: Check foundation exam 17–24 sources and historical results
         run: node scripts/check-exam-foundations-17-24-2026.cjs
 
+      - name: Check cross-module normative warnings and unchanged 112 historical exam keys
+        run: node scripts/check-judge-editorial-warnings-2026.cjs
+
       - name: Check demonstration sambo normative lesson coverage
         run: node scripts/check-demo-normative.cjs
 

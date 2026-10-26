@@ -62,6 +62,13 @@ try {
  check('all twelve judge modules registered',judgeModules.length===12,'modules='+judgeModules.length);
  check('expanded judge modules contain fifty-four authored lessons',judgeModules.slice(1).reduce((n,g)=>n+g.lessons,0)===54);
   check('independent exam bank loaded',await page.evaluate(()=>window.samboJudgeIndependentExamLoaded===true));
+  check('LOCAL unresolved Rules caveats visible before affected exams',await page.evaluate(()=>
+    [5,6,9,10].every(index=>{
+      const mod=window.samboJudgeCourseEngine.modules[index-1];
+      const sections=window.samboJudgeCourseEngine.sections(mod,index);
+      const marker='data-editorial-warning="'+index+'"';
+      return sections[0].html.includes(marker)&&sections.at(-1).html.includes(marker);
+    })));
   check('all revised judge exams use independent questions',await page.evaluate(()=>window.samboJudgeCourseEngine.modules.every(m=>m.examRevision===2&&m.questions.length>=8&&!m.questions.some(q=>m.lessons.some(l=>l.checks.some(c=>c[0].trim().toLowerCase()===q.q.trim().toLowerCase()))))));
  check('LOCAL VFS 2026 submission timer majority explanation',await page.evaluate(()=>
    window.samboJudgeCourseEngine.modules[2].questions[5].body.includes('Это два голоса из трёх')));
@@ -1076,6 +1083,21 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
          await new Promise(resolve=>setTimeout(resolve,5000));
        }
        check('Cloudflare Pages publishes foundation exam audit 17–24',foundationFinalPublished,foundationFinalStatus);
+       let caveatsPublished=false,caveatsStatus='not fetched';
+       for(let attempt=0;attempt<10;attempt++){
+         try{
+           const fresh=await page.request.get('https://sambo-academy.pages.dev/judge-course-engine.js',{timeout:12000,failOnStatusCode:false});
+           const source=await fresh.text();
+           caveatsStatus=String(fresh.status());
+           caveatsPublished=fresh.ok()&&source.includes('data-editorial-warning=')&&
+             source.includes('Условие вопроса № 47')&&
+             source.includes('Статья 45(4)')&&
+             source.includes('Статья 66 предусматривает');
+           if(caveatsPublished)break;
+         }catch(e){caveatsStatus=String(e).slice(0,120);}
+         await new Promise(resolve=>setTimeout(resolve,5000));
+       }
+       check('Cloudflare Pages publishes pre-exam normative caveats',caveatsPublished,caveatsStatus);
 
 
      }
