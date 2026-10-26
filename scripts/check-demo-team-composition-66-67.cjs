@@ -17,6 +17,10 @@ const body=[lesson.ref,...lesson.blocks.map(b=>b.join(' ')),lesson.situation,les
 for(const marker of ['статья 66','статья 67','статья 68','две судейские бригады','три судьи','два','20%','10%','одновременн','фонограмм','не зависящ','травмоопасн','повтор','расхождение'])
   assert.ok(body.includes(marker.toLowerCase()),'Missing normative anchor: '+marker);
 assert.ok(body.includes('статья 68(2)'),'Unresolved crew-size discrepancy must remain explicit');
+// Article 67 also requires a pre-submitted, labelled and quality-checked audio flash card.
+// Preserve this easily overlooked procedural requirement without inventing a penalty.
+for(const marker of ['флеш-карте','название команды','проверить качество','до начала выступления','не предусмотренный правилами штраф'])
+  assert.ok(body.includes(marker),'Missing article 67 audio-media preparation: '+marker);
 assert.ok(!lesson.checks.some(q=>q[0].includes('Сколько судей исполнительского мастерства обязательно')),'No false exam key for conflicting 66/68 figures');
 const original=[
  ['Как выполняется обязательная часть командной композиции?',['Одновременно всеми участниками','Только капитаном','По одному спортсмену','Только ассистентами'],0],
