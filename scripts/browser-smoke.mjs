@@ -862,6 +862,9 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
     check('LIVE demonstration team composition editorial depth',
       title.includes('Командная композиция и судейская бригада')&&blocks>=12&&checks>=7,
       'blocks='+blocks+' checks='+checks);
+    const audioText=await livePage.locator('.judge-prime').innerText();
+    check('LIVE article 67 flash-card label and audio preflight visible',
+      ['флеш-карте','название команды','проверить качество'].every(x=>audioText.includes(x)));
    }
   }
 
