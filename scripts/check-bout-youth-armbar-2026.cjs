@@ -3,7 +3,13 @@
 // presentation and key stability, NOT official interpretation of ambiguous text.
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const ctx={window:{}};vm.createContext(ctx);
-for(const file of ['judge-course-engine.js','judge-program-bout.js','judge-exam-independent.js']){
+for(const file of [
+ 'judge-course-engine.js','judge-program-admission.js','judge-program-participants.js',
+ 'judge-program-officials.js','judge-program-bout.js','judge-program-scoring.js',
+ 'judge-program-sanctions.js','judge-program-infrastructure.js','judge-program-combat.js',
+ 'judge-program-beach.js','judge-program-demo.js','judge-program-practicum.js',
+ 'judge-exam-independent.js'
+]){
  vm.runInContext(fs.readFileSync(file,'utf8'),ctx,{filename:file});
 }
 const engine=ctx.window.samboJudgeCourseEngine,mod=engine.modules[0];
