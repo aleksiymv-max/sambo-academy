@@ -54,17 +54,22 @@ try {
  check('brand logo returns home',!(await page.locator('#home').evaluate(e=>e.classList.contains('hidden'))));
  await page.evaluate(()=>{openCourse('judge');});
  check('judge modules render',await page.locator('#lessons .sambo-module-card').count()>=5);
- check('LOCAL legacy protest guide discloses cross-source 2026 deadline conflict',await page.evaluate(()=>{
+ const legacyProtestFlags=await page.evaluate(()=>{
    const guide=samboProtestFor({title:'Нарушения, санкции и протесты'});
    const excerpt=samboArticleExcerpts[41];
-   return guide.includes('data-protest-cross-source="2026"')&&
-     guide.includes('в день фиксации нарушения')&&
-     guide.includes('непосредственно во время соревнований')&&
-     guide.includes('izmeneniya_v_pravila_vida_sporta_sambo_bez_utesheniya.pdf')&&
-     guide.includes('old.sambo.ru/press/news/2026/12181/')&&
-     guide.includes('статья 41(2)(б)')&&
-     excerpt.note.includes('в день фиксации нарушения');
- }));
+   return {
+     guide:guide.length>100,
+     notice:guide.includes('data-protest-cross-source="2026"'),
+     amendmentDeadline:guide.includes('в день фиксации нарушения'),
+     consolidatedDeadline:guide.includes('непосредственно во время соревнований'),
+     amendmentUrl:guide.includes('izmeneniya_v_pravila_vida_sporta_sambo_bez_utesheniya.pdf'),
+     vfsUrl:guide.includes('old.sambo.ru/press/news/2026/12181/'),
+     exceptional:guide.includes('статья 41(2)(б)'),
+     excerptNotice:excerpt.note.includes('в день фиксации нарушения')
+   };
+ });
+ check('LOCAL legacy protest guide discloses cross-source 2026 deadline conflict',
+   Object.values(legacyProtestFlags).every(Boolean),JSON.stringify(legacyProtestFlags));
  const officialSourceVisible=await page.evaluate(()=>{
   const e=window.samboJudgeCourseEngine,m=e.modules[0],s=e.sections(m,1);
   const url='https://sambo.ru/wp-content/uploads/2025/09/pravila-vida-sporta-sambo-s-izm.-i-dopolneniyami.pdf';
