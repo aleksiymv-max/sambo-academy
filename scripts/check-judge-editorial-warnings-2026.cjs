@@ -27,6 +27,7 @@ assert.equal(engine.modules.reduce((n,m)=>n+m.lessons.length,0),54);
 assert.equal(engine.modules.reduce((n,m)=>n+m.questions.length,0),88);
 assert.ok(engine.modules.every(m=>m.examRevision===2));
 const expected=new Map([
+ [2,['Статья 10','31.08.2026','01.09.2026','снятие куртки','без определения места']],
  [4,['Статья 28','статья 27','11–12','12–14','14–16','отрывом туловища']],
  [5,['Статья 28(6)','статья 35(3)(д)','ровно 10 секунд']],
  [6,['вопрос № 47','статьи 34(9)','Статьи 38(1) и 40(3)','judge:1306']],
@@ -57,7 +58,7 @@ assert.equal(basic.progressIndex,1100);
 assert.equal(basic.version,'2026-10-23-1');
 assert.equal(fnv(JSON.stringify(Array.from(basic.questions,({q,a,correct,kind})=>({q,a,correct,kind})))),'4910eed2');
 assert.equal(basic.questions.length,24);
-console.log('PASS: editorial warnings precede exams for youth armbar, scoring, sanctions, beach and team demonstration modules');
+console.log('PASS: editorial warnings precede exams for participant equipment, youth armbar, scoring, sanctions, beach and team demonstration modules');
 console.log('PASS: source article references and unresolved status displayed in module introductions');
 console.log('PASS: 112 historical exam questions/keys, 54 expanded lessons and progress identifiers preserved');
 console.log('OPEN: historical item 47 remains archived, source conflicts, 12 repeated foundation items and authenticated E2E restoration');
