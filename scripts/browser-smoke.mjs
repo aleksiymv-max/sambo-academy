@@ -86,19 +86,19 @@ try {
  check('expanded judge modules contain fifty-four authored lessons',judgeModules.slice(1).reduce((n,g)=>n+g.lessons,0)===54);
   check('independent exam bank loaded',await page.evaluate(()=>window.samboJudgeIndependentExamLoaded===true));
   check('LOCAL unresolved Rules caveats visible before affected exams',await page.evaluate(()=>
-    [5,6,9,10].every(index=>{
+    [4,5,6,9,10].every(index=>{
       const mod=window.samboJudgeCourseEngine.modules[index-1];
       const sections=window.samboJudgeCourseEngine.sections(mod,index);
       const marker='data-editorial-warning="'+index+'"';
       return sections[0].html.includes(marker)&&sections.at(-1).html.includes(marker);
     })));
   check('LOCAL unresolved Rules notices are visible in affected lessons',await page.evaluate(()=>
-    [5,6,9,10].every(index=>{
+    [4,5,6,9,10].every(index=>{
       const mod=window.samboJudgeCourseEngine.modules[index-1];
       const lesson=window.samboJudgeCourseEngine.sections(mod,index)[1]?.html||'';
       const notice='data-editorial-warning="'+index+'"';
       return lesson.includes(notice)&&lesson.includes('pravila-vida-sporta-sambo-s-izm.-i-dopolneniyami.pdf')&&
-        ((index!==6&&index!==9)||lesson.includes('data-amendment-sources="2026"'));
+        ((![4,6,9].includes(index))||lesson.includes('data-amendment-sources="2026"'));
     })));
   check('LOCAL sanctions lesson explains article 34(9) first-warning boundary',await page.evaluate(()=>
     window.samboJudgeCourseEngine.modules[5].lessons.some(lesson=>lesson.blocks.some(block=>
