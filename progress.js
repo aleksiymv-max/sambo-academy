@@ -31,3 +31,18 @@ window.saveSamboProgress = async function(course,index) {
     return false;
   } catch(e) {authMessage('Не удалось сохранить результат в облаке. Повторите ответ позже.');return false;}
 };
+
+
+// Historical judge results remain visible but never count as completion of a revised exam.
+// Only progress keys belonging to the active account (or this browser's guest mode) are read.
+window.samboJudgeHistoricalIndices = function(currentIndex) {
+  if(currentIndex===1100)return [100];
+  if(currentIndex>=1201&&currentIndex<=1211)return [currentIndex-100];
+  // Reserved for a future revised sanctions exam; do not activate a new key here.
+  if(currentIndex===1306)return [1206,1106];
+  return [];
+};
+window.samboJudgeHistoricalCompletions = function(currentIndex) {
+  return window.samboJudgeHistoricalIndices(currentIndex)
+    .filter(index=>window.progressDone('judge',index));
+};

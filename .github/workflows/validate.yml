@@ -172,6 +172,9 @@ jobs:
       - name: Verify simulated judge progress restore, historical results and article 34(9) worked case
         run: node scripts/check-judge-progress-history-2026.cjs
 
+      - name: Verify archived judge result badges and account-scoped progress
+        run: node scripts/check-judge-history-ui-2026.cjs
+
       - name: Check demonstration sambo normative lesson coverage
         run: node scripts/check-demo-normative.cjs
 

@@ -74,6 +74,25 @@ try {
       block[0].includes('Пограничный случай статьи 34(9)')&&block[1].includes('01:10')&&
       block[1].includes('01:40')&&block[1].includes('проигравшим считается синий')&&
       block[1].includes('специальное условие статьи 34(9) не выполнено')))));
+  check('LOCAL archived judge pass displayed separately from current exam',await page.evaluate(()=>{
+    const oldKey='sambo-demo-judge-1106',newKey='sambo-demo-judge-1206';
+    const oldValue=localStorage.getItem(oldKey),newValue=localStorage.getItem(newKey);
+    try{
+      localStorage.setItem(oldKey,'done');localStorage.removeItem(newKey);
+      openCourse('judge');
+      const card=document.querySelectorAll('#lessons .sambo-module-card')[6];
+      const archived=card?.querySelector('.sambo-archive-note');
+      const state=card?.querySelector('.sambo-module-state')?.textContent||'';
+      return archived?.dataset.historyProgress==='1106'&&
+        archived.textContent.includes('отдельный зачёт')&&
+        !state.includes('Пройден')&&!progressDone('judge',1206)&&
+        samboJudgeHistoricalCompletions(1206).join(',')==='1106';
+    }finally{
+      if(oldValue===null)localStorage.removeItem(oldKey);else localStorage.setItem(oldKey,oldValue);
+      if(newValue===null)localStorage.removeItem(newKey);else localStorage.setItem(newKey,newValue);
+      openCourse('judge');
+    }
+  }));
   check('all revised judge exams use independent questions',await page.evaluate(()=>window.samboJudgeCourseEngine.modules.every(m=>m.examRevision===2&&m.questions.length>=8&&!m.questions.some(q=>m.lessons.some(l=>l.checks.some(c=>c[0].trim().toLowerCase()===q.q.trim().toLowerCase()))))));
  check('LOCAL VFS 2026 submission timer majority explanation',await page.evaluate(()=>
    window.samboJudgeCourseEngine.modules[2].questions[5].body.includes('Это два голоса из трёх')));
@@ -1111,6 +1130,24 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
          await new Promise(resolve=>setTimeout(resolve,5000));
        }
        check('Cloudflare Pages publishes pre-exam normative caveats',caveatsPublished,caveatsStatus);
+
+       let archivedPublished=false,archivedStatus='not fetched';
+       for(let attempt=0;attempt<10;attempt++){
+         try{
+           const [pr,home]=await Promise.all([
+             page.request.get('https://sambo-academy.pages.dev/progress.js',{timeout:12000,failOnStatusCode:false}),
+             page.request.get('https://sambo-academy.pages.dev/',{timeout:12000,failOnStatusCode:false})
+           ]);
+           archivedStatus=pr.status()+'/'+home.status();
+           archivedPublished=pr.ok()&&home.ok()&&
+             (await pr.text()).includes('samboJudgeHistoricalCompletions')&&
+             (await home.text()).includes('data-history-progress=');
+           if(archivedPublished)break;
+         }catch(e){archivedStatus=String(e).slice(0,120);}
+         await new Promise(resolve=>setTimeout(resolve,5000));
+       }
+       check('Cloudflare Pages publishes archived judge result display',archivedPublished,archivedStatus);
+
 
 
      }
