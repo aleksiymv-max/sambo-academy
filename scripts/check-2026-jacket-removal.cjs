@@ -37,4 +37,23 @@ for(const html of [intro,exam]){
  assert.ok(html.includes('data-amendment-sources="2026"'),'Official amendment links must remain visible');
  assert.ok(html.includes('не заменяет официальную')||html.includes('не официальный'),'No official qualification claim');
 }
-console.log('PASS 2026 jacket-removal: sourced lesson, preserved 5 keys, pre-exam warning, official PDF caveat');
+// The participant-equipment module must not imply that every form breach is the same.
+vm.runInContext(fs.readFileSync('judge-program-participants.js','utf8'),ctx,{filename:'judge-program-participants.js'});
+const participant=engine.modules.find(x=>x.title==='Участник, представитель, экипировка и безопасность');
+assert.ok(participant,'Participants module must remain registered');
+const clothing=participant.lessons.find(x=>x.title==='Экипировка спортивного самбо');
+assert.ok(clothing,'Article 10 lesson must remain present');
+const exception=clothing.blocks.find(x=>x[0]==='Снятие куртки на ковре: специальное последствие с 01.09.2026');
+assert.ok(exception,'The clothing lesson must distinguish jacket removal from an ordinary form defect');
+for(const token of ['Статья 10','31.08.2026','01.09.2026','непосредственно на ковре','соревновательной зоне','без определения места','уполномоченным судьям','точный номер пункта','https://old.sambo.ru/press/news/2026/12181/'])
+ assert.ok(exception[1].includes(token),'Missing participants exception condition or source: '+token);
+assert.equal(clothing.checks.length,6,'Preserve all six participant-equipment self-check questions');
+assert.deepEqual(Array.from(clothing.checks,q=>q[2]),[0,0,0,0,1,0],'Preserve all six participant-equipment self-check keys');
+const participantsIntro=engine.sections(participant,2)[0].html;
+const participantsExam=engine.sections(participant,2).at(-1).html;
+for(const html of [participantsIntro,participantsExam]){
+ assert.ok(html.includes('снятие куртки'),'Participants module must disclose the exception before the exam');
+ assert.ok(html.includes('data-amendment-sources="2026"'),'Participants warning must link official 2026 PDF amendments');
+ assert.ok(html.includes('не устанавливает дополнительные санкции'),'Do not invent an additional disqualification');
+}
+console.log('PASS 2026 jacket-removal: sanctions and participant lessons, 11 preserved self-check keys, two pre-exam warnings, source caveat');

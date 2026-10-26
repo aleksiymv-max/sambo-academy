@@ -114,6 +114,16 @@ try {
       block[1].includes('без определения места')&&
       exam.includes('снятие куртки'));
   }));
+  check('LOCAL participant equipment lesson distinguishes jacket removal from ordinary form defects',await page.evaluate(()=>{
+    const engine=window.samboJudgeCourseEngine,mod=engine.modules[1];
+    const lesson=mod?.lessons.find(l=>l.title==='Экипировка спортивного самбо');
+    const block=lesson?.blocks.find(b=>b[0]==='Снятие куртки на ковре: специальное последствие с 01.09.2026');
+    const sections=engine.sections(mod,2);
+    return Boolean(block&&block[1].includes('без определения места')&&
+      block[1].includes('https://old.sambo.ru/press/news/2026/12181/')&&
+      sections[0].html.includes('снятие куртки')&&
+      sections.at(-1).html.includes('data-amendment-sources="2026"'));
+  }));
   check('LOCAL archived sanctions results do not grant revision 3',await page.evaluate(()=>{
     const keys=['1106','1206','1306'].map(i=>'sambo-demo-judge-'+i);
     const saved=keys.map(key=>localStorage.getItem(key));
@@ -447,6 +457,16 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
       const exam=engine.sections(mod,6).at(-1).html;
       return Boolean(block&&block[1].includes('соревновательной зоне')&&
         block[1].includes('без определения места')&&exam.includes('снятие куртки'));
+    }));
+    check('LIVE participant equipment exception and pre-exam warning published',await livePage.evaluate(()=>{
+      const engine=window.samboJudgeCourseEngine,mod=engine.modules[1];
+      const lesson=mod?.lessons.find(l=>l.title==='Экипировка спортивного самбо');
+      const block=lesson?.blocks.find(b=>b[0]==='Снятие куртки на ковре: специальное последствие с 01.09.2026');
+      const sections=engine.sections(mod,2);
+      return Boolean(block&&block[1].includes('соревновательной зоне')&&
+        block[1].includes('без определения места')&&
+        sections[0].html.includes('снятие куртки')&&
+        sections.at(-1).html.includes('data-amendment-sources="2026"'));
     }));
   }
 
