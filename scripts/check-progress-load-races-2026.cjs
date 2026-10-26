@@ -70,7 +70,21 @@ async function main(){
  assert.equal(ctx.samboProgress.error,true);
  assert.equal(await ctx.saveSamboProgress('judge',1210),false);
  assert.equal(ctx.progressDone('judge',1210),false);
+ // Authenticated mode must fail closed when the cloud client is unavailable.
+ // Previously loadSamboProgress() returned true and marked the account ready.
+ ctx.samboAuthClient=null;
+ assert.equal(await ctx.loadSamboProgress({id:'carol'}),false);
+ assert.equal(ctx.samboProgress.userId,'carol');
+ assert.equal(ctx.samboProgress.ready,true);
+ assert.equal(ctx.samboProgress.error,true);
+ assert.equal(ctx.progressDone('judge',2100),false);
+ assert.equal(await ctx.saveSamboProgress('judge',2100),false);
+ // Guest mode remains independent of cloud availability.
+ assert.equal(await ctx.loadSamboProgress(null),true);
+ assert.equal(ctx.samboProgress.userId,null);
+ assert.equal(ctx.samboProgress.error,false);
  assert.ok(renders>=4);
+ console.log('PASS: missing authenticated cloud client fails closed; guest mode remains usable');
  console.log('PASS: overlapping same-account reads, stale errors and account switches are isolated');
  console.log('PASS: concurrent successful write survives a stale read snapshot');
  console.log('PASS: current read failures cannot grant an unverified result');

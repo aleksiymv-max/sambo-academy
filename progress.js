@@ -10,7 +10,10 @@ window.loadSamboProgress = async function(user) {
   // Reject stale responses, including overlapping loads for the SAME account.
   const loadId=++p.loadId;
   p.userId=user?.id||null;p.completed=new Set();p.ready=false;p.error=false;
-  if (!user || !window.samboAuthClient){p.ready=true;renderStudentDashboard();return true;}
+  if (!user){p.ready=true;renderStudentDashboard();return true;}
+  // An authenticated session without a configured cloud client is NOT a successful load.
+  // Keep the account scoped, but block unverified saves until a real read succeeds.
+  if (!window.samboAuthClient){p.ready=true;p.error=true;renderStudentDashboard();return false;}
   const userId=user.id;
   try {
     const {data,error}=await window.samboAuthClient.from('lesson_progress').select('course_key,lesson_index').eq('user_id',userId);
