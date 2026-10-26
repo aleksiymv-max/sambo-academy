@@ -130,6 +130,9 @@ jobs:
       - name: Report editorial gaps without treating them as a validated course
         run: node scripts/audit-judge-content.cjs
 
+      - name: Verify primary rules PDF is linked throughout judge lessons and exams
+        run: node scripts/check-judge-source-link-2026.cjs
+
       - name: Reject stale authenticated progress reads and preserve concurrent writes
         run: node scripts/check-progress-load-races-2026.cjs
 
