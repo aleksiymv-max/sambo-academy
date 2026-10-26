@@ -133,6 +133,9 @@ jobs:
       - name: Verify primary rules PDF is linked throughout judge lessons and exams
         run: node scripts/check-judge-source-link-2026.cjs
 
+      - name: Reject obsolete 2026 normative PDF links in course and editorial sources
+        run: node scripts/check-judge-source-links-repository-2026.cjs
+
       - name: Verify 2026 amendment and VFS explanation sources before disputed referee exams
         run: node scripts/check-judge-amendment-provenance-2026.cjs
 
