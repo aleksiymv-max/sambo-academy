@@ -54,6 +54,12 @@ try {
  check('brand logo returns home',!(await page.locator('#home').evaluate(e=>e.classList.contains('hidden'))));
  await page.evaluate(()=>{openCourse('judge');});
  check('judge modules render',await page.locator('#lessons .sambo-module-card').count()>=5);
+ const officialSourceVisible=await page.evaluate(()=>{
+  const e=window.samboJudgeCourseEngine,m=e.modules[0],s=e.sections(m,1);
+  const url='https://sambo.ru/wp-content/uploads/2025/09/pravila-vida-sporta-sambo-s-izm.-i-dopolneniyami.pdf';
+  return [s[0],s[1],s.at(-1)].every(x=>x.html.includes('href="'+url+'"')&&x.html.includes('rel="noopener noreferrer"'));
+ });
+ check('judge plan, lesson and exam link to amended official rules',officialSourceVisible);
  // Every expanded module must be reachable from the visible course and render its own first lesson.
  const judgeModules=await page.evaluate(()=>samboModuleData('judge').map((g,i)=>({
   index:i,title:g.title,lessons:g.parts.length,first:g.parts[0]?.title,questions:samboQuizQuestions(g).length,
@@ -1164,6 +1170,19 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
          await new Promise(resolve=>setTimeout(resolve,5000));
        }
        check('Cloudflare Pages publishes pre-exam normative caveats',caveatsPublished,caveatsStatus);
+
+       let officialRulesPublished=false,officialRulesStatus='not fetched';
+       for(let attempt=0;attempt<10;attempt++){
+         try{
+           const response=await page.request.get('https://sambo-academy.pages.dev/judge-course-engine.js',{timeout:12000,failOnStatusCode:false});
+           const code=await response.text();
+           officialRulesStatus=String(response.status());
+           officialRulesPublished=response.ok()&&code.includes('https://sambo.ru/wp-content/uploads/2025/09/pravila-vida-sporta-sambo-s-izm.-i-dopolneniyami.pdf')&&code.includes('rel="noopener noreferrer"')&&code.includes('sourceLink()');
+           if(officialRulesPublished)break;
+         }catch(e){officialRulesStatus=String(e).slice(0,120);}
+         await new Promise(resolve=>setTimeout(resolve,5000));
+       }
+       check('Cloudflare Pages publishes official amended rules source links',officialRulesPublished,officialRulesStatus);
 
        let archivedPublished=false,archivedStatus='not fetched';
        for(let attempt=0;attempt<10;attempt++){
