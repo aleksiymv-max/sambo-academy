@@ -172,6 +172,9 @@ jobs:
       - name: Verify sanctions and protests exam items 41-48, retaining removal procedure warning
         run: node scripts/check-exam-sanctions-2026.cjs
 
+      - name: Check 2026 jacket-removal disqualification, source and preserved self-check keys
+        run: node scripts/check-2026-jacket-removal.cjs
+
       - name: Verify article 34(9) sanctions exam revision 3 and archived results
         run: node scripts/check-exam-sanctions-v3-2026.cjs
 
