@@ -318,3 +318,6 @@ jobs:
 
       - name: Check official persons and safety articles 12, 13, 15, 42 and 43
         run: node scripts/check-participants-officials-safety-12-13.cjs
+
+      - name: Verify active and historical judge progress documentation matches course routing
+        run: node scripts/check-judge-progress-documentation.cjs
