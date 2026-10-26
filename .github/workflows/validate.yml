@@ -130,6 +130,9 @@ jobs:
       - name: Report editorial gaps without treating them as a validated course
         run: node scripts/audit-judge-content.cjs
 
+      - name: Reject stale authenticated progress reads and preserve concurrent writes
+        run: node scripts/check-progress-load-races-2026.cjs
+
       - name: Verify 16 independent exam keys and article-specific explanations (arts 3, 5, 7–11)
         run: node scripts/check-exam-admission-participants-2026.cjs
 
