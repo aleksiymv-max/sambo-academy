@@ -69,6 +69,11 @@ try {
       const marker='data-editorial-warning="'+index+'"';
       return sections[0].html.includes(marker)&&sections.at(-1).html.includes(marker);
     })));
+  check('LOCAL sanctions lesson explains article 34(9) first-warning boundary',await page.evaluate(()=>
+    window.samboJudgeCourseEngine.modules[5].lessons.some(lesson=>lesson.blocks.some(block=>
+      block[0].includes('Пограничный случай статьи 34(9)')&&block[1].includes('01:10')&&
+      block[1].includes('01:40')&&block[1].includes('проигравшим считается синий')&&
+      block[1].includes('специальное условие статьи 34(9) не выполнено')))));
   check('all revised judge exams use independent questions',await page.evaluate(()=>window.samboJudgeCourseEngine.modules.every(m=>m.examRevision===2&&m.questions.length>=8&&!m.questions.some(q=>m.lessons.some(l=>l.checks.some(c=>c[0].trim().toLowerCase()===q.q.trim().toLowerCase()))))));
  check('LOCAL VFS 2026 submission timer majority explanation',await page.evaluate(()=>
    window.samboJudgeCourseEngine.modules[2].questions[5].body.includes('Это два голоса из трёх')));
@@ -331,6 +336,14 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
   check('LIVE revised judge modules have eight independent exam questions',liveModules.slice(1).every(g=>g.questions===8));
    check('LIVE independent exam bank and new result keys deployed',await livePage.evaluate(()=>window.samboJudgeIndependentExamLoaded===true)&&liveModules.slice(1).every((g,i)=>g.progress===1201+i));
   check('LIVE judge progress IDs are unique',new Set(liveModules.map(g=>g.progress)).size===liveModules.length);
+  if(process.env.GITHUB_EVENT_NAME!=='pull_request'){
+    check('LIVE article 34(9) worked case published in sanctions module',await livePage.evaluate(()=>
+      window.samboJudgeCourseEngine.modules[5].lessons.some(lesson=>lesson.blocks.some(block=>
+        block[0].includes('Пограничный случай статьи 34(9)')&&
+        block[1].includes('01:10')&&block[1].includes('01:40')&&
+        block[1].includes('специальное условие статьи 34(9) не выполнено')))));
+  }
+
   // Detect stale deployments of the actual normative lesson content, not just module registration.
   for(const [asset,marker] of [
    ['judge-program-admission.js','Граница компетенции судьи'],
