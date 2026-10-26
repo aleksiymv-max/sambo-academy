@@ -139,6 +139,9 @@ jobs:
       - name: Verify article 41 protest deadlines across lessons and independent exam without changing keys
         run: node scripts/check-protest-deadline-cross-source-2026.cjs
 
+      - name: Verify legacy protest lesson and article excerpt disclose 2026 source discrepancy
+        run: node scripts/check-legacy-protest-cross-source-2026.cjs
+
       - name: Verify disputed normative caveats on directly opened judge lessons
         run: node scripts/check-judge-lesson-warnings-2026.cjs
 
