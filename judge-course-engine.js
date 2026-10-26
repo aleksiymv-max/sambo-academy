@@ -7,6 +7,8 @@
 "use strict";
 const modules=[];
 const clean=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rulesUrl='https://sambo.ru/wp-content/uploads/2025/09/pravila-vida-sporta-sambo-s-izm.-i-dopolneniyami.pdf';
+const sourceLink=()=>'<p class="jp-source"><a href="'+rulesUrl+'" target="_blank" rel="noopener noreferrer">Открыть полный текст Правил вида спорта «самбо» (PDF; приказ № 892, изменения по 14.09.2026 № 860)</a></p>';
 const paragraphs=s=>String(s).split(/¶/).filter(Boolean).map(p=>'<p>'+clean(p.trim())+'</p>').join('');
 const lesson=(title,ref,goal,lead,blocks,situation,caseAnalysis,decision,trap,checks)=>
  ({title,ref,goal,lead,blocks,situation,caseAnalysis,decision,trap,checks});
@@ -29,7 +31,7 @@ function editorialWarning(index){
  return w?'<aside class="jp-mistake" role="note" data-editorial-warning="'+index+'"><strong>Редакторское предупреждение: '+clean(w.heading)+'</strong><p>'+clean(w.body)+'</p></aside>':'';
 }
 function introduction(mod,index){
- return '<article class="judge-prime"><div class="jp-kicker">ШКОЛА СУДЕЙ · МОДУЛЬ '+(index+1)+'</div><h2>'+clean(mod.title)+'</h2><p class="jp-lead">'+clean(mod.lead)+'</p><div class="jp-goal"><strong>Как проходит обучение</strong><p>Уроки идут последовательно: суть нормы → условия и исключения → порядок действий судьи → практический эпизод → ошибки → самопроверка. Завершает модуль итоговый тест.</p></div><ol>'+mod.lessons.map(x=>'<li>'+clean(x.title)+'</li>').join('')+'</ol><div class="jp-mistake"><strong>Важно:</strong> материал составлен на основании российской редакции Правил самбо с изменениями до 14.09.2026 № 860; сам по себе курс не заменяет официальную практическую аттестацию. При подготовке к реальному турниру проверяйте Положение и действующую редакцию Правил.</div>'+editorialWarning(index)+'</article>';
+ return '<article class="judge-prime"><div class="jp-kicker">ШКОЛА СУДЕЙ · МОДУЛЬ '+(index+1)+'</div><h2>'+clean(mod.title)+'</h2><p class="jp-lead">'+clean(mod.lead)+'</p><div class="jp-goal"><strong>Как проходит обучение</strong><p>Уроки идут последовательно: суть нормы → условия и исключения → порядок действий судьи → практический эпизод → ошибки → самопроверка. Завершает модуль итоговый тест.</p></div><ol>'+mod.lessons.map(x=>'<li>'+clean(x.title)+'</li>').join('')+'</ol><div class="jp-mistake"><strong>Важно:</strong> материал составлен на основании российской редакции Правил самбо с изменениями до 14.09.2026 № 860; сам по себе курс не заменяет официальную практическую аттестацию. При подготовке к реальному турниру проверяйте Положение и действующую редакцию Правил.</div>'+sourceLink()+editorialWarning(index)+'</article>';
 }
 function render(mod,x,index){
  const sections=x.blocks.map((pair,k)=>'<section class="jp-part"><h3>'+clean((k+1)+'. '+pair[0])+'</h3>'+paragraphs(pair[1])+'</section>').join('');
@@ -39,10 +41,10 @@ function render(mod,x,index){
  '<div class="jp-mistake"><strong>Типичная ошибка:</strong> '+clean(x.trap)+'</div>'+
  '<div class="jp-summary"><strong>Алгоритм:</strong> Факты → применимый пункт '+clean(x.ref)+' → необходимое действие → фиксация решения.</div>'+
  '<section class="jp-self"><h3>Самопроверка</h3><p>Сначала сформулируйте ответ самостоятельно, затем раскройте пояснение.</p>'+questions+'</section>'+
- '<p class="jp-source">Нормативная основа: '+clean(x.ref)+'. Для окончательного решения используйте полный текст Правил, условия Положения и актуальные указания уполномоченных органов.</p></article>';
+ '<p class="jp-source">Нормативная основа: '+clean(x.ref)+'. Для окончательного решения используйте полный текст Правил, условия Положения и актуальные указания уполномоченных органов.</p>'+sourceLink()+'</article>';
 }
 function sections(mod,index){
- return [{title:'План модуля',html:introduction(mod,index)},...mod.lessons.map((x,i)=>({title:x.title,topicIndex:i,html:render(mod,x,i)})),{title:'Экзамен по модулю',quiz:true,html:'<div class="jp-panel"><h3>Итоговая проверка знаний</h3><p>'+mod.questions.length+' вопросов по этому модулю. Для зачёта необходимо 85% правильных ответов. Ошибки разбираются после завершения. Это учебный, а не официальный квалификационный экзамен.</p><p>Редакция экзамена: '+clean(mod.examRevision||1)+'. Предыдущие результаты не засчитываются за новую редакцию автоматически.</p>'+editorialWarning(index)+'</div>'}];
+ return [{title:'План модуля',html:introduction(mod,index)},...mod.lessons.map((x,i)=>({title:x.title,topicIndex:i,html:render(mod,x,i)})),{title:'Экзамен по модулю',quiz:true,html:'<div class="jp-panel"><h3>Итоговая проверка знаний</h3><p>'+mod.questions.length+' вопросов по этому модулю. Для зачёта необходимо 85% правильных ответов. Ошибки разбираются после завершения. Это учебный, а не официальный квалификационный экзамен.</p><p>Редакция экзамена: '+clean(mod.examRevision||1)+'. Предыдущие результаты не засчитываются за новую редакцию автоматически.</p>'+editorialWarning(index)+sourceLink()+'</div>'}];
 }
 window.samboJudgeCourseEngine={modules,lesson,register,sections,clean};
 })();
