@@ -136,6 +136,9 @@ jobs:
       - name: Verify 2026 amendment and VFS explanation sources before disputed referee exams
         run: node scripts/check-judge-amendment-provenance-2026.cjs
 
+      - name: Verify disputed normative caveats on directly opened judge lessons
+        run: node scripts/check-judge-lesson-warnings-2026.cjs
+
       - name: Reject stale authenticated progress reads and preserve concurrent writes
         run: node scripts/check-progress-load-races-2026.cjs
 
