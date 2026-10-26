@@ -1,5 +1,5 @@
 /* Deployment parity gate: a green browser test must not mask an older Pages revision.
- * Compare deployed JavaScript bytes with the exact files checked out by GitHub Actions.
+ * Compare the deployed page shell, styles and judge JavaScript bytes with checked-out GitHub Actions files.
  * No authentication, user data or database writes.
  */
 import { readFile } from 'node:fs/promises';
@@ -9,6 +9,7 @@ import { createHash } from 'node:crypto';
 import assert from 'node:assert/strict';
 
 const assets=[
+ 'index.html','judge-foundations.css','auth-config.js',
  'progress.js','judge-foundations.js','judge-exam-foundations-v2.js',
  'judge-exam-sanctions-v3.js','judge-exam-independent.js',
  'judge-course-engine.js','judge-program-bridge.js',
@@ -47,9 +48,9 @@ async function selfTest(){
  const hits=new Map();
  const server=createServer(async(req,res)=>{
   const asset=new URL(req.url,'http://localhost').pathname.slice(1);
-  if(asset==='judge-course-engine.js'){
+  if(asset==='judge-course-engine.js'||asset==='index.html'){
    const count=(hits.get(asset)||0)+1;hits.set(asset,count);
-   res.writeHead(200,{'Content-Type':'application/javascript'});
+   res.writeHead(200,{'Content-Type':asset==='index.html'?'text/html':'application/javascript'});
    res.end(count===1?'stale revision':await readFile(asset));
   }else{res.writeHead(404);res.end('Not found');}
  });
@@ -59,10 +60,13 @@ async function selfTest(){
   const recovered=await compareOne(base,'judge-course-engine.js',{attempts:3,waitMs:20});
   assert.equal(recovered.ok,true);
   assert.equal(recovered.attempt,2);
-  const missing=await compareOne(base,'progress.js',{attempts:2,waitMs:20});
+  const recoveredShell=await compareOne(base,'index.html',{attempts:3,waitMs:20});
+  assert.equal(recoveredShell.ok,true);
+  assert.equal(recoveredShell.attempt,2);
+  const missing=await compareOne(base,'judge-foundations.css',{attempts:2,waitMs:20});
   assert.equal(missing.ok,false);
   assert.equal(missing.detail,'HTTP 404');
-  console.log('PASS: stale revision is retried and fresh bytes are accepted');
+  console.log('PASS: stale JavaScript and HTML revisions are retried and fresh bytes are accepted');
   console.log('PASS: missing deployed asset fails closed');
  }finally{await new Promise(resolve=>server.close(resolve));}
 }
