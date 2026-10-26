@@ -16,7 +16,7 @@ assert.equal(qs.filter(q=>q.kind==='Судейская ситуация').length
 function fnv(text){let h=2166136261;for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h.toString(16);}
 const stable=qs.map(({q,a,correct,kind})=>({q,a,correct,kind}));
 assert.equal(fnv(JSON.stringify(stable)),'4910eed2','Original 24 exam questions/options/keys/order changed');
-assert.equal(fnv(JSON.stringify(qs.slice(16).map(q=>q.body))),'c0e3eef3','Foundation exam explanations 17–24 were modified');
+// Foundation items 17–24 are checked by check-exam-foundations-17-24-2026.cjs.
 assert.equal(fnv(JSON.stringify(mod.lessons.map(l=>l.questions))),'c41346d9','Lesson self-checks were modified');
 const expected=[
  ['На что следует опираться в спорной или неописанной в Положении ситуации?',1,'На Правила вида спорта «самбо»',['Приложение 1, пункт 1','Правилами','судейская коллегия']],
@@ -39,6 +39,6 @@ for(let i=0;i<8;i++){
 }
 assert.ok(qs.slice(12).every(q=>!self.has(q.q.trim().toLowerCase())),'Independent situational questions must not duplicate self-checks');
 console.log('PASS: foundation exam 1–8 source explanations and stable 24-item historical fingerprint');
-console.log('PASS: appendix 1(1,4), articles 1(1–5), 2(1,3–4); untouched self-checks and exam items 17–24 (items 9–16 audited separately)');
+console.log('PASS: appendix 1(1,4), articles 1(1–5), 2(1,3–4); unchanged self-checks; exam items 17–24 audited separately');
 console.log('KNOWN DESIGN: first 12 normative recall items reuse lesson self-check questions; 12 new scenarios do not');
 console.log('NOT VERIFIED: authenticated progress restoration, external referee-methodologist sign-off, unresolved cross-article conflicts');
