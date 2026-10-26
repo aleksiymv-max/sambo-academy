@@ -10,6 +10,8 @@ const localStorage={
 const context={window:{},localStorage,renderStudentDashboard(){},authMessage(){}};
 vm.createContext(context);
 vm.runInContext(fs.readFileSync('progress.js','utf8'),context,{filename:'progress.js'});
+// In a browser window globals and the global scope are the same object.
+context.progressKey=context.window.progressKey;
 const w=context.window;
 const history=index=>Array.from(w.samboJudgeHistoricalCompletions(index));
 const indices=index=>Array.from(w.samboJudgeHistoricalIndices(index));
