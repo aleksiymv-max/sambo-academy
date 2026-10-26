@@ -19,16 +19,10 @@ assert.doesNotMatch(guide,/<tr><td>Когда<\/td><td>Непосредстве�
 for(const flag of ['не устанавливает приоритет','не гарантирует возможность отложить','неординарной ситуации']){
   assert.ok(guide.includes(flag),'Missing caution: '+flag);
 }
-const excerpt=html.match(/41:\{title:'Протесты',partial:true,text:`([\s\S]*?)`,note:'([^']*)'\}/);
-assert.ok(excerpt,'Article 41 quoted excerpt must remain available');
-assert.ok(excerpt[1].includes('непосредственно во время соревнований'),
-  'Keep the consolidated PDF wording in its labeled quotation');
-assert.ok(excerpt[2].includes('в день фиксации нарушения'),
-  'The article excerpt needs a cross-source warning');
-assert.ok(excerpt[2].includes('неординарной ситуации'),
-  'Keep the exceptional situation separate');
 const active=html.match(/41:\{title:'Протесты',partial:false,text:`([\s\S]*?)`,note:'([^']*)'\}/);
-assert.ok(active,'Full article 41 excerpt must exist and supersedes the partial entry');
+assert.ok(active,'The unique active full article 41 excerpt must exist');
+assert.doesNotMatch(html,/41:\\{title:'Протесты',partial:true,text:/,
+  'Shadowed partial article 41 excerpt must not be reintroduced');
 assert.ok(active[1].includes('непосредственно во время соревнований'),
   'Preserve the full consolidated source text');
 assert.ok(active[2].includes('в день фиксации нарушения'),
