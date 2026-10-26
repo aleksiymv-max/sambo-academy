@@ -145,6 +145,9 @@ jobs:
       - name: Verify legacy protest lesson and article excerpt disclose 2026 source discrepancy
         run: node scripts/check-legacy-protest-cross-source-2026.cjs
 
+      - name: Reject duplicate normative article excerpts and preserve active full texts
+        run: node scripts/check-judge-article-excerpts-2026.cjs
+
       - name: Verify disputed normative caveats on directly opened judge lessons
         run: node scripts/check-judge-lesson-warnings-2026.cjs
 
