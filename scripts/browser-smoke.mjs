@@ -358,6 +358,13 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
   // Verify the published Cloudflare version, not just the checked-out source.
   // Earlier smoke coverage exercised the expanded modules only on localhost.
   await livePage.evaluate(()=>openCourse('judge'));
+  // Cloudflare Pages may deploy after the main push workflow has already started.
+  for(let attempt=0;attempt<12;attempt++){
+    if(await livePage.evaluate(()=>window.samboJudgeSanctionsExamV3Loaded===true))break;
+    await new Promise(resolve=>setTimeout(resolve,5000));
+    await livePage.reload({waitUntil:'domcontentloaded',timeout:20000});
+    await livePage.waitForFunction(()=>!document.querySelector('.nav-actions')?.classList.contains('auth-pending'),{timeout:15000});
+  }
   const liveModules=await livePage.evaluate(()=>samboModuleData('judge').map((g,i)=>({
    index:i,title:g.title,first:g.parts[0]?.title,questions:samboQuizQuestions(g).length,
    progress:samboModuleProgressIndex('judge',i)
