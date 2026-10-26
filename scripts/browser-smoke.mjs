@@ -105,6 +105,15 @@ try {
       block[0].includes('Пограничный случай статьи 34(9)')&&block[1].includes('01:10')&&
       block[1].includes('01:40')&&block[1].includes('проигравшим считается синий')&&
       block[1].includes('специальное условие статьи 34(9) не выполнено')))));
+  check('LOCAL 2026 jacket-removal rule appears in sanctions lesson and pre-exam warning',await page.evaluate(()=>{
+    const engine=window.samboJudgeCourseEngine,mod=engine.modules[5];
+    const lesson=mod.lessons.find(l=>l.title==='Снятие со схватки и дисквалификация с соревнований');
+    const block=lesson?.blocks.find(b=>b[0]==='Куртка снята на ковре: отдельная поправка 2026');
+    const exam=engine.sections(mod,6).at(-1).html;
+    return Boolean(block&&block[1].includes('соревновательной зоне')&&
+      block[1].includes('без определения места')&&
+      exam.includes('снятие куртки'));
+  }));
   check('LOCAL archived sanctions results do not grant revision 3',await page.evaluate(()=>{
     const keys=['1106','1206','1306'].map(i=>'sambo-demo-judge-'+i);
     const saved=keys.map(key=>localStorage.getItem(key));
@@ -428,6 +437,17 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
         block[0].includes('Пограничный случай статьи 34(9)')&&
         block[1].includes('01:10')&&block[1].includes('01:40')&&
         block[1].includes('специальное условие статьи 34(9) не выполнено')))));
+  }
+
+  if(process.env.GITHUB_EVENT_NAME!=='pull_request'){
+    check('LIVE 2026 jacket-removal disqualification published in lesson and exam warning',await livePage.evaluate(()=>{
+      const engine=window.samboJudgeCourseEngine,mod=engine.modules[5];
+      const lesson=mod.lessons.find(l=>l.title==='Снятие со схватки и дисквалификация с соревнований');
+      const block=lesson?.blocks.find(b=>b[0]==='Куртка снята на ковре: отдельная поправка 2026');
+      const exam=engine.sections(mod,6).at(-1).html;
+      return Boolean(block&&block[1].includes('соревновательной зоне')&&
+        block[1].includes('без определения места')&&exam.includes('снятие куртки'));
+    }));
   }
 
   // Detect stale deployments of the actual normative lesson content, not just module registration.
