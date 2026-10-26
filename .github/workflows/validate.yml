@@ -78,6 +78,7 @@ jobs:
             'judge-program-demo.js',
             'judge-program-practicum.js',
             'judge-exam-independent.js',
+            'judge-exam-sanctions-v3.js',
             'judge-program-bridge.js'
           ];
           const sandbox={window:{}};vm.createContext(sandbox);
@@ -113,7 +114,7 @@ jobs:
           for(let i=0;i<modules.length;i++){
             const group=allGroups[i+1],module=modules[i];
             if(group.title!==module.title||group.parts.length!==module.lessons.length)throw new Error('Bridge lost lessons: '+module.title);
-            if(group.progressIndex!==1201+i)throw new Error('Progress key collision: '+module.title);
+            if(group.progressIndex!==(i===5?1306:1201+i))throw new Error('Progress key collision: '+module.title);
             if(integration.samboQuizQuestions(group).length!==module.questions.length)throw new Error('Exam not routed: '+module.title);
             const sections=integration.samboLessonSections(group);
             if(sections.length!==module.lessons.length+2||!sections.at(-1).quiz)throw new Error('Lesson/exam sections not routed: '+module.title);
@@ -141,6 +142,9 @@ jobs:
 
       - name: Verify sanctions and protests exam items 41-48, retaining removal procedure warning
         run: node scripts/check-exam-sanctions-2026.cjs
+
+      - name: Verify article 34(9) sanctions exam revision 3 and archived results
+        run: node scripts/check-exam-sanctions-v3-2026.cjs
 
       - name: Verify infrastructure and protocol exam items 49-56, including article 42 safety and appendix 13 distinction
         run: node scripts/check-exam-infrastructure-2026.cjs
