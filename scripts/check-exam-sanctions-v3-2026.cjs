@@ -5,7 +5,7 @@ require('./check-exam-sanctions-2026.cjs');
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const ctx={window:{}};vm.createContext(ctx);
 const paths=[
- 'judge-course-engine.js','judge-program-admission.js','judge-program-participants.js',
+ 'judge-foundations.js','judge-exam-foundations-v2.js','judge-course-engine.js','judge-program-admission.js','judge-program-participants.js',
  'judge-program-officials.js','judge-program-bout.js','judge-program-scoring.js',
  'judge-program-sanctions.js','judge-program-infrastructure.js','judge-program-combat.js',
  'judge-program-beach.js','judge-program-demo.js','judge-program-practicum.js',
