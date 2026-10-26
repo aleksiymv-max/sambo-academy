@@ -845,7 +845,7 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
     try{
      const response=await livePage.request.get('https://sambo-academy.pages.dev/judge-program-demo.js',{timeout:12000,failOnStatusCode:false});
      teamStatus=String(response.status());
-     teamReady=response.ok()&&(await response.text()).includes('Две бригады на ковёр и разделение функций');
+     teamReady=response.ok()&&(await response.text()).includes('Фонограмма: носитель и предварительная проверка');
      if(teamReady)break;
     }catch(e){teamStatus=String(e).slice(0,120);}
     await new Promise(resolve=>setTimeout(resolve,5000));
