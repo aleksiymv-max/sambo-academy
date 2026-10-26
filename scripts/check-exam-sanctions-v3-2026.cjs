@@ -51,6 +51,7 @@ assert.match(bridge.samboLessonSections(routed[6])[0].html,/Статьи 38\(1\)
 const progress={window:{},localStorage:{getItem:()=>null,setItem(){},removeItem(){}},renderStudentDashboard(){},authMessage(){}};
 vm.createContext(progress);
 vm.runInContext(fs.readFileSync('progress.js','utf8'),progress);
+progress.progressKey=progress.window.progressKey;
 assert.deepEqual(Array.from(progress.window.samboJudgeHistoricalIndices(1306)),[1206,1106]);
 assert.equal(progress.window.progressDone('judge',1306),false);
 console.log('PASS: article 34(9) new independent case includes both first-warning timestamps');
