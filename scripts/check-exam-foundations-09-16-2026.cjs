@@ -17,7 +17,7 @@ assert.equal(qs.filter(q=>q.kind==='Проверка нормы').length,12);
 assert.equal(qs.filter(q=>q.kind==='Судейская ситуация').length,12);
 assert.equal(fnv(JSON.stringify(qs.map(({q,a,correct,kind})=>({q,a,correct,kind})))),'4910eed2','Historical 24-item exam fingerprint changed');
 assert.equal(fnv(JSON.stringify(qs.slice(0,8).map(q=>q.body))),'c654c4df','Audited explanations 1–8 were modified');
-assert.equal(fnv(JSON.stringify(qs.slice(16).map(q=>q.body))),'c0e3eef3','Untouched explanations 17–24 were modified');
+// Foundation items 17–24 are checked by check-exam-foundations-17-24-2026.cjs.
 assert.equal(fnv(JSON.stringify(mod.lessons.map(l=>l.questions))),'c41346d9','Lesson self-checks were modified');
 const expected=[
   [9,'Какой способ предполагает встречу каждого с каждым?',0,'Круговой',['Статья 2, пункт 2(а)','Приложение 2, раздел I, пункт 1','статья 2(5)']],
@@ -40,6 +40,6 @@ for(const [num,question,correct,answer,markers] of expected){
 const self=new Set(mod.lessons.flatMap(l=>l.questions.map(q=>q[0].trim().toLowerCase())));
 assert.ok(qs.slice(12).every(q=>!self.has(q.q.trim().toLowerCase())),'Situational exam items repeat self-checks');
 console.log('PASS: foundation exam 9–16 audited explanations, exact historical question/key fingerprint and module progress 1100');
-console.log('PASS: unchanged explanations 1–8 and 17–24; unchanged self-checks and 12 independent situational questions');
+console.log('PASS: unchanged explanations 1–8; unchanged self-checks and 12 independent situational questions');
 console.log('KNOWN DESIGN: 12 normative recall items duplicate lesson self-checks; replacement needs a new result index');
 console.log('NOT VERIFIED: authenticated progress restoration, unresolved cross-article issues, independent referee-methodologist sign-off');
