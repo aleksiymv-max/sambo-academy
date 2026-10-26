@@ -12,7 +12,7 @@ for(const file of [
 ]){
  vm.runInContext(fs.readFileSync(file,'utf8'),ctx,{filename:file});
 }
-const engine=ctx.window.samboJudgeCourseEngine,mod=engine.modules[0];
+const engine=ctx.window.samboJudgeCourseEngine,mod=engine.modules[3];
 assert.equal(mod.title,'Проведение схватки: положения, время и результат');
 assert.equal(mod.lessons.length,7,'Existing lesson identifiers must remain stable');
 const l=mod.lessons[2];
