@@ -490,6 +490,7 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
    ['judge-program-officials.js','Медицинская помощь и различия дисциплин'],
    ['judge-program-officials.js','Учебный алгоритм при споре'],
    ['judge-program-officials.js','Учебный алгоритм разграничения'],
+   ['judge-program-officials.js','Контроль куртки: приборы, аккредитация и протокол'],
    ['judge-program-sanctions.js','Две разные линии предупреждений'],
    ['judge-program-sanctions.js','Результат схватки и две процедуры протеста'],
    ['judge-program-scoring.js','Шаг 5. Одновременные предупреждения'],
@@ -605,6 +606,13 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
    const blocks=await livePage.locator('.judge-prime .jp-part').count();
    const checks=await livePage.locator('.judge-prime .jp-question').count();
    check('LIVE officials lesson '+(lessonIndex+1)+' revised editorial depth',title.includes(headingText)&&blocks>=8&&checks>=5,'blocks='+blocks+' checks='+checks);
+   if(lessonIndex===7&&process.env.GITHUB_EVENT_NAME!=='pull_request'){
+    const lessonText=await livePage.locator('.judge-prime').innerText();
+    check('LIVE article 25 accreditation and measuring-device lesson',
+     lessonText.includes('Контроль куртки: приборы, аккредитация и протокол')&&
+     lessonText.includes('приборов для измерения стандарта курток')&&checks>=7,
+     'checks='+checks);
+   }
   }
 
   // Article 14: PR checks source through Validate; after merge require the deployed lesson.
