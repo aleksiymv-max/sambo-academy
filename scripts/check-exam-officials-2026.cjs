@@ -48,11 +48,28 @@ const clothing=medical.blocks.find(b=>b[0]==='Ограничение стать�
 assert.ok(clothing,'Article 26(4) needs its own explanation');
 assert.match(clothing[1],/Статья 26\(4\).*«При оказании медицинской помощи, нарушение одежды запрещено»/s);
 assert.match(clothing[1],/статья 3\(4\)/i,'Do not misstate emergency medical care');
-assert.equal(medical.checks.length,6,'Keep five existing medical-lesson checks and the new sixth');
+assert.equal(medical.checks.length,7,'Keep six established self-checks and add one for article 25');
+const uniform=medical.blocks.find(b=>b[0]==='Контроль куртки: приборы, аккредитация и протокол');
+assert.ok(uniform,'Article 25(1)(а–г) uniform-control procedure needs its own explanation');
+for(const token of ['Статья 25(1)(а–г)','протокол','аккредитации','приборов','боевое самбо','Статья 10']){
+ assert.ok(uniform[1].toLowerCase().includes(token.toLowerCase()),'Missing article 25 source-specific detail: '+token);
+}
+const originalSelfCheckPrompts=[
+ 'Кто осматривает спортсменов на взвешивании?',
+ 'Кто проверяет экипировку перед выходом?',
+ 'Кто объявляет результат уже завершённой схватки?',
+ 'Что врач обязан сделать после заключения о невозможности продолжения?',
+ 'Кто отвечает за пригодность оборудования и инвентаря места соревнований?',
+ 'Какое отдельное ограничение содержит статья 26(4)?'
+];
+assert.deepEqual(Array.from(medical.checks.slice(0,6),q=>q[0]),originalSelfCheckPrompts,'Six existing self-checks must remain in place');
+assert.match(medical.checks[6][0],/статья 25\\(1\\)\\(г\\)/i,'New self-check must name the article 25 clause');
+assert.equal(medical.checks[6][2],1,'Article 25 new self-check correct index changed');
+assert.match(medical.checks[6][3],/Статья 25\\(1\\)\\(г\\).*аккредитации/s,'New answer must explain measurement and identity distinction');
 assert.equal(medical.checks[5][2],0,'New self-check answer mapping changed');
 assert.match(medical.checks[5][3],/Статья 26\(4\)/);
 const self=new Set(mods[2].lessons.flatMap(l=>l.checks.map(q=>q[0].trim().toLowerCase())));
 assert.ok(qs.every(q=>!self.has(q.q.trim().toLowerCase())),'Exam/self-check independence changed');
-console.log('PASS: 8 officials exam explanations and article 26(4) medical clothing caveat; 5 original checks preserved, sixth added; 88 original stems/options/keys protected');
+console.log('PASS: 8 officials exam explanations; article 25 uniform-control and article 26(4) medical clothing; six existing self-checks preserved, seventh added; 88 exam keys protected');
 console.log('SOURCE NOTE: item 22 majority requirement appears in separate VFS 2026 amendment, absent from consolidated art.19(6); discrepancy documented');
 console.log('NOT VERIFIED: 64 other independent questions before the bout audit, 24 foundation questions, real-account progress E2E');
