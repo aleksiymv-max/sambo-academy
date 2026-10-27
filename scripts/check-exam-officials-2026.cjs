@@ -51,7 +51,7 @@ assert.match(clothing[1],/статья 3\(4\)/i,'Do not misstate emergency medic
 assert.equal(medical.checks.length,7,'Keep six established self-checks and add one for article 25');
 const uniform=medical.blocks.find(b=>b[0]==='Контроль куртки: приборы, аккредитация и протокол');
 assert.ok(uniform,'Article 25(1)(а–г) uniform-control procedure needs its own explanation');
-for(const token of ['Статья 25(1)(а–г)','протокол','аккредитации','приборов','боевое самбо','Статья 10']){
+for(const token of ['Статья 25(1)(а–г)','протокол','аккредитации','приборов','боевое самбо','статьи 10']){
  assert.ok(uniform[1].toLowerCase().includes(token.toLowerCase()),'Missing article 25 source-specific detail: '+token);
 }
 const originalSelfCheckPrompts=[
@@ -63,9 +63,9 @@ const originalSelfCheckPrompts=[
  'Какое отдельное ограничение содержит статья 26(4)?'
 ];
 assert.deepEqual(Array.from(medical.checks.slice(0,6),q=>q[0]),originalSelfCheckPrompts,'Six existing self-checks must remain in place');
-assert.match(medical.checks[6][0],/статья 25\\(1\\)\\(г\\)/i,'New self-check must name the article 25 clause');
+assert.match(medical.checks[6][0],/статья 25\(1\)\(г\)/i,'New self-check must name the article 25 clause');
 assert.equal(medical.checks[6][2],1,'Article 25 new self-check correct index changed');
-assert.match(medical.checks[6][3],/Статья 25\\(1\\)\\(г\\).*аккредитации/s,'New answer must explain measurement and identity distinction');
+assert.match(medical.checks[6][3],/Статья 25\(1\)\(г\).*аккредитации/s,'New answer must explain measurement and identity distinction');
 assert.equal(medical.checks[5][2],0,'New self-check answer mapping changed');
 assert.match(medical.checks[5][3],/Статья 26\(4\)/);
 const self=new Set(mods[2].lessons.flatMap(l=>l.checks.map(q=>q[0].trim().toLowerCase())));
