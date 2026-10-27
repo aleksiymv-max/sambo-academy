@@ -607,11 +607,14 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
    const checks=await livePage.locator('.judge-prime .jp-question').count();
    check('LIVE officials lesson '+(lessonIndex+1)+' revised editorial depth',title.includes(headingText)&&blocks>=8&&checks>=5,'blocks='+blocks+' checks='+checks);
    if(lessonIndex===7&&process.env.GITHUB_EVENT_NAME!=='pull_request'){
-    const lessonText=await livePage.locator('.judge-prime').innerText();
+    // Details panels are collapsed by default: textContent includes authored normative text,
+    // whereas innerText omits text hidden inside the closed panels.
+    const lessonText=await livePage.locator('.judge-prime').textContent();
+    const hasHeading=lessonText.includes('Контроль куртки: приборы, аккредитация и протокол');
+    const hasSource=lessonText.includes('приборов для измерения стандарта курток');
     check('LIVE article 25 accreditation and measuring-device lesson',
-     lessonText.includes('Контроль куртки: приборы, аккредитация и протокол')&&
-     lessonText.includes('приборов для измерения стандарта курток')&&checks>=7,
-     'checks='+checks);
+     hasHeading&&hasSource&&checks>=7,
+     'heading='+hasHeading+' source='+hasSource+' checks='+checks);
    }
   }
 
