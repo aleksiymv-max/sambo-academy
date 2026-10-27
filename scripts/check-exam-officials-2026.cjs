@@ -39,8 +39,20 @@ assert.equal(reconciled.a[reconciled.correct],'Поддержку большин
 assert.match(reconciled.body,/Статья 19\(6\).*«Изменения в правилах с 01\.09\.2026».*статья 18\(6\).*поддержке хотя бы одного другого судьи.*два голоса из трёх/s,
  'Item 22 must cite the separate official VFS amendment, not infer majority from scoring rules');
 assert.match(reconciled.body,/Расхождение формулировок и нумерации.*зафиксировано/s);
+// Article 26(4) was previously cited together with 26(3), but the clothing restriction
+// was missing from the medical lesson. Protect the newly authored explanation and
+// preserve the five original self-checks while adding a sixth.
+const medical=mods[2].lessons.find(l=>l.title==='Информатор, контроль формы, врач, администратор');
+assert.ok(medical,'Officials medical lesson missing');
+const clothing=medical.blocks.find(b=>b[0]==='Ограничение статьи 26(4): одежда при медицинской помощи');
+assert.ok(clothing,'Article 26(4) needs its own explanation');
+assert.match(clothing[1],/Статья 26\(4\).*«При оказании медицинской помощи, нарушение одежды запрещено»/s);
+assert.match(clothing[1],/статья 3\(4\)/i,'Do not misstate emergency medical care');
+assert.equal(medical.checks.length,6,'Keep five existing medical-lesson checks and the new sixth');
+assert.equal(medical.checks[5][2],0,'New self-check answer mapping changed');
+assert.match(medical.checks[5][3],/Статья 26\(4\)/);
 const self=new Set(mods[2].lessons.flatMap(l=>l.checks.map(q=>q[0].trim().toLowerCase())));
 assert.ok(qs.every(q=>!self.has(q.q.trim().toLowerCase())),'Exam/self-check independence changed');
-console.log('PASS: 8 officials exam explanations checked against arts 14, 15, 18–22, 26, 41 and VFS September 2026 amendment; 16 earlier verified; 88 original stems/options/keys protected');
+console.log('PASS: 8 officials exam explanations and article 26(4) medical clothing caveat; 5 original checks preserved, sixth added; 88 original stems/options/keys protected');
 console.log('SOURCE NOTE: item 22 majority requirement appears in separate VFS 2026 amendment, absent from consolidated art.19(6); discrepancy documented');
 console.log('NOT VERIFIED: 64 other independent questions before the bout audit, 24 foundation questions, real-account progress E2E');
