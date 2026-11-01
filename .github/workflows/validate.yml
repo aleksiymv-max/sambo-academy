@@ -67,6 +67,7 @@ jobs:
           const programFiles=[
             'judge-course-engine.js',
             'judge-program-admission.js',
+            'judge-program-admission-v2.js',
             'judge-program-participants.js',
             'judge-program-officials.js',
             'judge-program-bout.js',
@@ -78,6 +79,7 @@ jobs:
             'judge-program-demo.js',
             'judge-program-practicum.js',
             'judge-exam-independent.js',
+            'judge-admission-exam-v3.js',
             'judge-exam-sanctions-v3.js',
             'judge-program-bridge.js'
           ];
@@ -93,7 +95,26 @@ jobs:
           const modules=sandbox.window.samboJudgeCourseEngine.modules;
           if(modules.length!==11)throw new Error('Expected 11 expanded judge modules; got '+modules.length);
           const lessons=modules.reduce((n,m)=>n+m.lessons.length,0);
-          if(lessons<50)throw new Error('Missing authored judge lessons: '+lessons);
+          if(lessons<56)throw new Error('Missing authored judge lessons: '+lessons);
+          if(!sandbox.window.samboJudgeAdmissionV2Loaded || !sandbox.window.samboJudgeAdmissionExamV3Loaded)
+            throw new Error('Judge admission module 2 revision 2 and exam 3 missing');
+          const admission=modules[0];
+          const expectedAdmission=[
+            'Антидопинг: требования и пределы судейских полномочий',
+            'Медицинское обеспечение и обязательные документы',
+            'Противоправное влияние на результаты',
+            'Возрастные группы и решение комиссии по допуску',
+            'Весовые категории спортивного, боевого и пляжного самбо',
+            'Взвешивание участников: процедура и фиксация',
+            'Сквозной алгоритм допуска'
+          ];
+          if(admission.lessons.length!==expectedAdmission.length || admission.questions.length!==24 || admission.examRevision!==3)
+            throw new Error('Admission module is not fully revised');
+          expectedAdmission.forEach((title,i)=>{
+            if(admission.lessons[i].title!==title||admission.lessons[i].blocks.length<5||admission.lessons[i].checks.length<5)
+              throw new Error('Admission lesson incorrect: '+i);
+          });
+          if(!html.includes('judge-admission-v2.css')) throw new Error('Admission illustrations missing');
           for(const m of modules){
            if(!m.questions.length)throw new Error('Empty exam: '+m.title);
            for(const lesson of m.lessons){
@@ -116,7 +137,7 @@ jobs:
           for(let i=0;i<modules.length;i++){
             const group=allGroups[i+1],module=modules[i];
             if(group.title!==module.title||group.parts.length!==module.lessons.length)throw new Error('Bridge lost lessons: '+module.title);
-            if(group.progressIndex!==(i===5?1306:1201+i))throw new Error('Progress key collision: '+module.title);
+            if(group.progressIndex!==(i===0?2201:i===5?1306:1201+i))throw new Error('Progress key collision: '+module.title);
             if(integration.samboQuizQuestions(group).length!==module.questions.length)throw new Error('Exam not routed: '+module.title);
             const sections=integration.samboLessonSections(group);
             if(sections.length!==module.lessons.length+2||!sections.at(-1).quiz)throw new Error('Lesson/exam sections not routed: '+module.title);
