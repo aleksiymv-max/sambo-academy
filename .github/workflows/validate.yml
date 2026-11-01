@@ -151,6 +151,16 @@ jobs:
       - name: Report editorial gaps without treating them as a validated course
         run: node scripts/audit-judge-content.cjs
 
+      - name: Inventory per-item normative evidence without declaring approval
+        run: node scripts/check-judge-evidence-ledger.cjs
+
+      - name: Preserve editorial evidence inventory for review
+        uses: actions/upload-artifact@v4
+        with:
+          name: judge-review-inventory
+          path: judge-review-inventory.json
+          retention-days: 7
+
       - name: Verify primary rules PDF is linked throughout judge lessons and exams
         run: node scripts/check-judge-source-link-2026.cjs
 
