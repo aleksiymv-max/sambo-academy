@@ -46,6 +46,22 @@ function approvalStatus(kind,id,digest){
  if(!criteria[kind].every(k=>item.criteria?.[k]===true))return 'incomplete_criteria';
  return 'editorially_reviewed';
 }
+// Independence is a course-wide property: an exam question can accidentally
+// repeat a self-check from a different module, not just its own module.
+const globalSelfCheckOwners=new Map();
+for(let mi=0;mi<all.length;mi++){
+ const moduleId='judge-module-'+String(mi+1).padStart(2,'0');
+ for(let li=0;li<all[mi].lessons.length;li++){
+  const id=moduleId+'/lesson-'+String(li+1).padStart(2,'0');
+  for(const q of (all[mi].lessons[li].checks||all[mi].lessons[li].questions||[])){
+   const key=normalize(Array.isArray(q)?q[0]:q.q);
+   if(!key)continue;
+   if(!globalSelfCheckOwners.has(key))globalSelfCheckOwners.set(key,[]);
+   globalSelfCheckOwners.get(key).push(id);
+  }
+ }
+}
+const globalExamOwners=new Map();
 const report={
  generated_at:new Date().toISOString(),
  source:'Published main-branch judge module registry; normative approval requires manual evidence',
@@ -68,10 +84,23 @@ for(let mi=0;mi<all.length;mi++){
   assert.ok(typeof q.q==='string' && Array.isArray(q.a) && Number.isInteger(q.correct) &&
     q.correct>=0 && q.correct<q.a.length,'Invalid active exam mapping: '+id);
   const digest=hash({q:q.q,a:q.a,correct:q.correct,body:q.body,kind:q.kind});
-  const repeated=selfChecks.has(normalize(q.q));
+  const questionKey=normalize(q.q);
+  const repeated=selfChecks.has(questionKey);
+  const matchingSelfChecks=globalSelfCheckOwners.get(questionKey)||[];
+  if(!globalExamOwners.has(questionKey))globalExamOwners.set(questionKey,[]);
+  globalExamOwners.get(questionKey).push(id);
   report.exams.push({id,question_sha256:digest,exact_self_check_duplicate:repeated,
+   exact_self_check_duplicate_any_module:matchingSelfChecks.length>0,
+   matching_self_check_ids:matchingSelfChecks,
    review_status:approvalStatus('exam',id,digest)});
  }
+}
+// Mark every occurrence, including the first, so review inventory is complete.
+for(const exam of report.exams){
+ const key=normalize(all[Number(exam.id.slice(13,15))-1]?.questions[
+  Number(exam.id.slice(-3))-1]?.q);
+ exam.matching_exam_ids=(globalExamOwners.get(key)||[]).filter(id=>id!==exam.id);
+ exam.exact_exam_question_duplicate=exam.matching_exam_ids.length>0;
 }
 const approved=items=>items.filter(x=>x.review_status==='editorially_reviewed').length;
 report.totals={
@@ -81,6 +110,8 @@ report.totals={
  editorially_reviewed_lessons:approved(report.lessons),
  editorially_reviewed_exam_questions:approved(report.exams),
  exact_self_check_duplicates:report.exams.filter(x=>x.exact_self_check_duplicate).length,
+ exact_self_check_duplicates_any_module:report.exams.filter(x=>x.exact_self_check_duplicate_any_module).length,
+ exact_exam_question_duplicates:report.exams.filter(x=>x.exact_exam_question_duplicate).length,
  stale_lesson_approvals:report.lessons.filter(x=>x.review_status==='stale_content_hash').length,
  stale_exam_approvals:report.exams.filter(x=>x.review_status==='stale_content_hash').length
 };
@@ -93,5 +124,9 @@ console.log('Documented per-item editorial reviews: '+report.totals.editorially_
 console.log('Stale approvals: '+report.totals.stale_lesson_approvals+' lessons, '+
  report.totals.stale_exam_approvals+' questions; exact self-check duplicates: '+
  report.totals.exact_self_check_duplicates);
+console.log('Course-wide independence: '+report.totals.exact_self_check_duplicates_any_module+
+ ' exam/self-check overlaps; '+report.totals.exact_exam_question_duplicates+
+ ' exam questions with duplicate wording across the active banks.');
 console.log('NOT READY by evidence ledger unless every item is reviewed; independent referee review and authenticated E2E remain separate gates.');
-if(report.totals.exact_self_check_duplicates)process.exitCode=1;
+if(report.totals.exact_self_check_duplicates_any_module ||
+   report.totals.exact_exam_question_duplicates)process.exitCode=1;
