@@ -5,13 +5,13 @@
 const fs=require('node:fs');
 const vm=require('node:vm');
 const names=[
- 'judge-program-admission.js','judge-program-participants.js',
+ 'judge-program-admission.js','judge-program-admission-v2.js','judge-program-participants.js',
  'judge-program-officials.js','judge-program-bout.js',
  'judge-program-scoring.js','judge-program-sanctions.js',
  'judge-program-infrastructure.js','judge-program-combat.js',
  'judge-program-beach.js','judge-program-demo.js',
  'judge-program-practicum.js',
- 'judge-exam-independent.js'
+ 'judge-exam-independent.js','judge-admission-exam-v3.js'
 ];
 const context={window:{}};vm.createContext(context);
 for(const file of ['judge-course-engine.js',...names]){
@@ -47,6 +47,12 @@ console.log('TOTAL: '+modules.length+' expanded modules, '+lessonTotal+' lessons
 for(const file of ['judge-foundations.js','judge-exam-foundations-v2.js','judge-exam-sanctions-v3.js']){
  vm.runInContext(fs.readFileSync(file,'utf8'),context,{filename:file});
 }
+const admission=context.window.samboJudgeCourseEngine.modules[0];
+if(!context.window.samboJudgeAdmissionV2Loaded || !context.window.samboJudgeAdmissionExamV3Loaded ||
+   admission.lessons.length!==7 || admission.questions.length!==24 || admission.examRevision!==3) {
+ console.error('EDITORIAL GAP: admissions revision 2 / independent exam revision 3 absent');
+ process.exitCode=1;
+}
 const foundation=context.window.samboJudgeFoundations;
 const foundationActive=context.window.samboJudgeFoundationsExamV2;
 const sanctionsActive=context.window.samboJudgeSanctionsExamV3;
@@ -63,11 +69,11 @@ console.log('ACTIVE: '+activeCount+' exam questions; foundation revision '+found
 if(foundationActive.examRevision!==2||foundationActive.progressIndex!==2100||
  sanctionsActive.examRevision!==3||sanctionsActive.progressIndex!==1306||
  foundationActive.questions.length!==24||sanctionsActive.questions.length!==8||
- activeCount!==112||repeatedFoundation||repeatedSanctions){
+ activeCount!==128||repeatedFoundation||repeatedSanctions){
  console.error('EDITORIAL GAP: active versioned exam is incomplete or repeats self-check');
  process.exitCode=1;
 }
 
 if(duplicateTotal)console.log('EDITORIAL GAP: final tests repeat lesson self-checks; add independent scenario questions before treating them as qualifying exams.');
 console.log('EDITORIAL GAP: normative point-by-point verification against the uploaded PDF, original illustrations and real-account progress E2E require separate evidence.');
-if(modules.length!==11||lessonTotal!==54||duplicateTotal!==0||rows.some(r=>r.issues.length>0||r.independent<Math.max(8,r.lessons)))process.exitCode=1;
+if(modules.length!==11||lessonTotal!==56||duplicateTotal!==0||rows.some(r=>r.issues.length>0||r.independent<Math.max(8,r.lessons)))process.exitCode=1;
