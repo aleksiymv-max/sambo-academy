@@ -62,6 +62,7 @@ for(let mi=0;mi<all.length;mi++){
  }
 }
 const globalExamOwners=new Map();
+const examKeys=new Map();
 const report={
  generated_at:new Date().toISOString(),
  source:'Published main-branch judge module registry; normative approval requires manual evidence',
@@ -85,6 +86,7 @@ for(let mi=0;mi<all.length;mi++){
     q.correct>=0 && q.correct<q.a.length,'Invalid active exam mapping: '+id);
   const digest=hash({q:q.q,a:q.a,correct:q.correct,body:q.body,kind:q.kind});
   const questionKey=normalize(q.q);
+  examKeys.set(id,questionKey);
   const repeated=selfChecks.has(questionKey);
   const matchingSelfChecks=globalSelfCheckOwners.get(questionKey)||[];
   if(!globalExamOwners.has(questionKey))globalExamOwners.set(questionKey,[]);
@@ -97,8 +99,7 @@ for(let mi=0;mi<all.length;mi++){
 }
 // Mark every occurrence, including the first, so review inventory is complete.
 for(const exam of report.exams){
- const key=normalize(all[Number(exam.id.slice(13,15))-1]?.questions[
-  Number(exam.id.slice(-3))-1]?.q);
+ const key=examKeys.get(exam.id);
  exam.matching_exam_ids=(globalExamOwners.get(key)||[]).filter(id=>id!==exam.id);
  exam.exact_exam_question_duplicate=exam.matching_exam_ids.length>0;
 }
