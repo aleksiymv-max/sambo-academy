@@ -154,7 +154,7 @@ try {
       q.a[1].includes('Синий')&&exam.includes('Редакция экзамена: 3')&&
       window.samboJudgeCourseEngine.modules[5].questions[6].correct===2;
   }));
-  check('all revised judge exams use independent questions',await page.evaluate(()=>window.samboJudgeCourseEngine.modules.every(m=>m.examRevision===2&&m.questions.length>=8&&!m.questions.some(q=>m.lessons.some(l=>l.checks.some(c=>c[0].trim().toLowerCase()===q.q.trim().toLowerCase()))))));
+  check('all revised judge exams use independent questions',await page.evaluate(()=>window.samboJudgeCourseEngine.modules.every((m,i)=>m.examRevision===(i===0?3:2)&&m.questions.length>=(i===0?24:8)&&!m.questions.some(q=>m.lessons.some(l=>l.checks.some(c=>c[0].trim().toLowerCase()===q.q.trim().toLowerCase()))))));
  check('LOCAL VFS 2026 submission timer majority explanation',await page.evaluate(()=>
    window.samboJudgeCourseEngine.modules[2].questions[5].body.includes('Это два голоса из трёх')));
  check('LOCAL independent bout exam source explanations',await page.evaluate(()=>
