@@ -19,7 +19,7 @@ assert.equal(mod.lessons.length,7);
 assert.equal(mod.questions.length,24);
 assert.equal(mod.examRevision,3);
 assert.equal(mod.progressIndex,2201);
-const titles=mod.lessons.map(x=>x.title);
+const titles=Array.from(mod.lessons,x=>x.title);
 const expected=[
  'Антидопинг: требования и пределы судейских полномочий',
  'Медицинское обеспечение и обязательные документы',
