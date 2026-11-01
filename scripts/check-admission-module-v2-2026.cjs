@@ -48,10 +48,16 @@ for(const marker of ['11–12','12–14','14–16','16–18','18–25','До 24'
 for(const marker of ['Студенческая категория 18–25 лет','не является студентом','среди студентов',
  'Категория «до 24 лет»','уже исполнилось 24 года','18–23 лет'])
  assert.ok(sections[4].html.includes(marker),'Missing source-backed age eligibility case: '+marker);
+// Article 5(1): qualifying events to the Russian 16–18 championship use a year-of-championship exception.
+for(const marker of ['Отбор к первенству России: возраст в календарном году','ещё 15','в год проведения первенства','не общее разрешение'])
+ assert.ok(sections[4].html.includes(marker),'Missing article 5 qualifying-age boundary: '+marker);
 for(const marker of ['Спортивное · 11–12','Спортивное · 12–14','Спортивное · 14–16','Спортивное · 16–18','Боевое · 14–16','Боевое · 16–18','Боевое · юниоры 18–20'])assert.ok(sections[5].html.includes(marker));
 assert.ok(sections[6].html.includes('30 минут'));
 assert.ok(sections[6].html.includes('за два часа'));
 assert.ok(sections[6].html.includes('0,1 кг'));
+// Article 8(6): an NV result may lead to weighing in the next category only under the regulations and team quota.
+for(const marker of ['НВ: возможен переход в следующую категорию','64,2 кг','ограничениям количества участников','Не обещать автоматический перевод'])
+ assert.ok(sections[6].html.includes(marker),'Missing conditional next-category weighing case: '+marker);
 const self=new Set(mod.lessons.flatMap(l=>l.checks.map(x=>x[0].trim().toLowerCase())));
 assert.equal(new Set(mod.questions.map(x=>x.q.trim().toLowerCase())).size,24);
 for(const q of mod.questions){
