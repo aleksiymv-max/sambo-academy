@@ -83,7 +83,7 @@ try {
   progress:samboModuleProgressIndex('judge',i)
  })));
  check('all twelve judge modules registered',judgeModules.length===12,'modules='+judgeModules.length);
- check('expanded judge modules contain fifty-four authored lessons',judgeModules.slice(1).reduce((n,g)=>n+g.lessons,0)===54);
+ check('expanded judge modules contain fifty-six authored lessons',judgeModules.slice(1).reduce((n,g)=>n+g.lessons,0)===56);
   check('independent exam bank loaded',await page.evaluate(()=>window.samboJudgeIndependentExamLoaded===true));
   check('LOCAL unresolved Rules caveats visible before affected exams',await page.evaluate(()=>
     [4,5,6,9,10].every(index=>{
@@ -437,8 +437,8 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
    progress:samboModuleProgressIndex('judge',i)
   })));
   check('LIVE all twelve judge modules deployed',liveModules.length===12,'modules='+liveModules.length);
-  check('LIVE revised judge modules have eight independent exam questions',liveModules.slice(1).every(g=>g.questions===8));
-   check('LIVE independent exam bank and new result keys deployed',await livePage.evaluate(()=>window.samboJudgeIndependentExamLoaded===true&&window.samboJudgeSanctionsExamV3Loaded===true)&&liveModules.slice(1).every((g,i)=>g.progress===(i===5?1306:1201+i)));
+  check('LIVE revised judge modules have updated independent examinations',liveModules.slice(1).every((g,i)=>g.questions===(i===0?24:8)));
+   check('LIVE independent exam bank and new result keys deployed',await livePage.evaluate(()=>window.samboJudgeIndependentExamLoaded===true&&window.samboJudgeSanctionsExamV3Loaded===true)&&liveModules.slice(1).every((g,i)=>g.progress===(i===0?2201:i===5?1306:1201+i)));
   check('LIVE judge progress IDs are unique',new Set(liveModules.map(g=>g.progress)).size===liveModules.length);
   check('LIVE 2026 VFS clarification PDF link is official',await livePage.evaluate(()=>{const e=window.samboJudgeCourseEngine,official='https://sambo.ru/wp-content/uploads/2026/08/razyasneniya_pravil_vida_sporta_sambo_sentyabr_2026_god.pdf',stale='https://sambo.ru/wp-content/uploads/2025/09/razyasneniya_pravil_vida_sporta_sambo_sentyabr_2026_god.pdf';return [6,9].every(i=>{const s=e.sections(e.modules[i-1],i);return [s[0],s[1],s.at(-1)].every(p=>p.html.includes('href="'+official+'"')&&!p.html.includes(stale));});}));
   if(process.env.GITHUB_EVENT_NAME!=='pull_request'){
@@ -527,13 +527,15 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
    check('LIVE module '+(i+1)+' opens its authored lesson',heading.includes(liveModules[i].first)&&await livePage.locator('.judge-prime .jp-part').count()>=2,heading);
   }
 
-  // Verify newly revised admission lessons, without changing progress keys or lesson order.
+  // Verify admission revision 2 and its dedicated progress ID and lesson order.
   for(const [lessonIndex,headingText] of [
-   [0,'Антидопинг и медицинское обеспечение'],
-   [1,'Противоправное влияние на результаты'],
-   [2,'Возрастные группы и весовые категории'],
-   [3,'Взвешивание участников: процедура и фиксация'],
-   [4,'Сквозной алгоритм допуска']
+   [0,'Антидопинг: требования и пределы судейских полномочий'],
+   [1,'Медицинское обеспечение и обязательные документы'],
+   [2,'Противоправное влияние на результаты'],
+   [3,'Возрастные группы и решение комиссии по допуску'],
+   [4,'Весовые категории спортивного, боевого и пляжного самбо'],
+   [5,'Взвешивание участников: процедура и фиксация'],
+   [6,'Сквозной алгоритм допуска']
   ]){
    await livePage.evaluate(()=>openCourse('judge'));
    const admissionCard=livePage.locator('#lessons .sambo-module-card').nth(1);
@@ -543,10 +545,21 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
    const blocks=await livePage.locator('.judge-prime .jp-part').count();
    const checks=await livePage.locator('.judge-prime .jp-question').count();
    check('LIVE admission lesson '+(lessonIndex+1)+' revised editorial depth',
-    title.includes(headingText)&&blocks>=8&&checks>=5,
+    title.includes(headingText)&&blocks>=5&&checks>=5,
     'blocks='+blocks+' checks='+checks);
   }
 
+
+  check('LIVE admission v2 age matrix shows all eight age groups',await livePage.evaluate(()=>{
+   const mod=window.samboJudgeCourseEngine.modules[0];
+   return mod.lessons.length===7&&mod.examRevision===3&&mod.questions.length===24&&
+    window.samboJudgeCourseEngine.sections(mod,1)[4].html.includes('data-admission-v2="age"');
+  }));
+  check('LIVE admission v2 weight table and complete workflow present',await livePage.evaluate(()=>{
+   const mod=window.samboJudgeCourseEngine.modules[0],p=window.samboJudgeCourseEngine.sections(mod,1);
+   return p[5].html.includes('data-admission-v2="weight"')&&p[7].html.includes('data-admission-v2="workflow"');
+  }));
+  check('LIVE admission v2 progress migrated safely',await livePage.evaluate(()=>samboModuleProgressIndex('judge',1)===2201));
   // Verify article 9 duties lesson in the published participant module.
    await livePage.evaluate(()=>openCourse('judge'));
    const participantCard=livePage.locator('#lessons .sambo-module-card').nth(2);
@@ -1304,7 +1317,7 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
            revisionPublished=exam.ok()&&bridge.ok()&&home.ok()&&
              (await exam.text()).includes('первое предупреждение на 01:10')&&
              (await exam.text()).includes('на 01:40')&&
-             (await bridge.text()).includes('progressIndex:i===5?1306:1201+i')&&
+             (await bridge.text()).includes('progressIndex:i===0?2201:i===5?1306:1201+i')&&
              (await home.text()).includes('judge-exam-sanctions-v3.js');
            if(revisionPublished)break;
          }catch(e){revisionStatus=String(e).slice(0,120);}
