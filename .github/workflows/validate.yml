@@ -331,6 +331,9 @@ jobs:
       - name: Check boundary decisions and scoring under articles 28, 35, 36 and 37
         run: node scripts/check-scoring-boundary-36-normative.cjs
 
+      - name: Verify complete revised admission module, normative matrices and 24-question exam
+        run: node scripts/check-admission-module-v2-2026.cjs
+
       - name: Check admission ages and documentary workflow
         run: node scripts/check-admission-ages-workflow-2026.cjs
 
