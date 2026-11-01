@@ -56,7 +56,7 @@ assert.ok(sections[6].html.includes('30 минут'));
 assert.ok(sections[6].html.includes('за два часа'));
 assert.ok(sections[6].html.includes('0,1 кг'));
 // Article 8(6): an NV result may lead to weighing in the next category only under the regulations and team quota.
-for(const marker of ['НВ: возможен переход в следующую категорию','64,2 кг','ограничениям количества участников','не обещать автоматический перевод'])
+for(const marker of ['НВ: возможен переход в следующую категорию','64,2 кг','ограничениям количества участников','Не обещать автоматический перевод'])
  assert.ok(sections[6].html.includes(marker),'Missing conditional next-category weighing case: '+marker);
 const self=new Set(mod.lessons.flatMap(l=>l.checks.map(x=>x[0].trim().toLowerCase())));
 assert.equal(new Set(mod.questions.map(x=>x.q.trim().toLowerCase())).size,24);
