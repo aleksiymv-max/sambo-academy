@@ -74,6 +74,21 @@ if(foundationActive.examRevision!==2||foundationActive.progressIndex!==2100||
  process.exitCode=1;
 }
 
+// Keep the approved editorial standard's *published inventory* in sync with the
+// live module registry. This is a documentation-consistency check, not approval.
+const publishedModules=modules.length+1;
+const publishedLessons=lessonTotal+foundation.lessons.length;
+const standardInventory='В интерфейсе сейчас '+publishedModules+' судейских модулей: '+
+ publishedLessons+' урока ('+foundation.lessons.length+' базовых и '+lessonTotal+
+ ' расширенных) и '+activeCount+' действующих экзаменационных заданий.';
+const editorialStandard=fs.readFileSync('docs/judge-editorial-standard.md','utf8');
+if(!editorialStandard.includes(standardInventory)){
+ console.error('EDITORIAL GAP: editorial standard inventory is stale; expected: '+standardInventory);
+ process.exitCode=1;
+}else{
+ console.log('PASS: published editorial standard inventory matches active modules, lessons and exams');
+}
+
 if(duplicateTotal)console.log('EDITORIAL GAP: final tests repeat lesson self-checks; add independent scenario questions before treating them as qualifying exams.');
 console.log('EDITORIAL GAP: normative point-by-point verification against the uploaded PDF, original illustrations and real-account progress E2E require separate evidence.');
 if(modules.length!==11||lessonTotal!==56||duplicateTotal!==0||rows.some(r=>r.issues.length>0||r.independent<Math.max(8,r.lessons)))process.exitCode=1;
