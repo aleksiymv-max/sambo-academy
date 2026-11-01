@@ -5,7 +5,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
 const moduleFiles=[
- 'judge-program-admission.js','judge-program-participants.js',
+ 'judge-program-admission.js','judge-program-admission-v2.js','judge-program-participants.js',
  'judge-program-officials.js','judge-program-bout.js',
  'judge-program-scoring.js','judge-program-sanctions.js',
  'judge-program-infrastructure.js','judge-program-combat.js',
@@ -23,7 +23,7 @@ const context={
 vm.createContext(context);
 for(const file of [
  'judge-course-engine.js',...moduleFiles,'judge-foundations.js',
- 'judge-exam-foundations-v2.js','judge-exam-independent.js',
+ 'judge-exam-foundations-v2.js','judge-exam-independent.js','judge-admission-exam-v3.js',
  'judge-exam-sanctions-v3.js',
  'progress.js','judge-program-bridge.js'
 ]){
