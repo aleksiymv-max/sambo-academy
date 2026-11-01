@@ -2,6 +2,7 @@
 (function(){
 const engine=window.samboJudgeCourseEngine;
 if(!engine)return;
+if(!window.samboJudgeAdmissionV2Loaded||!window.samboJudgeAdmissionExamV3Loaded)throw Error('Judge bridge: updated admission curriculum missing');
 const sanctionsV3=window.samboJudgeSanctionsExamV3;
 const foundationsV2=window.samboJudgeFoundationsExamV2;
 if(!foundationsV2||foundationsV2.examRevision!==2||foundationsV2.progressIndex!==2100)
@@ -20,7 +21,7 @@ samboModuleData=function(key){
   engine.modules.forEach((historical,i)=>{
   const m=activeModule(i),g=groups[i+1]||{title:m.title,parts:[]};
   groups[i+1]={...g,title:m.title,premiumFoundations:true,premiumCourse:true,
-  moduleIndex:i,progressIndex:i===5?1306:1201+i,examRevision:m.examRevision,
+  moduleIndex:i,progressIndex:i===0?2201:i===5?1306:1201+i,examRevision:m.examRevision,
   parts:m.lessons.map((l,j)=>({title:l.title,sourceIndex:-1,order:j}))};
   });
  }
