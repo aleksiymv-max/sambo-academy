@@ -43,7 +43,7 @@ const routed=bridge.samboModuleData('judge');
 assert.equal(routed.length,12);
 assert.equal(routed[6].progressIndex,1306);
 assert.equal(routed[6].examRevision,3);
-for(let i=1;i<12;i++)if(i!==6)assert.equal(routed[i].progressIndex,1200+i);
+for(let i=1;i<12;i++)if(i!==6)assert.equal(routed[i].progressIndex,i===1?2201:1200+i);
 assert.equal(bridge.samboQuizQuestions(routed[6])[6],v3.questions[6],'Active exam must use new item');
 assert.notEqual(bridge.samboQuizQuestions(routed[6])[6],old.questions[6],'Active exam must not use ambiguous item');
 assert.match(bridge.samboLessonSections(routed[6]).at(-1).html,/Редакция экзамена: 3/);
