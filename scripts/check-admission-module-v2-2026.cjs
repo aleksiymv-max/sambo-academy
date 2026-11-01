@@ -44,6 +44,10 @@ assert.ok(sections[5].html.includes('data-admission-v2="youth"'));
 assert.ok(sections[6].html.includes('data-admission-v2="weighing"'));
 assert.ok(sections[7].html.includes('data-admission-v2="workflow"'));
 for(const marker of ['11–12','12–14','14–16','16–18','18–25','До 24'])assert.ok(sections[4].html.includes(marker));
+// Article 5(1) exceptions: students 18–25 and under-24 (18–23) must be taught as decisions, not just table labels.
+for(const marker of ['Студенческая категория 18–25 лет','не является студентом','среди студентов',
+ 'Категория «до 24 лет»','уже исполнилось 24 года','18–23 лет'])
+ assert.ok(sections[4].html.includes(marker),'Missing source-backed age eligibility case: '+marker);
 for(const marker of ['Спортивное · 11–12','Спортивное · 12–14','Спортивное · 14–16','Спортивное · 16–18','Боевое · 14–16','Боевое · 16–18','Боевое · юниоры 18–20'])assert.ok(sections[5].html.includes(marker));
 assert.ok(sections[6].html.includes('30 минут'));
 assert.ok(sections[6].html.includes('за два часа'));
