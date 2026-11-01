@@ -83,6 +83,14 @@ try {
   progress:samboModuleProgressIndex('judge',i)
  })));
  check('all twelve judge modules registered',judgeModules.length===12,'modules='+judgeModules.length);
+ const article27Local=await page.evaluate(()=>{
+  const lesson=window.samboJudgeCourseEngine.modules[2].lessons[7];
+  const block=lesson.blocks.find(b=>b[0]==='Администратор: подготовка площадки и связь');
+  return !!block&&block[1].includes('радиофикацию')&&block[1].includes('Статья 27(2)')&&
+   lesson.checks.length===8&&lesson.checks[7][0].includes('радиофикацию');
+ });
+ check('LOCAL article 27 administrator duties and eighth self-check',article27Local);
+
  check('expanded judge modules contain fifty-six authored lessons',judgeModules.slice(1).reduce((n,g)=>n+g.lessons,0)===56);
   check('independent exam bank loaded',await page.evaluate(()=>window.samboJudgeIndependentExamLoaded===true));
   check('LOCAL unresolved Rules caveats visible before affected exams',await page.evaluate(()=>
@@ -628,6 +636,10 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
     check('LIVE article 25 accreditation and measuring-device lesson',
      hasHeading&&hasSource&&checks>=7,
      'heading='+hasHeading+' source='+hasSource+' checks='+checks);
+    const hasAdmin=lessonText.includes('Администратор: подготовка площадки и связь')&&
+      lessonText.includes('радиофикацию помещения')&&lessonText.includes('Статья 27(2)');
+    check('LIVE article 27 administrator duties and eighth self-check',
+      hasAdmin&&checks>=8,'admin='+hasAdmin+' checks='+checks);
    }
   }
 
