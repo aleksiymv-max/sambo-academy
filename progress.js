@@ -42,6 +42,7 @@ window.saveSamboProgress = async function(course,index) {
 // Historical judge results remain visible but never count as completion of a revised exam.
 // Only progress keys belonging to the active account (or this browser's guest mode) are read.
 window.samboJudgeHistoricalIndices = function(currentIndex) {
+  if(currentIndex===2201)return [1201,1101];
   if(currentIndex===2100)return [1100,100];
   if(currentIndex===1100)return [100];
   if(currentIndex>=1201&&currentIndex<=1211)return [currentIndex-100];
