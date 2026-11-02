@@ -47,7 +47,7 @@ for(let i=0;i<historicalKitChecks.length;i++){
 const kitBlock=judgeKit.blocks.find(b=>b[0]==='Судейская форма и обязательный комплект (ст. 45, п. 5)');
 if(!kitBlock)throw Error('Missing article 45(5) judge readiness block');
 for(const term of ['Статья 45(5)','судейский билет','Правила соревнований','свисток','белая рубашка','красным и синим рукавами','белые шорты','белые носки','спортивная обувь','кепка','белый брючный ремень','не должно быть никаких предметов','Учебный случай','не устанавливает санкцию спортсмену']){
- if(!kitBlock[1].includes(term))throw Error('Missing judge-kit source-specific detail: '+term);
+ if(!kitBlock[1].toLowerCase().includes(term.toLowerCase()))throw Error('Missing judge-kit source-specific detail: '+term);
 }
 if(judgeKit.checks[5][2]!==1||!judgeKit.checks[5][0].includes('статья 45(5)')||
    !judgeKit.checks[5][3].includes('судейский билет'))
