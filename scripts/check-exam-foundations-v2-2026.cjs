@@ -46,6 +46,25 @@ const expectedRefs=[
  'статья 2(2)(в)','приложение 1, пункт 3','приложение 1, пункт 4'
 ];
 for(let i=0;i<12;i++)assert.ok(active.questions[i].body.toLowerCase().includes(expectedRefs[i].toLowerCase()),'Source missing '+(i+1));
+// Regression: official Rules art. 2(1,3–4) and appendix 1(1,4) must not
+// be taught as permission for the secretariat to invent a competition format.
+const firstLesson=old.lessons[0],drawLesson=old.lessons[3];
+assert.equal(firstLesson.blocks.length,5,'Foundation lesson 1 needs the missing mandatory-regulation distinction');
+assert.equal(drawLesson.blocks.length,5,'Foundation lesson 4 needs a concrete subgroup progression example');
+const firstBlock=firstLesson.blocks.find(([title])=>title.includes('Пробел в Положении'));
+assert.ok(firstBlock && firstBlock[1].includes('статья 2, пункт 4') &&
+ firstBlock[1].includes('приложению 1, пункту 4'),
+ 'Mandatory system/method and authorized regulation change must be explained');
+assert.ok(firstLesson.case[1].includes('Статья 2, пункт 4') &&
+ firstLesson.case[2].includes('Не выдавать личный выбор секретаря'),
+ 'Foundation case must not imply that appendix 1(1) authorizes a missing competition format');
+const subgroupBlock=drawLesson.blocks.find(([title])=>title.includes('Контрольный пример'));
+assert.ok(subgroupBlock && subgroupBlock[1].includes('статье 2, пункту 1') &&
+ subgroupBlock[1].includes('статье 2, пункту 3') &&
+ subgroupBlock[1].includes('приложения 1, пункта 4'),
+ 'Subgroup progression, draw and amendment constraints must remain distinct');
+assert.match(old.render(firstLesson,0),/Пробел в Положении/);
+assert.match(old.render(drawLesson,3),/Контрольный пример/);
 const groups=[{title:old.title,parts:old.lessons.map(l=>({title:l.title})),premiumFoundations:true,progressIndex:1100},
  ...ctx.window.samboJudgeCourseEngine.modules.map(m=>({title:m.title,parts:m.lessons}))];
 const bridge={
