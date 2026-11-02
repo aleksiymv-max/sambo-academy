@@ -164,7 +164,7 @@ function examTriageSignals(q){
  const signals=[],body=String(q.body||'').trim();
  if(new Set(q.a.map(normalize)).size!==q.a.length)signals.push('duplicate_answer_choices');
  if(body.length<120)signals.push('short_explanation_needs_manual_review');
- if(!/(?:стат|ст\\.|прилож|раздел|пункт|правил|приказ)/i.test(body))
+ if(!/(?:стат|ст[.]|прилож|раздел|пункт|правил|приказ)/i.test(body))
   signals.push('no_explicit_normative_locator_in_explanation');
  return signals;
 }
