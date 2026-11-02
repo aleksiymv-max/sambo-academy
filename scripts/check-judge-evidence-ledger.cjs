@@ -28,8 +28,21 @@ const foundation=ctx.window.samboJudgeFoundations;
 const foundationExam=ctx.window.samboJudgeFoundationsExamV2;
 assert.ok(engine?.modules?.length>0 && foundation?.lessons?.length>0 && foundationExam?.questions?.length>0,
  'Missing active judge curriculum');
+// The published bridge uses the sanctions v3 bank for module 7, while the
+// engine deliberately retains v2 for historical results (judge:1206).
+// Inventory the SAME active bank as the learner-facing exam (judge:1306).
+const sanctionsExam=ctx.window.samboJudgeSanctionsExamV3;
+assert.ok(sanctionsExam?.examRevision===3 && sanctionsExam?.progressIndex===1306,
+ 'Active sanctions v3 exam missing from evidence ledger');
+assert.equal(engine.modules[5].examRevision,2,
+ 'Historical sanctions v2 bank unexpectedly changed');
+assert.notEqual(sanctionsExam.questions[6].q,engine.modules[5].questions[6].q,
+ 'Sanctions v3 correction must not silently revert to historical question 47');
 const all=[{title:'Нормативная основа',lessons:foundation.lessons,questions:foundationExam.questions,revision:foundationExam.examRevision},
- ...engine.modules.map(m=>({title:m.title,lessons:m.lessons,questions:m.questions,revision:m.examRevision||1}))];
+ ...engine.modules.map((m,i)=>{
+  const active=i===5?sanctionsExam:m;
+  return {title:active.title,lessons:active.lessons,questions:active.questions,revision:active.examRevision||1};
+ })];
 const approvals=JSON.parse(fs.readFileSync('docs/judge-evidence-approvals.json','utf8'));
 assert.ok(approvals.lessons && approvals.exams,'Missing evidence approval collections');
 const hash=value=>crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
@@ -161,6 +174,23 @@ for(let mi=0;mi<all.length;mi++){
    review_status:approvalStatus('exam',id,digest)});
  }
 }
+// Fail if the evidence inventory accidentally reverts to the preserved
+// sanctions v2 item: a green ledger must describe what students actually see.
+const liveSanctionsId='judge-module-07/exam-007';
+const liveSanctionsEntry=report.exams.find(e=>e.id===liveSanctionsId);
+assert.equal(report.modules[6].exam_revision,3,'Sanctions inventory revision must be v3');
+assert.equal(liveSanctionsEntry?.question_sha256,
+ hash({q:sanctionsExam.questions[6].q,a:sanctionsExam.questions[6].a,
+  correct:sanctionsExam.questions[6].correct,body:sanctionsExam.questions[6].body,
+  kind:sanctionsExam.questions[6].kind}),
+ 'Evidence ledger contains historical sanctions question instead of active v3');
+assert.notEqual(liveSanctionsEntry.question_sha256,
+ hash({q:engine.modules[5].questions[6].q,a:engine.modules[5].questions[6].a,
+  correct:engine.modules[5].questions[6].correct,body:engine.modules[5].questions[6].body,
+  kind:engine.modules[5].questions[6].kind}),
+ 'Evidence ledger incorrectly hashes preserved historical sanctions question');
+console.log('PASS: evidence ledger uses published sanctions v3 exam and preserves historical v2');
+
 // Mark every occurrence, including the first, so review inventory is complete.
 for(const exam of report.exams){
  const key=examKeys.get(exam.id);
