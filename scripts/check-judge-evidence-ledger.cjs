@@ -275,6 +275,8 @@ console.log('Editorial triage (not acceptance): '+report.totals.lessons_flagged_
  '/'+report.totals.lessons+' lessons and '+report.totals.exam_questions_flagged_for_editorial_triage+
  '/'+report.totals.active_exam_questions+' questions flagged; duplicate exam options: '+
  report.totals.exam_questions_with_duplicate_options+'.');
+console.log('Editorial review queue (up to 12): '+report.review_priorities.slice(0,12)
+ .map(x=>x.id+' ['+x.signals.join(', ')+']').join('; '));
 console.log('Orphaned approvals (must be reconciled): '+orphanedLessonApprovals.length+
  ' lessons, '+orphanedExamApprovals.length+' questions.');
 console.log('NOT READY by evidence ledger unless every item is reviewed; independent referee review and authenticated E2E remain separate gates.');
