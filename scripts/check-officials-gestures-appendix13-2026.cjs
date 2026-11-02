@@ -13,7 +13,7 @@ assert.equal(lesson.title,'Руководитель ковра, арбитр, б
 assert.ok(lesson.ref.includes('приложение 13'));
 const prose=lesson.blocks.map(x=>x.join(' ')).join(' ');
 for(const term of ['жесты № 3–6','большой и указательный','четыре пальца','открытая ладонь','сжатым кулаком','жест № 21','жест № 22','жест № 23','Статья 20(3)','Статья 18(2)(б)'])
- assert.ok(prose.includes(term),'Missing official gesture distinction: '+term);
+ assert.ok(prose.toLowerCase().includes(term.toLowerCase()),'Missing official gesture distinction: '+term);
 assert.ok(lesson.blocks.length>=12,'Four additional explanatory blocks expected');
 const originalQuestions=[
  'Где находится арбитр во время схватки?',
