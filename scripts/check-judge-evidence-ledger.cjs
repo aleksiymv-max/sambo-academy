@@ -138,6 +138,39 @@ for(let mi=0;mi<all.length;mi++){
   }
  }
 }
+// Automated triage exposes possible pedagogical gaps; it NEVER approves a lesson.
+function lessonTriageSignals(l){
+ const signals=[],checks=l.checks||l.questions||[];
+ if(!String(l.ref||'').trim())signals.push('missing_rule_reference');
+ if(!String(l.goal||'').trim())signals.push('missing_learning_goal');
+ if(!Array.isArray(l.blocks)||l.blocks.length<5)signals.push('fewer_than_five_explanation_blocks');
+ const hasCase=Array.isArray(l.case)&&l.case.length>=3;
+ if(!String(l.situation||'').trim()&&!hasCase)signals.push('missing_situational_case');
+ if(!String(l.caseAnalysis||'').trim()&&!hasCase)signals.push('missing_case_analysis');
+ if(!String(l.decision||'').trim()&&!hasCase)signals.push('missing_case_decision');
+ if(!String(l.trap||l.mistake||'').trim())signals.push('missing_typical_error');
+ if(checks.length<5)signals.push('fewer_than_five_self_checks');
+ for(let i=0;i<checks.length;i++){
+  const q=checks[i],choices=Array.isArray(q)?q[1]:q.a;
+  if(!Array.isArray(choices)||choices.length<3)signals.push('self_check_'+(i+1)+'_malformed_choices');
+  else if(new Set(choices.map(normalize)).size!==choices.length)
+   signals.push('self_check_'+(i+1)+'_duplicate_choices');
+  if(!String(Array.isArray(q)?q[3]:q.body||'').trim())
+   signals.push('self_check_'+(i+1)+'_missing_explanation');
+ }
+ return signals;
+}
+function examTriageSignals(q){
+ const signals=[],body=String(q.body||'').trim();
+ if(new Set(q.a.map(normalize)).size!==q.a.length)signals.push('duplicate_answer_choices');
+ if(body.length<120)signals.push('short_explanation_needs_manual_review');
+ if(!/(?:стат|ст\\.|прилож|раздел|пункт|правил|приказ)/i.test(body))
+  signals.push('no_explicit_normative_locator_in_explanation');
+ return signals;
+}
+const orphanedApprovalIds=(collection,activeIds)=>
+ Object.keys(collection).filter(id=>!activeIds.has(id));
+
 const globalExamOwners=new Map();
 const examKeys=new Map();
 const report={
@@ -155,7 +188,8 @@ for(let mi=0;mi<all.length;mi++){
   const l=mod.lessons[li],id=moduleId+'/lesson-'+String(li+1).padStart(2,'0');
   const digest=hash(l);
   report.lessons.push({id,title:l.title||'',reference:l.ref||'NOT_SPECIFIED',
-   content_sha256:digest,review_status:approvalStatus('lesson',id,digest)});
+   content_sha256:digest,review_status:approvalStatus('lesson',id,digest),
+   editorial_risks:lessonTriageSignals(l)});
  }
  for(let qi=0;qi<mod.questions.length;qi++){
   const q=mod.questions[qi],id=moduleId+'/exam-'+String(qi+1).padStart(3,'0');
@@ -171,7 +205,8 @@ for(let mi=0;mi<all.length;mi++){
   report.exams.push({id,question_sha256:digest,exact_self_check_duplicate:repeated,
    exact_self_check_duplicate_any_module:matchingSelfChecks.length>0,
    matching_self_check_ids:matchingSelfChecks,
-   review_status:approvalStatus('exam',id,digest)});
+   review_status:approvalStatus('exam',id,digest),
+   editorial_risks:examTriageSignals(q)});
  }
 }
 // Fail if the evidence inventory accidentally reverts to the preserved
@@ -198,6 +233,15 @@ for(const exam of report.exams){
  exam.exact_exam_question_duplicate=exam.matching_exam_ids.length>0;
 }
 const approved=items=>items.filter(x=>x.review_status==='editorially_reviewed').length;
+const orphanedLessonApprovals=orphanedApprovalIds(approvals.lessons,new Set(report.lessons.map(x=>x.id)));
+const orphanedExamApprovals=orphanedApprovalIds(approvals.exams,new Set(report.exams.map(x=>x.id)));
+assert.deepEqual(orphanedApprovalIds({retired:{}},new Set()),['retired'],
+ 'Orphaned approvals must be detected');
+report.review_priorities=[...report.lessons,...report.exams]
+ .filter(x=>x.editorial_risks.length)
+ .sort((a,b)=>b.editorial_risks.length-a.editorial_risks.length)
+ .slice(0,30)
+ .map(x=>({id:x.id,title:x.title||'',signals:x.editorial_risks}));
 report.totals={
  modules:report.modules.length,
  lessons:report.lessons.length,
@@ -208,7 +252,12 @@ report.totals={
  exact_self_check_duplicates_any_module:report.exams.filter(x=>x.exact_self_check_duplicate_any_module).length,
  exact_exam_question_duplicates:report.exams.filter(x=>x.exact_exam_question_duplicate).length,
  stale_lesson_approvals:report.lessons.filter(x=>x.review_status==='stale_content_hash').length,
- stale_exam_approvals:report.exams.filter(x=>x.review_status==='stale_content_hash').length
+ stale_exam_approvals:report.exams.filter(x=>x.review_status==='stale_content_hash').length,
+ lessons_flagged_for_editorial_triage:report.lessons.filter(x=>x.editorial_risks.length).length,
+ exam_questions_flagged_for_editorial_triage:report.exams.filter(x=>x.editorial_risks.length).length,
+ exam_questions_with_duplicate_options:report.exams.filter(x=>x.editorial_risks.includes('duplicate_answer_choices')).length,
+ orphaned_lesson_approval_ids:orphanedLessonApprovals,
+ orphaned_exam_approval_ids:orphanedExamApprovals
 };
 fs.writeFileSync('judge-review-inventory.json',JSON.stringify(report,null,2)+'\n');
 console.log('Judge evidence ledger: '+report.totals.modules+' modules, '+report.totals.lessons+
@@ -222,6 +271,13 @@ console.log('Stale approvals: '+report.totals.stale_lesson_approvals+' lessons, 
 console.log('Course-wide independence: '+report.totals.exact_self_check_duplicates_any_module+
  ' exam/self-check overlaps; '+report.totals.exact_exam_question_duplicates+
  ' exam questions with duplicate wording across the active banks.');
+console.log('Editorial triage (not acceptance): '+report.totals.lessons_flagged_for_editorial_triage+
+ '/'+report.totals.lessons+' lessons and '+report.totals.exam_questions_flagged_for_editorial_triage+
+ '/'+report.totals.active_exam_questions+' questions flagged; duplicate exam options: '+
+ report.totals.exam_questions_with_duplicate_options+'.');
+console.log('Orphaned approvals (must be reconciled): '+orphanedLessonApprovals.length+
+ ' lessons, '+orphanedExamApprovals.length+' questions.');
 console.log('NOT READY by evidence ledger unless every item is reviewed; independent referee review and authenticated E2E remain separate gates.');
 if(report.totals.exact_self_check_duplicates_any_module ||
-   report.totals.exact_exam_question_duplicates)process.exitCode=1;
+   report.totals.exact_exam_question_duplicates ||
+   orphanedLessonApprovals.length || orphanedExamApprovals.length)process.exitCode=1;
