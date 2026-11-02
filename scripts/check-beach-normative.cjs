@@ -50,7 +50,7 @@ for(const [i,key] of [[5,1],[6,2],[7,3]]){
 const gestureBlocks=beachTime.blocks.filter(b=>/приложение 13\.1|Судейская ситуация: жест активности/.test(b[0]));
 if(gestureBlocks.length!==5)throw Error('Five appendix 13.1 teaching blocks required');
 const gestureText=gestureBlocks.flat().join(' ').toLowerCase();
-for(const marker of ['жест № 10','вращение предплечьями','знак «+»','статья 51(3)','врач','секундометрист','гонгом','жест № 11','жест № 13','судейская ситуация','решение:','ошибка:']){
+for(const marker of ['жест № 10','вращение предплечьями','знак «+»','статья 51(3)','врач','секундометрист','гонгом','жест № 11','№ 13','судейская ситуация','решение:','ошибка:']){
  if(!gestureText.includes(marker.toLowerCase()))throw Error('Missing beach gesture detail: '+marker);
 }
 const gestureHtml=context.window.samboJudgeCourseEngine.sections(mod,0)[3].html;
