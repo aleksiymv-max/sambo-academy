@@ -128,6 +128,27 @@ assert.ok(!active.questions.some(q=>norm(q.q)===norm(subgroupCheck[0])),
 assert.match(old.render(drawLesson,3),/Алгоритм проверки перед составлением пар/);
 assert.match(old.render(drawLesson,3),/В двух подгруппах уже провели/);
 
+// Article 2(5) and Appendix 2(I.1): an explicit round-robin rule in the
+// current Regulation is an exception to the default for <=7 athletes.
+const methodsLesson=old.lessons[4];
+assert.equal(methodsLesson.blocks.length,7,'Methods lesson needs a contrasting default/exception decision');
+const methodsContrast=methodsLesson.blocks.find(([title])=>title.includes('Сравнение двух решений'));
+assert.ok(methodsContrast && methodsContrast[1].includes('Ситуация А:') &&
+ methodsContrast[1].includes('Ситуация Б:') && methodsContrast[1].includes('Приложение 2'),
+ 'Methods lesson must distinguish the default from a lawful round-robin exception');
+assert.equal(methodsLesson.questions.length,5,'Methods lesson needs a contextual exception self-check');
+assert.equal(fnv(JSON.stringify(methodsLesson.questions.slice(0,4))),'68f5d71b',
+ 'Historical four methods checks or their answer keys/explanations changed');
+const methodsCheck=methodsLesson.questions[4];
+assert.match(methodsCheck[0],/шесть спортсменов/);
+assert.equal(methodsCheck[2],0,'Six athletes and an explicit round-robin Regulation must be distinguished from the default');
+assert.match(methodsCheck[3],/Статья 2, пункт 5/);
+assert.match(methodsCheck[3],/Приложение 2/);
+assert.ok(!active.questions.some(q=>norm(q.q)===norm(methodsCheck[0])),
+ 'Methods self-check must not duplicate the active independent exam');
+assert.match(old.render(methodsLesson,4),/Сравнение двух решений/);
+assert.match(old.render(methodsLesson,4),/Утверждённое Положение прямо предусматривает круговую систему/);
+
 const groups=[{title:old.title,parts:old.lessons.map(l=>({title:l.title})),premiumFoundations:true,progressIndex:1100},
  ...ctx.window.samboJudgeCourseEngine.modules.map(m=>({title:m.title,parts:m.lessons}))];
 const bridge={
