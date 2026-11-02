@@ -168,6 +168,28 @@ assert.ok(!active.questions.some(q=>norm(q.q)===norm(methodsCheck[0])),
 assert.match(old.render(methodsLesson,4),/Сравнение двух решений/);
 assert.match(old.render(methodsLesson,4),/Утверждённое Положение прямо предусматривает круговую систему/);
 
+// Integrative practicum: test an omitted subgroup-progression rule BEFORE the draw.
+// Historical four self-checks, active independent exam and progress IDs remain unchanged.
+const practicumLesson=old.lessons[5];
+assert.equal(practicumLesson.blocks.length,7,'Foundation practicum needs a pre-draw decision checklist');
+const preDraw=practicumLesson.blocks.find(([title])=>title.includes('Сводная проверка до жеребьёвки'));
+assert.ok(preDraw && preDraw[1].includes('статье 2(1, 4)') &&
+ preDraw[1].includes('приложения 1(4)') &&
+ preDraw[1].includes('оповещение всех'),
+ 'Missing subgroup progression must be resolved through authorized pre-draw procedure');
+assert.equal(practicumLesson.questions.length,5,'Foundation practicum needs an applied pre-draw self-check');
+assert.equal(fnv(JSON.stringify(practicumLesson.questions.slice(0,4))),'c420f046',
+ 'Historical four practicum checks, keys or explanations changed');
+const preDrawCheck=practicumLesson.questions[4];
+assert.match(preDrawCheck[0],/Жеребьёвка ещё не началась/);
+assert.equal(preDrawCheck[2],2,'Pre-draw omission must be referred to the authorized organizers');
+assert.match(preDrawCheck[3],/Статья 2, пункты 1 и 4/);
+assert.match(preDrawCheck[3],/Приложение 1, пункт 4/);
+assert.ok(!active.questions.some(q=>norm(q.q)===norm(preDrawCheck[0])),
+ 'Practicum self-check must not duplicate the active independent exam');
+assert.match(old.render(practicumLesson,5),/Сводная проверка до жеребьёвки/);
+assert.match(old.render(practicumLesson,5),/В Положении названы две подгруппы/);
+
 const groups=[{title:old.title,parts:old.lessons.map(l=>({title:l.title})),premiumFoundations:true,progressIndex:1100},
  ...ctx.window.samboJudgeCourseEngine.modules.map(m=>({title:m.title,parts:m.lessons}))];
 const bridge={
