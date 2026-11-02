@@ -38,14 +38,78 @@ const criteria={
  lesson:['sequence','normative','pedagogy','case','assessment','accessibility','compatibility'],
  exam:['normative','distractors','independent','explanation','accessibility']
 };
-function approvalStatus(kind,id,digest){
- const item=(kind==='lesson'?approvals.lessons:approvals.exams)[id];
+// These are validation guards, NOT a substitute for checking the linked source
+// and the reviewer. A bare string, a future date or a non-existent document must
+// never be sufficient to turn an audit item green.
+const officialHosts=new Set([
+ 'sambo.ru','www.sambo.ru','old.sambo.ru',
+ 'minsport.gov.ru','www.minsport.gov.ru',
+ 'publication.pravo.gov.ru','pravo.gov.ru','www.pravo.gov.ru'
+]);
+function officialSourceUrl(value){
+ try{
+  const url=new URL(value);
+  return url.protocol==='https:' && !url.username && !url.password &&
+   officialHosts.has(url.hostname.toLowerCase()) && !url.port && url.pathname.length>1;
+ }catch{return false;}
+}
+function localEditorialEvidenceUrl(value){
+ try{
+  const url=new URL(value);
+  if(url.protocol!=='https:'||url.hostname!=='github.com'||url.port||url.username||url.password)return false;
+  const match=url.pathname.match(/^\/aleksiymv-max\/sambo-academy\/blob\/(?:main|[a-f0-9]{40})\/(docs\/editorial-[a-z0-9._-]+\.md)$/i);
+  return !!match && fs.existsSync(match[1]) && fs.statSync(match[1]).isFile();
+ }catch{return false;}
+}
+function validReviewDate(value){
+ if(typeof value!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(value))return false;
+ const date=new Date(value+'T00:00:00Z');
+ return !Number.isNaN(date.valueOf()) &&
+  date.toISOString().slice(0,10)===value &&
+  value<=new Date().toISOString().slice(0,10);
+}
+function validReviewer(value){
+ return typeof value==='string' && value.trim().length>=3 &&
+  !/^(?:ci|bot|automation|system|test|todo|unknown|placeholder)$/i.test(value.trim());
+}
+function approvalStatusForEntry(kind,item,digest){
  if(!item)return 'unreviewed';
  if(item.content_sha256!==digest)return 'stale_content_hash';
- if(!item.source_url||!item.reviewed_by||!item.reviewed_at||!item.evidence_url)return 'incomplete_evidence';
+ if(!officialSourceUrl(item.source_url)||!localEditorialEvidenceUrl(item.evidence_url)||
+    !validReviewer(item.reviewed_by)||!validReviewDate(item.reviewed_at))return 'incomplete_evidence';
  if(!criteria[kind].every(k=>item.criteria?.[k]===true))return 'incomplete_criteria';
  return 'editorially_reviewed';
 }
+function approvalStatus(kind,id,digest){
+ return approvalStatusForEntry(kind,(kind==='lesson'?approvals.lessons:approvals.exams)[id],digest);
+}
+// A deliberately synthetic fixture checks the validator; it is NOT added to
+// docs/judge-evidence-approvals.json and does not approve any real lesson.
+const synthetic={
+ content_sha256:'a'.repeat(64),
+ source_url:'https://sambo.ru/wp-content/uploads/2025/09/pravila-vida-sporta-sambo-s-izm.-i-dopolneniyami.pdf',
+ evidence_url:'https://github.com/aleksiymv-max/sambo-academy/blob/main/docs/editorial-article14-2026-10-25.md',
+ reviewed_by:'manual-reviewer',reviewed_at:'2026-11-02',
+ criteria:Object.fromEntries(criteria.lesson.map(k=>[k,true]))
+};
+assert.equal(approvalStatusForEntry('lesson',synthetic,synthetic.content_sha256),'editorially_reviewed');
+for(const change of [
+ {source_url:'https://example.com/fake.pdf'},
+ {source_url:'http://sambo.ru/fake.pdf'},
+ {evidence_url:'https://github.com/aleksiymv-max/sambo-academy/blob/main/docs/editorial-not-found.md'},
+ {evidence_url:'https://example.com/fake-review'},
+ {reviewed_at:'2099-01-01'},
+ {reviewed_at:'2026-02-30'},
+ {reviewed_by:'automation'}
+]){
+ const invalid={...synthetic,...change};
+ assert.equal(approvalStatusForEntry('lesson',invalid,synthetic.content_sha256),
+  'incomplete_evidence','Invalid evidence was accepted: '+JSON.stringify(change));
+}
+assert.equal(approvalStatusForEntry('lesson',{...synthetic,criteria:{...synthetic.criteria,case:false}},synthetic.content_sha256),
+ 'incomplete_criteria');
+assert.equal(approvalStatusForEntry('lesson',synthetic,'b'.repeat(64)),'stale_content_hash');
+console.log('PASS: evidence approvals reject fake sources, missing review files, placeholder reviewers, future/invalid dates and stale hashes');
 // Independence is a course-wide property: an exam question can accidentally
 // repeat a self-check from a different module, not just its own module.
 const globalSelfCheckOwners=new Map();
