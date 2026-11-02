@@ -15,7 +15,7 @@ if(lessons.length!==3)throw Error('Infrastructure lesson count changed; progress
 const markers=[
  ['11×11','14×14','5 см','6 до 9','1 м','45°','представителем','приложению 11'],
  ['гонг','выверены','без сброса','разминочном','механическое','видеозаписи','50 сантиметров','чистки'],
- ['приложение 8','приложение 9','приложение 11','приложение 12','приложение 14','технический секретарь','трёх дней']
+ ['приложение 8','приложение 9','приложение 11','приложение 12','приложение 14','технический секретарь','трёх дней','первое предупреждение','второе','третье','четвёртом предупреждении','медицинской помощи']
 ];
 let checks=0;
 for(let i=0;i<lessons.length;i++){
@@ -28,7 +28,33 @@ for(let i=0;i<lessons.length;i++){
   checks++;
  }
 }
+// Article 21(2) regression: preserve the five original checks and their keys.
+const protocol=lessons[2];
+const originalProtocolChecks=[
+ 'Где находится форма судейского протокола схватки?',
+ 'Где находится акт готовности места?',
+ 'Кто ведёт протокол схватки?',
+ 'В какой срок главный судья направляет отчёт?',
+ 'Как фиксируют оценки удержаний в протоколе?'
+];
+if(protocol.checks.length!==7)throw Error('Protocol self-check count changed; expected five originals and two new checks');
+for(let i=0;i<originalProtocolChecks.length;i++){
+ if(protocol.checks[i][0]!==originalProtocolChecks[i]||protocol.checks[i][2]!==0)
+  throw Error('Original protocol self-check text/key changed at '+i);
+}
+const [warning,medical]=protocol.checks.slice(5);
+if(warning[2]!==1||medical[2]!==2||
+ !warning[0].includes('второе предупреждение')||
+ !medical[0].includes('досрочном окончании'))
+ throw Error('New protocol checks have incorrect questions/keys');
+const teaching=protocol.blocks.map(x=>x.join(' ')).join(' ');
+for(const term of ['Статья 21(2)','Первое предупреждение','второе — 1','третье — 1','четвёртом предупреждении','время оказания ему медицинской помощи','через дробь']){
+ if(!teaching.includes(term))throw Error('Missing article 21 teaching evidence: '+term);
+}
+const html=ctx.window.samboJudgeCourseEngine.sections(mods[0],7).map(s=>s.html||'').join(' ');
+if(!html.includes('Предупреждения в протоколе')||!html.includes('Чистое и медицинское время'))
+ throw Error('New article 21 teaching blocks are not rendered');
 const all=lessons.flatMap(l=>l.blocks.flat()).join(' ');
 if(!all.includes('рекомендацией')||!all.includes('Учебный алгоритм'))throw Error('Normative obligations and educational guidance must be distinguished');
-console.log('PASS: 3 infrastructure lessons, '+checks+' self-checks, rules 15/21/42/43 and appendices 8/9/11/12/14 markers');
+console.log('PASS: 3 infrastructure lessons, '+checks+' self-checks; article 21 warning frame and medical time verified structurally; original checks preserved');
 console.log('NOTE: structural coverage only; expert source audit and authenticated Supabase E2E remain open');
