@@ -280,6 +280,7 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
  await page.evaluate(()=>openCourse('judge'));
  await page.locator('#lessons .sambo-module-card').first().locator('.sambo-topic-link').last().click();
  check('judge last lesson is integrated practical exercise',(await page.locator('.judge-prime h2').textContent()).includes('практикум'));
+ check('LOCAL foundation practicum pre-draw decision and fifth check rendered',await page.locator('.judge-prime .jp-question').count()===5&&(await page.locator('.judge-prime').textContent()).includes('Сводная проверка до жеребьёвки')&&(await page.locator('.judge-prime').textContent()).includes('Жеребьёвка ещё не началась'));
  await page.evaluate(()=>{localStorage.setItem('sambo-demo-judge-100','done');openCourse('judge')});
  check('old judge module completion is not falsely credited',(await page.locator('#lessons .sambo-module-card').first().locator('.sambo-module-state').textContent()).includes('Раскрыть'));
  await page.evaluate(()=>{openLesson(0);samboSectionIndex=samboLessonSections(samboModuleData(currentCourse)[0]).length-1;renderSamboSection();startModuleQuiz();});
@@ -437,6 +438,13 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
     return l?.blocks?.some(b=>b[0].includes('Проверка дисциплины')&&b[1].includes('статья 49, пункт 1'))&&
       l.questions.length===5&&l.questions[4][2]===2;
   }));
+  await livePage.evaluate(()=>openCourse('judge'));
+  await livePage.locator('#lessons .sambo-module-card').first().locator('.sambo-topic-link').last().click();
+  check('LIVE foundation practicum pre-draw decision and fifth self-check deployed',
+    await livePage.locator('.judge-prime .jp-question').count()===5&&
+    (await livePage.locator('.judge-prime').textContent()).includes('Сводная проверка до жеребьёвки')&&
+    (await livePage.locator('.judge-prime').textContent()).includes('Жеребьёвка ещё не началась'));
+  await livePage.evaluate(()=>openCourse('judge'));
   check('LIVE foundation exam 1–8 audited explanations loaded',await livePage.evaluate(()=>{
     const m=window.samboJudgeFoundations;
     return m?.progressIndex===1100&&m.questions.length===24&&
