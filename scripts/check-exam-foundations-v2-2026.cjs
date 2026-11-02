@@ -58,6 +58,20 @@ assert.ok(firstBlock && firstBlock[1].includes('статья 2, пункт 4') &
 assert.ok(firstLesson.case[1].includes('Статья 2, пункт 4') &&
  firstLesson.case[2].includes('Не выдавать личный выбор секретаря'),
  'Foundation case must not imply that appendix 1(1) authorizes a missing competition format');
+// Editorial regression: an authorized pre-draw amendment is not sufficient if
+// one participating team has not been notified (Appendix 1, paragraph 4).
+const regulationLesson=old.lessons[1];
+assert.equal(regulationLesson.blocks.length,6,'Amendment lesson must teach three independent conditions');
+const amendmentMatrix=regulationLesson.blocks.find(([title])=>title.includes('три независимых условия'));
+assert.ok(amendmentMatrix && amendmentMatrix[1].includes('Ситуация А:') &&
+ amendmentMatrix[1].includes('Ситуация Б:') && amendmentMatrix[1].includes('Ситуация В:'),
+ 'Amendment lesson must distinguish authority, notice and deadline');
+assert.ok(regulationLesson.case[0].includes('Две из трёх команд уведомлены') &&
+ regulationLesson.case[1].includes('оповещения представителей всех') &&
+ regulationLesson.case[2].includes('Не считать поправку отвечающей требованиям'),
+ 'Pre-draw amendment with incomplete notice must not be treated as valid');
+assert.equal(regulationLesson.questions.length,4,'Historical self-check questions must remain unchanged');
+assert.match(old.render(regulationLesson,1),/Проверка изменения Положения/);
 const subgroupBlock=drawLesson.blocks.find(([title])=>title.includes('Контрольный пример'));
 assert.ok(subgroupBlock && subgroupBlock[1].includes('статье 2, пункту 1') &&
  subgroupBlock[1].includes('статье 2, пункту 3') &&
