@@ -30,6 +30,34 @@ for(let i=0;i<mod.lessons.length;i++){
   if(!q[0]||!Array.isArray(q[1])||q[1].length!==4||!Number.isInteger(q[2])||q[2]<0||q[2]>=4||!q[3])throw Error('Malformed check in '+l.title);
  }
 }
+// Appendix 13.1: distinguish procedural gestures from the article 51(3) activity award.
+const beachTime=mod.lessons[2];
+const historicalTimeChecks=[
+ 'Сколько длится пляжная схватка, включая медальные встречи?',
+ 'Что является моментом окончания схватки по статье 50?',
+ 'Когда применяется оценка активности по статье 51?',
+ 'Что произойдёт, если после оценки активности до конца схватки так и не было технических действий?',
+ 'Какой минимальный отдых между схватками?'
+];
+if(beachTime.checks.length!==8)throw Error('Expected five historical + three beach-gesture checks');
+for(let i=0;i<historicalTimeChecks.length;i++){
+ if(beachTime.checks[i][0]!==historicalTimeChecks[i]||beachTime.checks[i][2]!==0)
+  throw Error('Historical beach timing self-check changed: '+i);
+}
+for(const [i,key] of [[5,1],[6,2],[7,3]]){
+ if(beachTime.checks[i][2]!==key)throw Error('Beach gesture self-check answer changed: '+i);
+}
+const gestureBlocks=beachTime.blocks.filter(b=>/приложение 13\.1|Судейская ситуация: жест активности/.test(b[0]));
+if(gestureBlocks.length!==5)throw Error('Five appendix 13.1 teaching blocks required');
+const gestureText=gestureBlocks.flat().join(' ').toLowerCase();
+for(const marker of ['жест № 10','вращение предплечьями','знак «+»','статья 51(3)','врач','секундометрист','гонгом','жест № 11','№ 13','судейская ситуация','решение:','ошибка:']){
+ if(!gestureText.includes(marker.toLowerCase()))throw Error('Missing beach gesture detail: '+marker);
+}
+const gestureHtml=context.window.samboJudgeCourseEngine.sections(mod,0)[3].html;
+for(const marker of ['Активизировать борьбу — не присудить активность','Судейская ситуация: жест активности','Что означает вращение предплечьями','Как арбитр показывает остановку времени','Когда секундометрист начинает отсчёт']){
+ if(!gestureHtml.includes(marker))throw Error('Beach gesture missing from rendered lesson: '+marker);
+}
+
 // Article 45(5): judge's own kit is distinct from athlete uniform (article 44).
 const judgeKit=mod.lessons[0];
 const historicalKitChecks=[
