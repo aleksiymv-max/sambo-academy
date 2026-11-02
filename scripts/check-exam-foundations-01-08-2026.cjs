@@ -17,7 +17,7 @@ function fnv(text){let h=2166136261;for(let i=0;i<text.length;i++){h^=text.charC
 const stable=qs.map(({q,a,correct,kind})=>({q,a,correct,kind}));
 assert.equal(fnv(JSON.stringify(stable)),'4910eed2','Original 24 exam questions/options/keys/order changed');
 // Foundation items 17–24 are checked by check-exam-foundations-17-24-2026.cjs.
-assert.equal(fnv(JSON.stringify(mod.lessons.map((l,i)=>(i===1||i===2)?l.questions.slice(0,4):l.questions))),'c41346d9','Lesson self-checks were modified');
+assert.equal(fnv(JSON.stringify(mod.lessons.map((l,i)=>(i===1||i===2||i===3)?l.questions.slice(0,4):l.questions))),'c41346d9','Lesson self-checks were modified');
 const expected=[
  ['На что следует опираться в спорной или неописанной в Положении ситуации?',1,'На Правила вида спорта «самбо»',['Приложение 1, пункт 1','Правилами','судейская коллегия']],
  ['Какая статья регулирует характер соревнований?',1,'Статья 1',['Статья 1, пункты 1–5','статье 2','Положением']],
