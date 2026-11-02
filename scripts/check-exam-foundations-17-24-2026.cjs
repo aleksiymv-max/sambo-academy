@@ -12,9 +12,9 @@ assert.equal(mod.lessons.length,6);assert.equal(qs.length,24);
 assert.equal(fnv(JSON.stringify(qs.map(({q,a,correct,kind})=>({q,a,correct,kind})))),'4910eed2','Historical question/choice/key fingerprint changed');
 assert.equal(fnv(JSON.stringify(qs.slice(0,8).map(q=>q.body))),'c654c4df','Previously audited explanations 1–8 changed');
 assert.equal(fnv(JSON.stringify(qs.slice(8,16).map(q=>q.body))),'1753162d','Previously audited explanations 9–16 changed');
-// Preserve the first four historical checks in lessons 2 and 3, and all
-// checks of the other four lessons. New application checks are append-only.
-assert.equal(fnv(JSON.stringify(mod.lessons.map((l,i)=>(i===1||i===2)?l.questions.slice(0,4):l.questions))),
+// Preserve the first four historical checks in lessons 2, 3 and 4, and all
+// checks of the other three lessons. New application checks are append-only.
+assert.equal(fnv(JSON.stringify(mod.lessons.map((l,i)=>(i===1||i===2||i===3)?l.questions.slice(0,4):l.questions))),
  'c41346d9','Historical lesson self-checks changed');
 const expected=[
   {
