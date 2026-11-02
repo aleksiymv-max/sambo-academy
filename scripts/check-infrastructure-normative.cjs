@@ -37,22 +37,29 @@ const originalProtocolChecks=[
  'В какой срок главный судья направляет отчёт?',
  'Как фиксируют оценки удержаний в протоколе?'
 ];
-if(protocol.checks.length!==7)throw Error('Protocol self-check count changed; expected five originals and two new checks');
+if(protocol.checks.length!==9)throw Error('Protocol self-check count changed; expected five originals, two article 21 checks and two appendix 14 checks');
 for(let i=0;i<originalProtocolChecks.length;i++){
  if(protocol.checks[i][0]!==originalProtocolChecks[i]||protocol.checks[i][2]!==0)
   throw Error('Original protocol self-check text/key changed at '+i);
 }
-const [warning,medical]=protocol.checks.slice(5);
+const [warning,medical,form,signers]=protocol.checks.slice(5);
 if(warning[2]!==1||medical[2]!==2||
  !warning[0].includes('второе предупреждение')||
  !medical[0].includes('досрочном окончании'))
  throw Error('New protocol checks have incorrect questions/keys');
+if(form[2]!==3||signers[2]!==1||
+ !form[0].includes('шапке судейского протокола')||
+ !signers[0].includes('подписи предусмотрены'))
+ throw Error('Appendix 14 checks have incorrect questions/keys');
 const teaching=protocol.blocks.map(x=>x.join(' ')).join(' ');
 for(const term of ['Статья 21(2)','Первое предупреждение','второе — 1','третье — 1','четвёртом предупреждении','время оказания ему медицинской помощи','через дробь']){
  if(!teaching.includes(term))throw Error('Missing article 21 teaching evidence: '+term);
 }
+for(const term of ['Приложение 14: шапка и графы','номер ковра, круг и весовая категория','главного судьи, секретаря, руководителя ковра и технического секретаря','не новая санкция']){
+ if(!teaching.includes(term))throw Error('Missing appendix 14 teaching evidence: '+term);
+}
 const html=ctx.window.samboJudgeCourseEngine.sections(mods[0],7).map(s=>s.html||'').join(' ');
-if(!html.includes('Предупреждения в протоколе')||!html.includes('Чистое и медицинское время'))
+if(!html.includes('Предупреждения в протоколе')||!html.includes('Чистое и медицинское время')||!html.includes('Приложение 14: шапка и графы'))
  throw Error('New article 21 teaching blocks are not rendered');
 const all=lessons.flatMap(l=>l.blocks.flat()).join(' ');
 if(!all.includes('рекомендацией')||!all.includes('Учебный алгоритм'))throw Error('Normative obligations and educational guidance must be distinguished');
