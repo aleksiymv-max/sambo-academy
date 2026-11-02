@@ -70,8 +70,21 @@ assert.ok(regulationLesson.case[0].includes('Две из трёх команд �
  regulationLesson.case[1].includes('оповещения представителей всех') &&
  regulationLesson.case[2].includes('Не считать поправку отвечающей требованиям'),
  'Pre-draw amendment with incomplete notice must not be treated as valid');
-assert.equal(regulationLesson.questions.length,4,'Historical self-check questions must remain unchanged');
+// The original four checks retain their order, answer keys and explanations.
+// The fifth is a separate application case, not a copied independent exam item.
+assert.equal(regulationLesson.questions.length,5,'Amendment lesson needs an applied deadline check');
+const fnv=s=>{let h=2166136261;for(const ch of s){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)>>>0;}return h.toString(16).padStart(8,'0');};
+assert.equal(fnv(JSON.stringify(regulationLesson.questions.slice(0,4))),'868f07b9',
+ 'Historical four self-checks or answer keys changed');
+const deadlineCheck=regulationLesson.questions[4];
+assert.match(deadlineCheck[0],/после её начала/);
+assert.equal(deadlineCheck[2],2,'Post-draw change must not be accepted');
+assert.match(deadlineCheck[3],/Приложение 1, пункт 4/);
+assert.match(deadlineCheck[3],/срок/);
+assert.ok(!active.questions.some(q=>norm(q.q)===norm(deadlineCheck[0])),
+ 'Self-check must not duplicate an independent exam item');
 assert.match(old.render(regulationLesson,1),/Проверка изменения Положения/);
+assert.match(old.render(regulationLesson,1),/после её начала/);
 const subgroupBlock=drawLesson.blocks.find(([title])=>title.includes('Контрольный пример'));
 assert.ok(subgroupBlock && subgroupBlock[1].includes('статье 2, пункту 1') &&
  subgroupBlock[1].includes('статье 2, пункту 3') &&
