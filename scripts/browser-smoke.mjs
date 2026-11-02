@@ -1077,7 +1077,7 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
   await practicumCard.locator('summary').click();
   await practicumCard.locator('.sambo-topic-link').first().click();
   check('LIVE integrated practicum lesson has at least five teaching blocks',await livePage.locator('.judge-prime .jp-part').count()>=5);
-  check('LIVE integrated practicum has five self-check questions',await livePage.locator('.judge-prime .jp-question').count()===5);
+  check('LIVE integrated practicum has six checks and venue-roles distinction',await livePage.locator('.judge-prime .jp-question').count()===6&&(await livePage.locator('.judge-prime').textContent()).includes('Статья 42(4)'));
     check('LIVE judge typography stylesheet loaded',(await livePage.locator('.judge-prime').evaluate(el=>getComputedStyle(el).borderRadius))!=='0px');
   check('LIVE browser no uncaught errors',liveErrors.length===0,liveErrors.slice(0,4).join(' | '));
   await livePage.setViewportSize({width:390,height:844});
