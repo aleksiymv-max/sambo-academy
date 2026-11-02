@@ -19,12 +19,15 @@ jobs:
         run: npm install --no-save --no-package-lock playwright@1.57.0
       - name: Self-test deployment revision checker
         run: node scripts/check-deployment-parity.mjs --self-test
+      # On main, wait for the exact deployed revision BEFORE the live browser.
+      # Otherwise the browser can read an old shell while current JS assets are
+      # already published and report misleading failures (8 instead of 12 modules).
+      - name: Verify deployed judge assets match checked-out main
+        if: github.event_name != 'pull_request'
+        run: node scripts/check-deployment-parity.mjs
       - name: Run browser checks
         env:
           SAMBO_SMOKE_LOCAL_ONLY: ${{ github.event_name == 'pull_request' && '1' || '0' }}
         run: |
           google-chrome --version
           node scripts/browser-smoke.mjs
-      - name: Verify deployed judge assets match checked-out main
-        if: github.event_name != 'pull_request'
-        run: node scripts/check-deployment-parity.mjs
