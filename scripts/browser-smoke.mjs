@@ -275,7 +275,8 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
  await page.locator('#lessons .sambo-module-card').first().locator('.sambo-topic-link').first().click();
  check('judge first lesson opens directly',await page.locator('#lessonTitle').textContent()!=='');
  check('judge first lesson contains clear sequence',await page.locator('.judge-prime .jp-part').count()>=4);
- check('judge first lesson contains situation and explanations',await page.locator('.judge-prime .jp-case').count()===1&&await page.locator('.judge-prime .jp-question').count()===4);
+ check('judge first lesson contains situation and explanations',await page.locator('.judge-prime .jp-case').count()===1&&await page.locator('.judge-prime .jp-question').count()===5);
+ check('LOCAL foundation discipline-specific source and beach self-check rendered',(await page.locator('.judge-prime').textContent()).includes('Проверка дисциплины до выбора нормы')&&(await page.locator('.judge-prime').textContent()).includes('статья 49, пункт 1')&&(await page.locator('.judge-prime').textContent()).includes('На пляжном турнире секретарь'));
  await page.evaluate(()=>openCourse('judge'));
  await page.locator('#lessons .sambo-module-card').first().locator('.sambo-topic-link').last().click();
  check('judge last lesson is integrated practical exercise',(await page.locator('.judge-prime h2').textContent()).includes('практикум'));
@@ -431,6 +432,11 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
   check('LIVE new judge course shown',(await judgeFirst.textContent()).includes('Нормативная основа и способы проведения'));
   await judgeFirst.locator('.sambo-topic-link').first().click();
   check('LIVE detailed judge lesson has ordered sections',await livePage.locator('.judge-prime .jp-part').count()>=4);
+  check('LIVE foundation discipline source and fifth self-check deployed',await livePage.evaluate(()=>{
+    const l=window.samboJudgeFoundations?.lessons?.[0];
+    return l?.blocks?.some(b=>b[0].includes('Проверка дисциплины')&&b[1].includes('статья 49, пункт 1'))&&
+      l.questions.length===5&&l.questions[4][2]===2;
+  }));
   check('LIVE foundation exam 1–8 audited explanations loaded',await livePage.evaluate(()=>{
     const m=window.samboJudgeFoundations;
     return m?.progressIndex===1100&&m.questions.length===24&&
