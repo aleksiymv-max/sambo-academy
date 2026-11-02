@@ -173,7 +173,7 @@ assert.match(old.render(methodsLesson,4),/Утверждённое Положе�
 const practicumLesson=old.lessons[5];
 assert.equal(practicumLesson.blocks.length,7,'Foundation practicum needs a pre-draw decision checklist');
 const preDraw=practicumLesson.blocks.find(([title])=>title.includes('Сводная проверка до жеребьёвки'));
-assert.ok(preDraw && preDraw[1].includes('статье 2(1, 4)') &&
+assert.ok(preDraw && preDraw[1].includes('статьи 2(1, 4)') &&
  preDraw[1].includes('приложения 1(4)') &&
  preDraw[1].includes('оповещение всех'),
  'Missing subgroup progression must be resolved through authorized pre-draw procedure');
