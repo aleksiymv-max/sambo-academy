@@ -49,7 +49,7 @@ for(let i=0;i<12;i++)assert.ok(active.questions[i].body.toLowerCase().includes(e
 // Regression: official Rules art. 2(1,3–4) and appendix 1(1,4) must not
 // be taught as permission for the secretariat to invent a competition format.
 const firstLesson=old.lessons[0],drawLesson=old.lessons[3];
-assert.equal(firstLesson.blocks.length,5,'Foundation lesson 1 needs the missing mandatory-regulation distinction');
+assert.equal(firstLesson.blocks.length,6,'Foundation lesson 1 needs both mandatory-regulation and discipline-source boundaries');
 assert.equal(drawLesson.blocks.length,6,'Foundation lesson 4 needs a subgroup decision algorithm');
 const firstBlock=firstLesson.blocks.find(([title])=>title.includes('Пробел в Положении'));
 assert.ok(firstBlock && firstBlock[1].includes('статья 2, пункт 4') &&
@@ -109,6 +109,25 @@ assert.ok(subgroupBlock && subgroupBlock[1].includes('статье 2, пункт
  subgroupBlock[1].includes('приложения 1, пункта 4'),
  'Subgroup progression, draw and amendment constraints must remain distinct');
 assert.match(old.render(firstLesson,0),/Пробел в Положении/);
+// The first foundation lesson must teach selection of the discipline-specific
+// source before making a technical ruling; preserve all four historic checks.
+const disciplineBlock=firstLesson.blocks.find(([title])=>title.includes('Проверка дисциплины'));
+assert.ok(disciplineBlock && disciplineBlock[1].includes('статья 49, пункт 1') &&
+ disciplineBlock[1].includes('только в положении стоя') &&
+ disciplineBlock[1].includes('спортивного самбо'),
+ 'Beach sambo must not inherit sporting-sambo holds by habit');
+assert.equal(firstLesson.questions.length,5,'Foundation lesson 1 needs an applied discipline-source self-check');
+assert.equal(fnv(JSON.stringify(firstLesson.questions.slice(0,4))),'a2401aa9',
+ 'Historical first four foundation checks, answer keys or explanations changed');
+const disciplineCheck=firstLesson.questions[4];
+assert.match(disciplineCheck[0],/пляжном турнире/);
+assert.equal(disciplineCheck[2],2,'Beach source-selection answer key must remain correct');
+assert.match(disciplineCheck[3],/статья 49, пункт 1/);
+assert.ok(!active.questions.some(q=>norm(q.q)===norm(disciplineCheck[0])),
+ 'Beach source-selection self-check must not duplicate an independent exam item');
+assert.match(old.render(firstLesson,0),/Проверка дисциплины до выбора нормы/);
+assert.match(old.render(firstLesson,0),/На пляжном турнире секретарь/);
+
 assert.match(old.render(drawLesson,3),/Контрольный пример/);
 // Official Rules, article 2(1,3–4) and Appendix 1(4): no retroactive subgroup progression rule.
 assert.equal(drawLesson.questions.length,5,'Subgroup lesson needs an applied pre-draw self-check');
