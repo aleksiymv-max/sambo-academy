@@ -22,7 +22,9 @@ const assets=[
 ];
 const digest=b=>createHash('sha256').update(b).digest('hex').slice(0,16);
 
-async function compareOne(base,asset,{attempts=15,waitMs=5000}={}){
+// Cloudflare Pages may publish a main push after Actions starts; allow a bounded
+// convergence window, but never treat a stale or missing asset as a pass.
+async function compareOne(base,asset,{attempts=30,waitMs=5000}={}){
  const expected=await readFile(asset);
  const url=new URL(asset,base).toString();
  let detail='no response';
