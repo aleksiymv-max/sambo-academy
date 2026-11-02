@@ -66,12 +66,22 @@ function officialSourceUrl(value){
    officialHosts.has(url.hostname.toLowerCase()) && !url.port && url.pathname.length>1;
  }catch{return false;}
 }
-function localEditorialEvidenceUrl(value){
+function localEditorialEvidenceUrl(value,id,digest,item,readEvidence=path=>fs.readFileSync(path,'utf8')){
  try{
   const url=new URL(value);
-  if(url.protocol!=='https:'||url.hostname!=='github.com'||url.port||url.username||url.password)return false;
+  if(url.protocol!=='https:'||url.hostname!=='github.com'||url.port||url.username||url.password||
+     url.search||url.hash)return false;
   const match=url.pathname.match(/^\/aleksiymv-max\/sambo-academy\/blob\/(?:main|[a-f0-9]{40})\/(docs\/editorial-[a-z0-9._-]+\.md)$/i);
-  return !!match && fs.existsSync(match[1]) && fs.statSync(match[1]).isFile();
+  if(!match||!fs.existsSync(match[1])||!fs.statSync(match[1]).isFile())return false;
+  // An unrelated editorial file is not proof of reviewing THIS item.
+  // The document must bind its explicit reviewer, date and official source
+  // to the current item id and exact content digest.
+  const markers=[...String(readEvidence(match[1])).matchAll(/<!--\s*judge-review-evidence:\s*(\{[^\r\n]*\})\s*-->/g)];
+  if(markers.length!==1)return false;
+  const evidence=JSON.parse(markers[0][1]);
+  return evidence.audit_id===id && evidence.content_sha256===digest &&
+    evidence.reviewed_by===item.reviewed_by && evidence.reviewed_at===item.reviewed_at &&
+    evidence.source_url===item.source_url;
  }catch{return false;}
 }
 function validReviewDate(value){
@@ -85,16 +95,16 @@ function validReviewer(value){
  return typeof value==='string' && value.trim().length>=3 &&
   !/^(?:ci|bot|automation|system|test|todo|unknown|placeholder)$/i.test(value.trim());
 }
-function approvalStatusForEntry(kind,item,digest){
+function approvalStatusForEntry(kind,id,item,digest,readEvidence){
  if(!item)return 'unreviewed';
  if(item.content_sha256!==digest)return 'stale_content_hash';
- if(!officialSourceUrl(item.source_url)||!localEditorialEvidenceUrl(item.evidence_url)||
+ if(!officialSourceUrl(item.source_url)||!localEditorialEvidenceUrl(item.evidence_url,id,digest,item,readEvidence)||
     !validReviewer(item.reviewed_by)||!validReviewDate(item.reviewed_at))return 'incomplete_evidence';
  if(!criteria[kind].every(k=>item.criteria?.[k]===true))return 'incomplete_criteria';
  return 'editorially_reviewed';
 }
 function approvalStatus(kind,id,digest){
- return approvalStatusForEntry(kind,(kind==='lesson'?approvals.lessons:approvals.exams)[id],digest);
+ return approvalStatusForEntry(kind,id,(kind==='lesson'?approvals.lessons:approvals.exams)[id],digest);
 }
 // A deliberately synthetic fixture checks the validator; it is NOT added to
 // docs/judge-evidence-approvals.json and does not approve any real lesson.
@@ -105,7 +115,19 @@ const synthetic={
  reviewed_by:'manual-reviewer',reviewed_at:'2026-11-02',
  criteria:Object.fromEntries(criteria.lesson.map(k=>[k,true]))
 };
-assert.equal(approvalStatusForEntry('lesson',synthetic,synthetic.content_sha256),'editorially_reviewed');
+const syntheticId='judge-module-01/lesson-01';
+const syntheticEvidence={
+ audit_id:syntheticId,content_sha256:synthetic.content_sha256,
+ reviewed_by:synthetic.reviewed_by,reviewed_at:synthetic.reviewed_at,
+ source_url:synthetic.source_url
+};
+const syntheticReader=()=>'<'+ '!-- judge-review-evidence: '+JSON.stringify(syntheticEvidence)+' -->';
+assert.equal(approvalStatusForEntry('lesson',syntheticId,synthetic,synthetic.content_sha256,syntheticReader),
+ 'editorially_reviewed');
+// The real article-14 document has no marker for module 1, lesson 1.
+// Merely linking to an existing editorial note must NOT approve an item.
+assert.equal(approvalStatusForEntry('lesson',syntheticId,synthetic,synthetic.content_sha256),
+ 'incomplete_evidence');
 for(const change of [
  {source_url:'https://example.com/fake.pdf'},
  {source_url:'http://sambo.ru/fake.pdf'},
@@ -116,13 +138,27 @@ for(const change of [
  {reviewed_by:'automation'}
 ]){
  const invalid={...synthetic,...change};
- assert.equal(approvalStatusForEntry('lesson',invalid,synthetic.content_sha256),
+ assert.equal(approvalStatusForEntry('lesson',syntheticId,invalid,synthetic.content_sha256,syntheticReader),
   'incomplete_evidence','Invalid evidence was accepted: '+JSON.stringify(change));
 }
-assert.equal(approvalStatusForEntry('lesson',{...synthetic,criteria:{...synthetic.criteria,case:false}},synthetic.content_sha256),
+for(const change of [
+ {audit_id:'judge-module-02/lesson-01'},
+ {content_sha256:'b'.repeat(64)},
+ {reviewed_by:'other-reviewer'},
+ {reviewed_at:'2026-11-01'},
+ {source_url:'https://sambo.ru/other-source.pdf'}
+]){
+ const invalidEvidence={...syntheticEvidence,...change};
+ const reader=()=>'<'+ '!-- judge-review-evidence: '+JSON.stringify(invalidEvidence)+' -->';
+ assert.equal(approvalStatusForEntry('lesson',syntheticId,synthetic,synthetic.content_sha256,reader),
+  'incomplete_evidence','Evidence marker is not bound to item: '+JSON.stringify(change));
+}
+assert.equal(approvalStatusForEntry('lesson',syntheticId,
+ {...synthetic,criteria:{...synthetic.criteria,case:false}},synthetic.content_sha256,syntheticReader),
  'incomplete_criteria');
-assert.equal(approvalStatusForEntry('lesson',synthetic,'b'.repeat(64)),'stale_content_hash');
-console.log('PASS: evidence approvals reject fake sources, missing review files, placeholder reviewers, future/invalid dates and stale hashes');
+assert.equal(approvalStatusForEntry('lesson',syntheticId,synthetic,'b'.repeat(64),syntheticReader),
+ 'stale_content_hash');
+console.log('PASS: evidence approvals require a matching item/hash/reviewer/source marker, reject unrelated documents, fake sources, placeholder reviewers, invalid dates and stale hashes');
 // Independence is a course-wide property: an exam question can accidentally
 // repeat a self-check from a different module, not just its own module.
 const globalSelfCheckOwners=new Map();
