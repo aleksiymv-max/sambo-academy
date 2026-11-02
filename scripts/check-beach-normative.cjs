@@ -30,6 +30,33 @@ for(let i=0;i<mod.lessons.length;i++){
   if(!q[0]||!Array.isArray(q[1])||q[1].length!==4||!Number.isInteger(q[2])||q[2]<0||q[2]>=4||!q[3])throw Error('Malformed check in '+l.title);
  }
 }
+// Article 45(5): judge's own kit is distinct from athlete uniform (article 44).
+const judgeKit=mod.lessons[0];
+const historicalKitChecks=[
+ 'Какая куртка предусмотрена для пляжного самбо?',
+ 'Какова нижняя граница шорт по статье 44?',
+ 'Кто руководит работой судейской бригады на площадке?',
+ 'Как обозначают активного спортсмена на табло?',
+ 'Кто входит в нейтральную пляжную бригаду согласно отдельным изменениям ВФС от 1 сентября 2026?'
+];
+if(judgeKit.checks.length!==6)throw Error('Expected 5 historical + 1 article 45 judge-kit self-check');
+for(let i=0;i<historicalKitChecks.length;i++){
+ if(judgeKit.checks[i][0]!==historicalKitChecks[i]||judgeKit.checks[i][2]!==0)
+  throw Error('Historical beach judge-kit self-check changed: '+i);
+}
+const kitBlock=judgeKit.blocks.find(b=>b[0]==='Судейская форма и обязательный комплект (ст. 45, п. 5)');
+if(!kitBlock)throw Error('Missing article 45(5) judge readiness block');
+for(const term of ['Статья 45(5)','судейский билет','Правила соревнований','свисток','белая рубашка','красным и синим рукавами','белые шорты','белые носки','спортивная обувь','кепка','белый брючный ремень','не должно быть никаких предметов','Учебный случай','не устанавливает санкцию спортсмену']){
+ if(!kitBlock[1].includes(term))throw Error('Missing judge-kit source-specific detail: '+term);
+}
+if(judgeKit.checks[5][2]!==1||!judgeKit.checks[5][0].includes('статья 45(5)')||
+   !judgeKit.checks[5][3].includes('судейский билет'))
+ throw Error('Article 45(5) new self-check key or explanation invalid');
+const kitHtml=context.window.samboJudgeCourseEngine.sections(mod,0)[1].html;
+for(const term of ['Судейская форма и обязательный комплект','судейский билет','Арбитр пляжного самбо пришёл']){
+ if(!kitHtml.includes(term))throw Error('Article 45(5) missing from rendered lesson: '+term);
+}
+
 // Article 58(6–8) is a beach-specific equipment rule, not the general mat rule.
 const equipment=mod.lessons[4];
 const originalChecks=[
