@@ -50,7 +50,7 @@ for(let i=0;i<12;i++)assert.ok(active.questions[i].body.toLowerCase().includes(e
 // be taught as permission for the secretariat to invent a competition format.
 const firstLesson=old.lessons[0],drawLesson=old.lessons[3];
 assert.equal(firstLesson.blocks.length,5,'Foundation lesson 1 needs the missing mandatory-regulation distinction');
-assert.equal(drawLesson.blocks.length,5,'Foundation lesson 4 needs a concrete subgroup progression example');
+assert.equal(drawLesson.blocks.length,6,'Foundation lesson 4 needs a subgroup decision algorithm');
 const firstBlock=firstLesson.blocks.find(([title])=>title.includes('Пробел в Положении'));
 assert.ok(firstBlock && firstBlock[1].includes('статья 2, пункт 4') &&
  firstBlock[1].includes('приложению 1, пункту 4'),
@@ -110,6 +110,24 @@ assert.ok(subgroupBlock && subgroupBlock[1].includes('статье 2, пункт
  'Subgroup progression, draw and amendment constraints must remain distinct');
 assert.match(old.render(firstLesson,0),/Пробел в Положении/);
 assert.match(old.render(drawLesson,3),/Контрольный пример/);
+// Official Rules, article 2(1,3–4) and Appendix 1(4): no retroactive subgroup progression rule.
+assert.equal(drawLesson.questions.length,5,'Subgroup lesson needs an applied pre-draw self-check');
+assert.equal(fnv(JSON.stringify(drawLesson.questions.slice(0,4))),'93a7a868',
+ 'Historical subgroup self-checks, keys or explanations changed');
+const subgroupDecision=drawLesson.blocks.find(([title])=>title.includes('Алгоритм проверки'));
+assert.ok(subgroupDecision && subgroupDecision[1].includes('Ситуация А:') &&
+ subgroupDecision[1].includes('Ситуация Б:') && subgroupDecision[1].includes('Ситуация В:') &&
+ subgroupDecision[1].includes('приложение 1, пункт 4'),
+ 'Subgroup lesson must distinguish valid draw, missing progression and authorized amendment');
+const subgroupCheck=drawLesson.questions[4];
+assert.match(subgroupCheck[0],/первые встречи/);
+assert.equal(subgroupCheck[2],2,'Missing progression principle cannot be decided after matches');
+assert.match(subgroupCheck[3],/Статья 2, пункт 1/);
+assert.ok(!active.questions.some(q=>norm(q.q)===norm(subgroupCheck[0])),
+ 'Subgroup self-check must remain independent of the active exam');
+assert.match(old.render(drawLesson,3),/Алгоритм проверки перед составлением пар/);
+assert.match(old.render(drawLesson,3),/В двух подгруппах уже провели/);
+
 const groups=[{title:old.title,parts:old.lessons.map(l=>({title:l.title})),premiumFoundations:true,progressIndex:1100},
  ...ctx.window.samboJudgeCourseEngine.modules.map(m=>({title:m.title,parts:m.lessons}))];
 const bridge={

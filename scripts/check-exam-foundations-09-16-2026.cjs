@@ -18,7 +18,7 @@ assert.equal(qs.filter(q=>q.kind==='Судейская ситуация').length
 assert.equal(fnv(JSON.stringify(qs.map(({q,a,correct,kind})=>({q,a,correct,kind})))),'4910eed2','Historical 24-item exam fingerprint changed');
 assert.equal(fnv(JSON.stringify(qs.slice(0,8).map(q=>q.body))),'c654c4df','Audited explanations 1–8 were modified');
 // Foundation items 17–24 are checked by check-exam-foundations-17-24-2026.cjs.
-assert.equal(fnv(JSON.stringify(mod.lessons.map((l,i)=>(i===1||i===2)?l.questions.slice(0,4):l.questions))),'c41346d9','Lesson self-checks were modified');
+assert.equal(fnv(JSON.stringify(mod.lessons.map((l,i)=>(i===1||i===2||i===3)?l.questions.slice(0,4):l.questions))),'c41346d9','Lesson self-checks were modified');
 const expected=[
   [9,'Какой способ предполагает встречу каждого с каждым?',0,'Круговой',['Статья 2, пункт 2(а)','Приложение 2, раздел I, пункт 1','статья 2(5)']],
   [10,'В каком способе предусмотрено выбывание после двух поражений?',0,'Пункт 2(г)',['Статья 2, пункт 2(г)','приложении 6','шести штрафных очков']],
