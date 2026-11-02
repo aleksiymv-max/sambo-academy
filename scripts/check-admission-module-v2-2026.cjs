@@ -66,6 +66,31 @@ for(const q of mod.questions){
  assert.ok(Number.isInteger(q.correct)&&q.correct>=0&&q.correct<4);
  assert.ok(q.body.length>=30,'Short legal explanation: '+q.q);
 }
+// Focused editorial regression for six published admission exam explanations.
+// This checks source anchors and answer-key stability; it does NOT certify legal accuracy.
+const feedbackCases=[
+ {n:18,key:1,answer:'Приведённое в статье 7 требование указать минимальный вес в Положении',
+  tokens:['Статья 7','юниоров и юниорок','минимальный вес','не вправе сам назначить']},
+ {n:19,key:0,answer:'Статья 8(2): для пляжного самбо 30 минут',
+  tokens:['Статья 8(2)','30 минут','60 минут','Положении','за два часа']},
+ {n:21,key:2,answer:'Все члены судейской бригады должны быть одного пола со взвешиваемыми спортсменами',
+  tokens:['Статья 8(3)','представитель секретариата','одного пола','Врач обязательно']},
+ {n:22,key:0,answer:'Только спортсмены, судейская бригада и врач',
+  tokens:['Статья 8(4)','Родитель','несовершеннолетний','не придумывая санкций']},
+ {n:23,key:1,answer:'По статье 8(5) требуются названные для младше 14 лет документы и заполненная анкета',
+  tokens:['Статья 8(5)','свидетельство о рождении','справкой с фотографией','заполненную анкету','приложение 9']},
+ {n:24,key:0,answer:'Записать 64,1 кг, «НВ» и получить подпись участника',
+  tokens:['Статья 8(5)','статье 8(6)','64,1 кг','«НВ»','следующей весовой категории','не автоматический перевод']}
+];
+for(const item of feedbackCases){
+ const q=mod.questions[item.n-1];
+ assert.equal(q.correct,item.key,'Admission exam correct index changed: '+item.n);
+ assert.equal(q.a[item.key],item.answer,'Admission exam correct option changed: '+item.n);
+ assert.ok(q.body.length>=220,'Admission exam reasoning too thin: '+item.n);
+ for(const token of item.tokens)assert.ok(q.body.includes(token),
+  'Missing source-backed explanation for admission exam '+item.n+': '+token);
+}
+console.log('PASS: six article 7–8 admission cases explain procedural limits; questions, correct answers and revision 3 preserved');
 const progress={window:{},localStorage:{getItem:()=>null},renderStudentDashboard(){},authMessage(){}};
 vm.createContext(progress);vm.runInContext(fs.readFileSync('progress.js','utf8'),progress);
 assert.deepEqual(Array.from(progress.window.samboJudgeHistoricalIndices(2201)),[1201,1101]);
