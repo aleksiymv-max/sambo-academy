@@ -170,6 +170,9 @@ jobs:
       - name: Verify 2026 amendment and VFS explanation sources before disputed referee exams
         run: node scripts/check-judge-amendment-provenance-2026.cjs
 
+      - name: Verify articles 38-40 removal decision and announcement safeguards without changing historical checks
+        run: node scripts/check-sanctions-38-40-decision-announcement-2026.cjs
+
       - name: Verify article 41 protest deadlines across lessons and independent exam without changing keys
         run: node scripts/check-protest-deadline-cross-source-2026.cjs
 

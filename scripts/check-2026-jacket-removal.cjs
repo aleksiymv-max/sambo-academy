@@ -25,7 +25,7 @@ const questions=[
  'Каковы последствия дисквалификации по статье 39(4)?',
  'Какое основание прямо названо в статье 39(3)?'
 ];
-assert.equal(lesson.checks.length,questions.length,'Preserve the five original self-check questions');
+assert.ok(lesson.checks.length>=questions.length,'Preserve the five original self-check questions');
 for(let i=0;i<questions.length;i++){
  assert.equal(lesson.checks[i][0],questions[i],'Original self-check question changed');
  assert.equal(lesson.checks[i][2],0,'Original self-check key changed');
