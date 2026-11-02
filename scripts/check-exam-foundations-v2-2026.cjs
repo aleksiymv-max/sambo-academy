@@ -85,6 +85,24 @@ assert.ok(!active.questions.some(q=>norm(q.q)===norm(deadlineCheck[0])),
  'Self-check must not duplicate an independent exam item');
 assert.match(old.render(regulationLesson,1),/Проверка изменения Положения/);
 assert.match(old.render(regulationLesson,1),/после её начала/);
+// Article 1(4–5): personally-team standings must use the CURRENT regulation,
+// not last year's formula or the results of head-to-head team meetings.
+const characterLesson=old.lessons[2];
+assert.equal(characterLesson.blocks.length,6,'Character lesson needs a worked scoring-boundary example');
+const characterBoundary=characterLesson.blocks.find(([title])=>title.includes('формула командного зачёта'));
+assert.ok(characterBoundary && characterBoundary[1].includes('статье 1, пункту 5') &&
+ characterBoundary[1].includes('действующее Положение'),
+ 'Character lesson must explain the difference between team meetings and personally-team scoring');
+assert.equal(characterLesson.questions.length,5,'Character lesson needs an applied scoring check');
+assert.equal(fnv(JSON.stringify(characterLesson.questions.slice(0,4))),'987ea919',
+ 'Historical four character self-checks or answer keys changed');
+const characterCheck=characterLesson.questions[4];
+assert.match(characterCheck[0],/прошлогоднего турнира/);
+assert.equal(characterCheck[2],2,'Current tournament regulation must govern personally-team results');
+assert.match(characterCheck[3],/Статья 1, пункт 5/);
+assert.ok(!active.questions.some(q=>norm(q.q)===norm(characterCheck[0])),
+ 'Character self-check duplicates independent exam');
+assert.match(old.render(characterLesson,2),/формула командного зачёта/);
 const subgroupBlock=drawLesson.blocks.find(([title])=>title.includes('Контрольный пример'));
 assert.ok(subgroupBlock && subgroupBlock[1].includes('статье 2, пункту 1') &&
  subgroupBlock[1].includes('статье 2, пункту 3') &&
