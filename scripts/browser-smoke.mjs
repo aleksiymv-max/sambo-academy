@@ -393,6 +393,9 @@ check('expanded judge progress IDs are unique',new Set(judgeModules.map(g=>g.pro
  const preflightText=await page.locator('.judge-prime').textContent();
  check('LOCAL practicum separates readiness, mat suitability and act signatories',preflightText.includes('Статья 15(2)(а)')&&preflightText.includes('Статья 42(4)')&&preflightText.includes('представитель спортсооружения'));
  check('LOCAL practicum first lesson keeps historical checks and adds venue case',await page.locator('.judge-prime .jp-question').count()===6&&preflightText.includes('Кто по статье 42(4) определяет'));
+ // Opening a lesson hides the course list: return to the list before clicking lesson 3.
+ await page.evaluate(()=>openCourse('judge'));
+ await localPracticumCard.locator('summary').click();
  await localPracticumCard.locator('.sambo-topic-link').nth(2).click();
  check('LOCAL practicum results editorial depth',await page.locator('.judge-prime .jp-part').count()>=13&&await page.locator('.judge-prime .jp-question').count()>=9);
  check('LOCAL practicum article 34 exception visible',(await page.locator('.judge-prime').textContent()).includes('Статья 34(8)'));
