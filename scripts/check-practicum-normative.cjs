@@ -27,6 +27,34 @@ for(let i=0;i<lessons.length;i++){
   total++;
  }
 }
+// Article 15(2)(a), article 42(4), and appendix 11 describe different roles.
+const preflight=lessons[0];
+const oldPreflightQuestions=[
+ 'Какой документ определяет систему турнира?',
+ 'Кто проверяет готовность места проведения?',
+ 'Спортсмен есть в сетке, но отсутствует во взвешивании. Что проверять?',
+ 'Кто вправе исправлять расхождение в документах?',
+ 'Является ли учебный алгоритм самостоятельной нормой?'
+];
+if(preflight.checks.length!==6)throw Error('Expected five historical + one venue-roles self-check');
+for(let i=0;i<oldPreflightQuestions.length;i++){
+ if(preflight.checks[i][0]!==oldPreflightQuestions[i]||preflight.checks[i][2]!==0)
+  throw Error('Historical practicum self-check changed at '+i);
+}
+const venueBlock=preflight.blocks.find(b=>b[0]==='Различайте готовность места, пригодность ковра и акт');
+if(!venueBlock)throw Error('Missing venue-readiness distinction');
+for(const token of ['Статья 15(2)(а)','Статья 42(4)','приложения 11','представитель ОСФ','представитель спортсооружения','врач','Учебный случай','не создаёт новой санкции']){
+ if(!venueBlock[1].includes(token))throw Error('Missing source-specific venue detail: '+token);
+}
+const extra=preflight.checks[5];
+if(extra[2]!==2||!extra[0].includes('статье 42(4)')||
+ !extra[1][2].includes('представитель ОСФ')||
+ !extra[3].includes('приложения 11'))throw Error('Venue roles self-check answer or explanation invalid');
+const html=ctx.window.samboJudgeCourseEngine.sections(modules[0],0)[1].html;
+for(const token of ['Различайте готовность места, пригодность ковра и акт','Статья 42(4)','Кто по статье 42(4) определяет']){
+ if(!html.includes(token))throw Error('Venue roles lesson missing from rendered HTML: '+token);
+}
+
 const full=lessons.map(l=>[l.ref,...l.blocks.flat(),...l.checks.flat(2)].join(' ')).join(' ');
 for(const token of ['статьи 36','статьи 34','Статьи 66 и 68','официальных изменениях 2026','учебный алгоритм']){
  if(!full.toLowerCase().includes(token.toLowerCase()))throw Error('Missing documented decision marker: '+token);
