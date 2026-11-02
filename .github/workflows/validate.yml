@@ -320,6 +320,9 @@ jobs:
       - name: Check referee trio and support officials articles 18–20 and 24–27
         run: node scripts/check-referee-trio-support-normative.cjs
 
+      - name: Check official gestures appendix 13 and original self-check integrity
+        run: node scripts/check-officials-gestures-appendix13-2026.cjs
+
       - name: Check positions, counterthrows and holds under article 28
         run: node scripts/check-bout-article28-normative.cjs
 
