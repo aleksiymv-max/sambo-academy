@@ -30,7 +30,33 @@ for(let i=0;i<mod.lessons.length;i++){
   if(!q[0]||!Array.isArray(q[1])||q[1].length!==4||!Number.isInteger(q[2])||q[2]<0||q[2]>=4||!q[3])throw Error('Malformed check in '+l.title);
  }
 }
+// Article 58(6–8) is a beach-specific equipment rule, not the general mat rule.
+const equipment=mod.lessons[4];
+const originalChecks=[
+ 'Каков размер пляжной площадки?',
+ 'Сколько флагов предусмотрено по углам?',
+ 'Какое требование к сигналам разных площадок?',
+ 'Может ли секундомер обнуляться при каждой остановке?',
+ 'Можно ли подать апелляцию против судейского решения по пляжной схватке по статье 56?'
+];
+for(let i=0;i<originalChecks.length;i++){
+ if(equipment.checks[i][0]!==originalChecks[i]||equipment.checks[i][2]!==0)
+  throw Error('Historical beach self-check changed: '+i);
+}
+const equipmentText=[...equipment.blocks.flat(),...equipment.checks.flat(2)].join(' ');
+for(const term of ['ст. 58, п. 6','ст. 58, пп. 7–8','каждой площадке','ручной секундомер','видеокамера','20 дюймов','не требует механическое табло','Факты:','Норма:','Вывод:']){
+ if(!equipmentText.toLowerCase().includes(term.toLowerCase()))
+  throw Error('Missing article 58 equipment detail: '+term);
+}
+if(equipment.checks.length!==8)throw Error('Expected 5 historical + 3 new equipment checks');
+for(const [i,key] of [[5,1],[6,2],[7,3]]){
+ if(equipment.checks[i][2]!==key)throw Error('Incorrect article 58 check key: '+i);
+}
+const rendered=context.window.samboJudgeCourseEngine.sections(mod,0)[5].html;
+for(const term of ['Резерв при отключении электричества','Камера и экран для просмотра','Ситуация: табло отключилось','20 дюймов']){
+ if(!rendered.includes(term))throw Error('Beach article 58 lesson missing from rendered HTML: '+term);
+}
 const all=mod.lessons.map(l=>[l.title,l.ref,...l.blocks.flat()].join(' ')).join(' ');
 if(!all.includes('ст. 56')||!all.includes('ст. 45')||!all.includes('Изменения от 1 сентября 2026'))throw Error('Official beach-sambo side-referee amendment not documented');
-console.log('PASS: 5 beach-sambo lessons, 25 self-checks, verified article markers 44–58, 2026 side-referee amendment applied and PDF discrepancy documented');
+console.log('PASS: '+mod.lessons.length+' beach-sambo lessons, '+mod.lessons.reduce((n,l)=>n+l.checks.length,0)+' self-checks, article 58(6–8) backup/video/monitor coverage, 2026 side-referee amendment and PDF discrepancy documented');
 console.log('NOTE: normative and real-account end-to-end approval remain separate from this regression guard');
