@@ -46,6 +46,31 @@ for(const r of rows){
 }
 console.log('TOTAL: '+modules.length+' expanded modules, '+lessonTotal+' lessons, '+examTotal+' exam questions; '+duplicateTotal+' repeated, '+independentTotal+' independent.');
 
+// Cross-module lexical overlap is advisory until each match has been reviewed.
+// This supplements (but does not replace) the existing per-module gate.
+const globalSelfChecks=new Map();
+for(const mod of modules){
+ for(const lesson of mod.lessons){
+  for(const check of lesson.checks){
+   const stem=normalized(check[0]);
+   if(!globalSelfChecks.has(stem))globalSelfChecks.set(stem,new Set());
+   globalSelfChecks.get(stem).add(mod.title);
+  }
+ }
+}
+const crossModuleMatches=[];
+for(const mod of modules){
+ for(const q of mod.questions){
+  const otherModules=[...(globalSelfChecks.get(normalized(q.q))||[])].filter(title=>title!==mod.title);
+  if(otherModules.length)crossModuleMatches.push({examModule:mod.title,stem:q.q,selfCheckModules:otherModules});
+ }
+}
+console.log('CROSS-MODULE lexical exam/self-check overlaps: '+crossModuleMatches.length);
+for(const match of crossModuleMatches){
+ console.log('  REVIEW '+match.examModule+' vs '+match.selfCheckModules.join(', ')+': '+match.stem);
+}
+// Semantic paraphrases still require expert review; no exam IDs or keys change.
+
 // Audit the ACTIVE versioned banks, not only the preserved historical exam data.
 for(const file of ['judge-foundations.js','judge-exam-foundations-v2.js','judge-exam-sanctions-v3.js']){
  vm.runInContext(fs.readFileSync(file,'utf8'),context,{filename:file});
