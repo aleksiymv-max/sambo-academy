@@ -18,12 +18,15 @@ for(const file of ['judge-course-engine.js',...names]){
  vm.runInContext(fs.readFileSync(file,'utf8'),context,{filename:file});
 }
 const modules=context.window.samboJudgeCourseEngine.modules;
+// Normalise layout differences before comparing question stems. This remains a
+// lexical guard only: paraphrases require a separate human semantic review.
+const normalized=q=>String(q).trim().toLowerCase().replace(/\s+/g,' ');
 const rows=[];
 let lessonTotal=0,examTotal=0,duplicateTotal=0,independentTotal=0;
 for(const mod of modules){
- const self=mod.lessons.flatMap(l=>l.checks.map(q=>q[0].trim().toLowerCase()));
+ const self=mod.lessons.flatMap(l=>l.checks.map(q=>normalized(q[0])));
  const selfSet=new Set(self);
- const repeated=mod.questions.filter(q=>selfSet.has(q.q.trim().toLowerCase())).length;
+ const repeated=mod.questions.filter(q=>selfSet.has(normalized(q.q))).length;
  const independent=mod.questions.length-repeated;
  const issues=[];
  for(const l of mod.lessons){
@@ -57,7 +60,6 @@ const foundation=context.window.samboJudgeFoundations;
 const foundationActive=context.window.samboJudgeFoundationsExamV2;
 const sanctionsActive=context.window.samboJudgeSanctionsExamV3;
 if(!foundation||!foundationActive||!sanctionsActive)throw Error('Active versioned exams missing');
-const normalized=q=>q.trim().toLowerCase().replace(/\s+/g,' ');
 const foundationChecks=new Set(foundation.lessons.flatMap(l=>l.questions.map(q=>normalized(q[0]))));
 const sanctionsChecks=new Set(modules[5].lessons.flatMap(l=>l.checks.map(q=>normalized(q[0]))));
 const repeatedFoundation=foundationActive.questions.filter(q=>foundationChecks.has(normalized(q.q))).length;
