@@ -12,7 +12,7 @@ const repoRoot = path.resolve(__dirname, '..');
 const args = new Set(process.argv.slice(2));
 const findings = [];
 const binaryAssets = [];
-const allowEmail = /@(?:example\.(?:com|org|net|test|invalid)|(?:users\.)?noreply\.github\.com)$/i;
+const allowEmail = /(?:@example\.(?:com|org|net|test|invalid)|@(?:users\.)?noreply\.github\.com|^noreply@github\.com)$/i;
 const privateFilename = /(?:^|\/)(?:\.env(?:\..+)?|id_(?:rsa|ed25519)(?:\.pub)?|.*\.(?:pem|p12|pfx|key|sqlite3?|db|dump|bak)|(?:users?|accounts?|customers?|contacts?)[-_]?(?:export|backup)\.(?:csv|json|sql)|.*(?:backup|dump)\.sql)$/i;
 const secretPatterns = [
   ['private key', /-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----/g],
