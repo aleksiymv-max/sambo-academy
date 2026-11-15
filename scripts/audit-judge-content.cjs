@@ -101,6 +101,28 @@ if(foundationActive.examRevision!==2||foundationActive.progressIndex!==2100||
  process.exitCode=1;
 }
 
+// Detect repeated stems across the ACTIVE exam banks, including version overrides.
+// Advisory until an editor confirms whether matching stems are genuinely duplicate
+// assessments; this does not modify keys, revisions or historical attempts.
+const activeExamBanks=[
+ {name:'foundations v2',questions:foundationActive.questions},
+ ...modules.map((mod,i)=>({name:mod.title,questions:i===5?sanctionsActive.questions:mod.questions}))
+];
+const activeStemLocations=new Map();
+for(const bank of activeExamBanks){
+ bank.questions.forEach((q,i)=>{
+  const stem=normalized(q.q);
+  if(!activeStemLocations.has(stem))activeStemLocations.set(stem,[]);
+  activeStemLocations.get(stem).push(bank.name+' #'+(i+1));
+ });
+}
+const activeDuplicates=[...activeStemLocations.entries()].filter(([stem,locations])=>stem&&locations.length>1);
+console.log('ACTIVE exam repeated normalized stems: '+activeDuplicates.length);
+for(const [stem,locations] of activeDuplicates){
+ console.log('  REVIEW '+locations.join(' / ')+': '+stem);
+}
+// This is a lexical inventory, not semantic independence or normative acceptance.
+
 // Keep the approved editorial standard's *published inventory* in sync with the
 // live module registry. This is a documentation-consistency check, not approval.
 const publishedModules=modules.length+1;
