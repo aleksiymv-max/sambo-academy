@@ -36,7 +36,7 @@ if(errors)process.exitCode=1;
 const previous = process.cwd();
 try {
  process.chdir(root);
- vm.runInThisContext(audit + '\n' + integrity, {filename:'judge-answer-integrity-audit.js'});
+ vm.runInNewContext(audit + '\n' + integrity, {require,console,process}, {filename:'judge-answer-integrity-audit.js'});
 } finally {
  process.chdir(previous);
 }
