@@ -11,6 +11,8 @@ jobs:
         run: |
           node scripts/check-repo-privacy.cjs --self-test
           node scripts/check-repo-privacy.cjs
+      - name: Verify source-backed athlete training scenarios and preserved progress keys
+        run: node scripts/check-athlete-applied-cases.cjs
       - name: Verify JavaScript syntax and core features
         run: |
           node <<'NODE'
