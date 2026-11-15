@@ -10,6 +10,9 @@ const cases=ctx.window.samboAthleteAppliedCases;
 assert(cases,'Athlete case bank unavailable');
 const titles=Object.keys(cases);
 assert.equal(titles.length,4,'Expected four source-verified athlete cases');
+// A fixed correct-option position across every case invites answer-position guessing.
+assert.deepEqual([...new Set(titles.map(title=>cases[title].correct))].sort(),[0,1,2],
+ 'Athlete practice cases must use all three correct-option positions');
 const expected={
  'Взвешивание: важные действия спортсмена':'Статья 8, пункт 2',
  'Взвешивание: документы, одежда и медицинский осмотр':'Статья 8, пункты 4–5',
