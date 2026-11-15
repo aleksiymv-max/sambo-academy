@@ -1,0 +1,26 @@
+name: Public release privacy preflight
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  privacy-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Fetch full repository history for publication audit
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Verify scanner self-test
+        run: node scripts/check-repo-privacy.cjs --self-test
+      - name: Audit tracked content and all fetched history
+        run: node scripts/check-repo-privacy.cjs --history
+      - name: Publication notes
+        if: always()
+        run: |
+          echo "This is an intentionally strict pre-publication gate."
+          echo "A passing result cannot establish image rights, GitHub PR-cache safety, live Supabase RLS or approved privacy notices."
+          echo "See docs/publication-security-checklist-2026-11-15.md"

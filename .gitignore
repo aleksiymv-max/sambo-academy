@@ -1,0 +1,41 @@
+# Credentials / local configuration (never commit personal or service-role secrets)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_ed25519
+**/secrets/
+**/credentials/
+*.sqlite
+*.sqlite3
+*.db
+*.dump
+*.bak
+*.backup
+**/*-backup.sql
+**/*-dump.sql
+
+# User exports and local privacy-review evidence
+*-users.csv
+*-contacts.csv
+*-accounts.csv
+*-export.csv
+*-backup.csv
+private/
+local-data/
+personal-data/
+privacy-review/
+
+# Build and developer artifacts
+node_modules/
+.cache/
+dist/
+coverage/
+test-results/
+playwright-report/
+*.log
+.DS_Store
