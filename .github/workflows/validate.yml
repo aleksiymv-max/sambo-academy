@@ -7,6 +7,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - name: Prevent committing personal data or service secrets
+        run: |
+          node scripts/check-repo-privacy.cjs --self-test
+          node scripts/check-repo-privacy.cjs
       - name: Verify JavaScript syntax and core features
         run: |
           node <<'NODE'
