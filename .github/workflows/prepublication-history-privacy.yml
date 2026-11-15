@@ -1,0 +1,23 @@
+name: Prepublication full-history privacy gate
+on:
+  workflow_dispatch:
+jobs:
+  history-privacy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout complete reachable history
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Fetch remote branches for reachable-ref audit
+        run: git fetch --no-tags origin '+refs/heads/*:refs/remotes/origin/*'
+      - name: Check tracked files and author/committer history
+        run: node scripts/check-repo-privacy.cjs --history
+      - name: Explain limits
+        if: always()
+        run: |
+          echo 'This check cannot establish safety of forks, cached PR diffs, deleted objects, or image rights.'
+          echo 'A passing run does not authorize making the repository public or releasing paid materials.'
