@@ -41,4 +41,7 @@ check('empty choice', [{...valid,a:['Referee','']}], 1, /FAIL empty choice/);
 check('negative answer index', [{...valid,correct:-1}], 1, /FAIL invalid answer index/);
 check('fractional answer index', [{...valid,correct:0.5}], 1, /FAIL invalid answer index/);
 check('duplicate answer choices', [{...valid,a:['Referee',' referee  ']}], 0, /REVIEW repeated choice/);
-console.log('PASS: 9 fixture cases for active judge answer integrity gate');
+check('string answer index', [{...valid,correct:'0'}], 1, /FAIL invalid answer index/);
+check('non-string choice', [{...valid,a:['Referee',42]}], 1, /FAIL empty choice/);
+check('non-string explanation', [{...valid,body:42}], 1, /FAIL missing explanation/);
+console.log('PASS: 12 fixture cases for active judge answer integrity gate');
