@@ -28,6 +28,14 @@ for(let i=12;i<24;i++){
   const display=i+1;
   const source=old.questions[i];
   const active=current.questions[i];
+  // Structural integrity is checked independently of the historical comparison:
+  // changing both banks together must not make malformed questions pass.
+  assert.equal(typeof active.q,'string','Question '+display+' missing stem');
+  assert.ok(active.q.trim().length>=20,'Question '+display+' stem too short');
+  assert.ok(Array.isArray(active.a)&&active.a.length>=3,'Question '+display+' missing distractors');
+  assert.ok(active.a.every(a=>typeof a==='string'&&a.trim().length>0),'Question '+display+' empty option');
+  assert.equal(new Set(active.a.map(a=>a.trim().toLowerCase())).size,active.a.length,'Question '+display+' duplicate options');
+  assert.ok(Number.isInteger(active.correct)&&active.correct>=0&&active.correct<active.a.length,'Question '+display+' invalid answer index');
   assert.equal(active.q,source.q,'Question '+display+' source mapping changed');
   assert.deepEqual(Array.from(active.a),Array.from(source.a),'Question '+display+' options changed');
   assert.equal(active.correct,source.correct,'Question '+display+' key changed');
