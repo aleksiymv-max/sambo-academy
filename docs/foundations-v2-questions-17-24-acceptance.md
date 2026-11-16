@@ -42,3 +42,11 @@ This is a verified source-code trace, **not an independent correctness check**. 
 ## Release gate
 
 No row may become `accepted` without an exact source reference, verified answer, checked alternatives, independent exam/self-check review, reviewer identity/date, and confirmed applicability. The reported risks above are **leads from prior editorial review**, not freshly verified defects. Do not use this register as evidence of normative approval. This file does not modify published exam data, payments or learner progress.
+
+## Critical disambiguation: two different question #22 records (2026-11-16)
+
+**Display numbers are not identities across exam banks.** The #22 in this register is **Foundations v2** (`judge-exam-foundations-v2.js`; historical `judge-foundations.js`, `examApplication[9]`): a six-participant round-robin scenario, stored answer index 1 (zero-based), citing article 2(5) and appendix 2. Its reported concern is weak distractors/overlap, **not** painful-hold counting.
+
+A **different** #22 appears in the **independent judges' exam** (`judge-exam-independent.js`), tracked by [issue #104](https://github.com/aleksiymv-max/sambo-academy/issues/104) and `docs/editorial-independent-officials-items-17-24-2026-11-04.md`. It concerns support from another judge for starting a painful-hold count, with a disputed article 19(6) versus 18(6) reference. That issue remains blocked pending authoritative page-level source and effective-date verification. Its answer index must **not** be transferred to Foundations v2.
+
+Until immutable IDs are introduced via a versioned non-destructive migration, identify questions using `(bank file, exam version, progressIndex, display number, source locator)`. Maintain separate acceptance records and independent normative reviews. **Neither #22 is accepted by this clarification.** No exam keys, versions, questions, or historical results are changed.
