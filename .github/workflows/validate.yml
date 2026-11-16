@@ -13,6 +13,8 @@ jobs:
           node scripts/check-repo-privacy.cjs
       - name: Verify source-backed athlete training scenarios and preserved progress keys
         run: node scripts/check-athlete-applied-cases.cjs
+      - name: Protect Foundations v2 historical question and progress mappings
+        run: node scripts/check-foundations-v2-historical-mapping.cjs
       - name: Verify JavaScript syntax and core features
         run: |
           node <<'NODE'
