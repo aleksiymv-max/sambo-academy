@@ -13,14 +13,16 @@ Status: **OPEN / NOT NORMATIVELY ACCEPTED**. Baseline: main `fae853021a04e7b5434
 
 | Display # | Current editorial risk to investigate | Exact ID / version | Rule evidence (article/point/appendix/PDF page) | Independent answer check | Semantic overlap | Acceptance |
 | --- | --- | --- | --- | --- | --- | --- |
-| 17 | Source and answer audit pending | To extract | Unverified | Pending | Pending | Blocked |
-| 18 | Source and answer audit pending | To extract | Unverified | Pending | Pending | Blocked |
-| 19 | Source and answer audit pending | To extract | Unverified | Pending | Pending | Blocked |
-| 20 | Source and answer audit pending | To extract | Unverified | Pending | Pending | Blocked |
-| 21 | Reported cue from a numerical threshold; verify actual wording and source | To extract | Unverified | Pending | Pending | Blocked |
-| 22 | Reported implausible distractors and overlap with #9; verify both against active bank | To extract | Unverified | Pending | Pending | Blocked |
-| 23 | Reported insufficiently applied scenario and possible overlap | To extract | Unverified | Pending | Pending | Blocked |
-| 24 | Reported semantic overlap with #12 and #15 | To extract | Unverified | Pending | Pending | Blocked |
+| 17 | Source and answer audit pending | No immutable ID; Foundations v2 / 2026-10-26-2 / progressIndex 2100 / examApplication[4] | Unverified | Pending | Pending | Blocked |
+| 18 | Source and answer audit pending | No immutable ID; Foundations v2 / 2026-10-26-2 / progressIndex 2100 / examApplication[5] | Unverified | Pending | Pending | Blocked |
+| 19 | Source and answer audit pending | No immutable ID; Foundations v2 / 2026-10-26-2 / progressIndex 2100 / examApplication[6] | Unverified | Pending | Pending | Blocked |
+| 20 | Source and answer audit pending | No immutable ID; Foundations v2 / 2026-10-26-2 / progressIndex 2100 / examApplication[7] | Unverified | Pending | Pending | Blocked |
+| 21 | Reported cue from a numerical threshold; verify actual wording and source | No immutable ID; Foundations v2 / 2026-10-26-2 / progressIndex 2100 / examApplication[8] | Unverified | Pending | Pending | Blocked |
+| 22 | Reported implausible distractors and overlap with #9; verify both against active bank | No immutable ID; Foundations v2 / 2026-10-26-2 / progressIndex 2100 / examApplication[9] | Unverified | Pending | Pending | Blocked |
+| 23 | Reported insufficiently applied scenario and possible overlap | No immutable ID; Foundations v2 / 2026-10-26-2 / progressIndex 2100 / examApplication[10] | Unverified | Pending | Pending | Blocked |
+| 24 | Reported semantic overlap with #12 and #15 | No immutable ID; Foundations v2 / 2026-10-26-2 / progressIndex 2100 / examApplication[11] | Unverified | Pending | Pending | Blocked |
+
+The table above now uses a composite source locator instead of the misleading `To extract` placeholder. It is **not** a newly assigned immutable ID; no learner record or key was migrated. This explicitly prevents display number alone from being treated as identity across exam banks.
 
 ## Verified code mapping (2026-11-16; not normative approval)
 
