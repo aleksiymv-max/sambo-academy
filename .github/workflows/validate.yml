@@ -157,6 +157,12 @@ jobs:
       - name: Report editorial gaps without treating them as a validated course
         run: node scripts/audit-judge-content.cjs
 
+      - name: Validate active judge exam answer indices and explanations
+        run: node scripts/check-active-judge-answer-integrity.cjs
+
+      - name: Exercise active judge answer-integrity gate with synthetic valid and invalid banks
+        run: node scripts/test-active-judge-answer-integrity-fixtures.cjs
+
       - name: Inventory per-item normative evidence without declaring approval
         run: node scripts/check-judge-evidence-ledger.cjs
 
