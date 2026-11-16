@@ -36,6 +36,12 @@ for(let i=12;i<24;i++){
   assert.ok(active.a.every(a=>typeof a==='string'&&a.trim().length>0),'Question '+display+' empty option');
   assert.equal(new Set(active.a.map(a=>a.trim().toLowerCase())).size,active.a.length,'Question '+display+' duplicate options');
   assert.ok(Number.isInteger(active.correct)&&active.correct>=0&&active.correct<active.a.length,'Question '+display+' invalid answer index');
+  // An explanation must be present and substantive in both retained banks.
+  // Equal empty explanations would otherwise pass the historical equality check.
+  for(const [label,item] of [['historical',source],['active',active]]){
+    assert.equal(typeof item.body,'string','Question '+display+' '+label+' explanation missing');
+    assert.ok(item.body.trim().length>=40,'Question '+display+' '+label+' explanation too short');
+  }
   assert.equal(active.q,source.q,'Question '+display+' source mapping changed');
   assert.deepEqual(Array.from(active.a),Array.from(source.a),'Question '+display+' options changed');
   assert.equal(active.correct,source.correct,'Question '+display+' key changed');
