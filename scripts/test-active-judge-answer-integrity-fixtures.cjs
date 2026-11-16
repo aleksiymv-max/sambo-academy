@@ -38,4 +38,7 @@ check('missing explanation', [{...valid,body:''}], 1, /FAIL missing explanation/
 check('missing choices', [{...valid,a:[]}], 1, /FAIL missing choices/);
 check('missing stem', [{...valid,q:'  '}], 1, /FAIL missing stem/);
 check('empty choice', [{...valid,a:['Referee','']}], 1, /FAIL empty choice/);
-console.log('PASS: 6 fixture cases for active judge answer integrity gate');
+check('negative answer index', [{...valid,correct:-1}], 1, /FAIL invalid answer index/);
+check('fractional answer index', [{...valid,correct:0.5}], 1, /FAIL invalid answer index/);
+check('duplicate answer choices', [{...valid,a:['Referee',' referee  ']}], 0, /REVIEW repeated choice/);
+console.log('PASS: 9 fixture cases for active judge answer integrity gate');
