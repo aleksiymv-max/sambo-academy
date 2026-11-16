@@ -22,13 +22,16 @@ const expected=[
   ['Личные',1],['лично-команд',2],['подгрупп',0],['жереб',0],
   ['восемь',1],['шесть',1],['семь',1],['Положен',1]
 ];
-for(let i=0;i<8;i++){
-  const display=17+i;
-  const source=old.questions[16+i];
-  const active=current.questions[16+i];
+// Protect the entire retained historical tail (13–24), not just 17–24.
+for(let i=12;i<24;i++){
+  const display=i+1;
+  const source=old.questions[i];
+  const active=current.questions[i];
   assert.equal(active.q,source.q,'Question '+display+' source mapping changed');
   assert.deepEqual(Array.from(active.a),Array.from(source.a),'Question '+display+' options changed');
   assert.equal(active.correct,source.correct,'Question '+display+' key changed');
-  assert.equal(active.correct,expected[i][1],'Question '+display+' historical answer index drift');
+  if(i>=16){
+    assert.equal(active.correct,expected[i-16][1],'Question '+display+' historical answer index drift');
+  }
 }
-console.log('Foundations v2: historical indices 17–24, keys, options, versions and progress indices preserved; normative acceptance NOT asserted');
+console.log('Foundations v2: historical indices 13–24, keys, options, versions and progress indices preserved; normative acceptance NOT asserted');
