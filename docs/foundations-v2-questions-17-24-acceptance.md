@@ -52,3 +52,16 @@ No row may become `accepted` without an exact source reference, verified answer,
 A **different** #22 appears in the **independent judges' exam** (`judge-exam-independent.js`), tracked by [issue #104](https://github.com/aleksiymv-max/sambo-academy/issues/104) and `docs/editorial-independent-officials-items-17-24-2026-11-04.md`. It concerns support from another judge for starting a painful-hold count, with a disputed article 19(6) versus 18(6) reference. That issue remains blocked pending authoritative page-level source and effective-date verification. Its answer index must **not** be transferred to Foundations v2.
 
 Until immutable IDs are introduced via a versioned non-destructive migration, identify questions using `(bank file, exam version, progressIndex, display number, source locator)`. Maintain separate acceptance records and independent normative reviews. **Neither #22 is accepted by this clarification.** No exam keys, versions, questions, or historical results are changed.
+
+## Cross-check against existing main editorial source review (2026-11-17)
+
+The existing [21–24 editorial audit on main](https://github.com/aleksiymv-max/sambo-academy/blob/main/docs/editorial-foundations-exam-items-21-24-2026-11-03.md) records a **prior** comparison with the consolidated Rules PDF (edition including order 860 dated 2026-09-14). This is a traceable inherited finding, **not** an independent new verification of the PDF, the effective date, or the active v2 answer key:
+
+| Item | Previously recorded PDF anchor | Narrow finding supported by that review | Still blocking acceptance |
+| --- | --- | --- | --- |
+| 21 | Article 2(4–5), PDF p. 2 | The seven-or-fewer default cannot automatically decide the method for eight entrants; consult the approved regulations. Do **not** claim the six-penalty-points method is categorically forbidden for eight. | Compare exact active stem/choices to source; independent key and distractor review |
+| 22 (Foundations only) | Article 2, PDF p. 2; appendix 2(I.1), PDF p. 60 | A round robin for six or fewer entrants entails each meeting each; one first-round loss alone does not establish elimination. | Verify pairing/exception provisions and full answer set; do not conflate with independent-officials #22 |
+| 23 | Article 2(5), PDF p. 2; appendix 5(I.1), PDF p. 72 | With seven or fewer, appendix 5 describes a single subgroup notwithstanding the method's name. | Verify exception, pairing, current key and semantic overlap |
+| 24 | Appendix 1(4), **page not independently recorded** | No accepted normative finding; strong overlap with #12/#15 was reported. | Obtain exact current PDF page and replace repetitive skill in a new exam revision only |
+
+**Gate:** no automatic promotion from `source mapped` to `accepted` based on this inherited source audit. Re-open the authoritative PDF, verify page numbering and applicability, independently check the active v2 answers and all distractors, and record reviewer/date. Preserve the existing revision and historical attempts until a reviewed replacement version exists.
