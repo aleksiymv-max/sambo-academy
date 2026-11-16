@@ -28,14 +28,16 @@ for(let i=12;i<24;i++){
   const display=i+1;
   const source=old.questions[i];
   const active=current.questions[i];
-  // Structural integrity is checked independently of the historical comparison:
-  // changing both banks together must not make malformed questions pass.
-  assert.equal(typeof active.q,'string','Question '+display+' missing stem');
-  assert.ok(active.q.trim().length>=20,'Question '+display+' stem too short');
-  assert.ok(Array.isArray(active.a)&&active.a.length>=3,'Question '+display+' missing distractors');
-  assert.ok(active.a.every(a=>typeof a==='string'&&a.trim().length>0),'Question '+display+' empty option');
-  assert.equal(new Set(active.a.map(a=>a.trim().toLowerCase())).size,active.a.length,'Question '+display+' duplicate options');
-  assert.ok(Number.isInteger(active.correct)&&active.correct>=0&&active.correct<active.a.length,'Question '+display+' invalid answer index');
+  // Validate both retained banks independently. A simultaneous malformed edit
+  // must not pass merely because the two versions still compare equal.
+  for(const [label,item] of [['historical',source],['active',active]]){
+    assert.equal(typeof item.q,'string','Question '+display+' '+label+' missing stem');
+    assert.ok(item.q.trim().length>=20,'Question '+display+' '+label+' stem too short');
+    assert.ok(Array.isArray(item.a)&&item.a.length>=3,'Question '+display+' '+label+' missing distractors');
+    assert.ok(item.a.every(a=>typeof a==='string'&&a.trim().length>0),'Question '+display+' '+label+' empty option');
+    assert.equal(new Set(item.a.map(a=>a.trim().toLowerCase())).size,item.a.length,'Question '+display+' '+label+' duplicate options');
+    assert.ok(Number.isInteger(item.correct)&&item.correct>=0&&item.correct<item.a.length,'Question '+display+' '+label+' invalid answer index');
+  }
   // An explanation must be present and substantive in both retained banks.
   // Equal empty explanations would otherwise pass the historical equality check.
   for(const [label,item] of [['historical',source],['active',active]]){
