@@ -13,6 +13,7 @@ for(const filename of ['judge-foundations.js','judge-exam-foundations-v2.js']){
 const old=root.window.samboJudgeFoundations;
 const current=root.window.samboJudgeFoundationsExamV2;
 assert.equal(old.progressIndex,1100,'Historical progress index changed');
+assert.equal(old.version,'2026-10-23-1','Historical exam version changed');
 assert.equal(current.progressIndex,2100,'Current progress index changed');
 assert.equal(current.version,'2026-10-26-2','Current exam version changed');
 assert.equal(current.examRevision,2,'Current revision changed');
@@ -30,8 +31,10 @@ for(let i=12;i<24;i++){
   assert.equal(active.q,source.q,'Question '+display+' source mapping changed');
   assert.deepEqual(Array.from(active.a),Array.from(source.a),'Question '+display+' options changed');
   assert.equal(active.correct,source.correct,'Question '+display+' key changed');
+  assert.equal(active.body,source.body,'Question '+display+' explanation changed');
+  assert.equal(active.kind,source.kind,'Question '+display+' type changed');
   if(i>=16){
     assert.equal(active.correct,expected[i-16][1],'Question '+display+' historical answer index drift');
   }
 }
-console.log('Foundations v2: historical indices 13–24, keys, options, versions and progress indices preserved; normative acceptance NOT asserted');
+console.log('Foundations v2: historical indices 13–24, keys, options, explanations, types, versions and progress indices preserved; normative acceptance NOT asserted');
