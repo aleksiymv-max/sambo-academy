@@ -6,13 +6,13 @@ on:
       - 'supabase/migrations/20261117_guardian_consent_evidence_not_valid.sql'
       - 'supabase/tests/guardian_consent_evidence_regression.sql'
       - 'supabase/tests/guardian_applications_rls_regression.sql'
-      - 'supabase/tests/guardian_applications_rls_regression.sql'
       - '.github/workflows/guardian-consent-postgres.yml'
   pull_request:
     paths:
       - 'supabase/guardian_applications.sql'
       - 'supabase/migrations/20261117_guardian_consent_evidence_not_valid.sql'
       - 'supabase/tests/guardian_consent_evidence_regression.sql'
+      - 'supabase/tests/guardian_applications_rls_regression.sql'
       - '.github/workflows/guardian-consent-postgres.yml'
 jobs:
   guardian-consent-sql:
