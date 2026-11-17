@@ -18,12 +18,31 @@ assert.equal(active.version,'2026-10-26-2');
 assert.equal(active.progressIndex,2100);
 assert.equal(active.questions.length,24);
 assert.equal(historical.questions.length,24);
+// Verify the locator's declared source array, not merely two derived banks.
+// Instrument only the sandboxed source string; never modify shipped course code.
+const sourceText=fs.readFileSync('judge-foundations.js','utf8');
+const exportMarker='window.samboJudgeFoundations=';
+assert.equal(sourceText.split(exportMarker).length,2,'Historical export marker changed');
+const sourceCtx={window:{}};
+vm.createContext(sourceCtx);
+vm.runInContext(sourceText.replace(exportMarker,
+  'window.__locatorExamApplication=examApplication;'+exportMarker),sourceCtx,
+  {filename:'judge-foundations.js (locator source check)'});
+const sourceItems=sourceCtx.window.__locatorExamApplication;
+assert.ok(Array.isArray(sourceItems)&&sourceItems.length>=12,
+  'Expected examApplication source positions are missing');
 const locators=[];
 for(let display=17;display<=24;display++){
   const index=display-1;
   const sourceIndex=display-13; // examApplication[4..11] follows 12 examBase questions
   const h=historical.questions[index],a=active.questions[index];
   assert.ok(h&&a,'Missing historical/active item '+display);
+  const src=sourceItems[sourceIndex];
+  assert.ok(src,'Missing source examApplication item '+sourceIndex);
+  assert.equal(h.q,src.q,'Source stem locator drift at '+display);
+  assert.deepEqual(Array.from(h.a),Array.from(src.a),'Source options locator drift at '+display);
+  assert.equal(h.correct,src.correct,'Source answer locator drift at '+display);
+  assert.equal(h.body,src.body,'Source explanation locator drift at '+display);
   assert.equal(a.q,h.q,'Stem drift at '+display);
   assert.deepEqual(Array.from(a.a),Array.from(h.a),'Option drift at '+display);
   assert.equal(a.correct,h.correct,'Answer drift at '+display);
