@@ -17,9 +17,9 @@ BEGIN
  IF (SELECT count(*) FROM public.guardian_applications) <> 1 THEN
   RAISE EXCEPTION 'Owner cannot read own application';
  END IF;
-END $;
+END $$;
 -- Owner must not be able to approve or delete their own application.
-DO $
+DO $$
 DECLARE denied boolean := false;
 BEGIN
  BEGIN
@@ -38,7 +38,7 @@ BEGIN
  IF (SELECT count(*) FROM public.guardian_applications) <> 1 THEN
   RAISE EXCEPTION 'Owner application changed after denied mutations';
  END IF;
-END $;
+END $$;
 SELECT set_config('request.jwt.claim.sub','00000000-0000-4000-8000-0000000000b2',true);
 DO $$
 DECLARE denied boolean := false;
