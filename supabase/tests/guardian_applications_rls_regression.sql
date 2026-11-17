@@ -56,6 +56,18 @@ BEGIN
  EXCEPTION WHEN insufficient_privilege THEN denied := true;
  END;
  IF NOT denied THEN RAISE EXCEPTION 'Cross-user INSERT was not denied'; END IF;
+ -- Even for their own identity, authenticated users must not submit a pre-approved application.
+ denied := false;
+ BEGIN
+  INSERT INTO public.guardian_applications
+   (user_id,child_last_name,child_first_name,child_birth_date,guardian_full_name,
+    guardian_relation,declaration_text,consent_version,consent_at,status)
+  VALUES
+   ('00000000-0000-4000-8000-0000000000b2','Synthetic','Child',DATE '2010-01-01',
+    'Synthetic Guardian','parent','Test acknowledgment','test-v1',now(),'approved');
+ EXCEPTION WHEN insufficient_privilege OR check_violation THEN denied := true;
+ END;
+ IF NOT denied THEN RAISE EXCEPTION 'User can insert pre-approved application'; END IF;
  denied := false;
  BEGIN
   UPDATE public.guardian_applications SET status='approved'
@@ -63,7 +75,14 @@ BEGIN
  EXCEPTION WHEN insufficient_privilege THEN denied := true;
  END;
  IF NOT denied THEN RAISE EXCEPTION 'Authenticated user can UPDATE applications'; END IF;
-END $$;
+ denied := false;
+ BEGIN
+  DELETE FROM public.guardian_applications
+   WHERE user_id='00000000-0000-4000-8000-0000000000a1';
+ EXCEPTION WHEN insufficient_privilege THEN denied := true;
+ END;
+ IF NOT denied THEN RAISE EXCEPTION 'Authenticated user can DELETE applications'; END IF;
+END $;
 INSERT INTO public.guardian_applications
  (user_id,child_last_name,child_first_name,child_birth_date,guardian_full_name,
   guardian_relation,declaration_text,consent_version,consent_at)
