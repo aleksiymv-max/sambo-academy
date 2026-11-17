@@ -17,7 +17,28 @@ BEGIN
  IF (SELECT count(*) FROM public.guardian_applications) <> 1 THEN
   RAISE EXCEPTION 'Owner cannot read own application';
  END IF;
-END $$;
+END $;
+-- Owner must not be able to approve or delete their own application.
+DO $
+DECLARE denied boolean := false;
+BEGIN
+ BEGIN
+  UPDATE public.guardian_applications SET status='approved'
+   WHERE user_id='00000000-0000-4000-8000-0000000000a1';
+ EXCEPTION WHEN insufficient_privilege THEN denied := true;
+ END;
+ IF NOT denied THEN RAISE EXCEPTION 'Owner can approve own application'; END IF;
+ denied := false;
+ BEGIN
+  DELETE FROM public.guardian_applications
+   WHERE user_id='00000000-0000-4000-8000-0000000000a1';
+ EXCEPTION WHEN insufficient_privilege THEN denied := true;
+ END;
+ IF NOT denied THEN RAISE EXCEPTION 'Owner can delete own application'; END IF;
+ IF (SELECT count(*) FROM public.guardian_applications) <> 1 THEN
+  RAISE EXCEPTION 'Owner application changed after denied mutations';
+ END IF;
+END $;
 SELECT set_config('request.jwt.claim.sub','00000000-0000-4000-8000-0000000000b2',true);
 DO $$
 DECLARE denied boolean := false;
