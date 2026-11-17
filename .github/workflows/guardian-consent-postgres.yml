@@ -5,6 +5,8 @@ on:
       - 'supabase/guardian_applications.sql'
       - 'supabase/migrations/20261117_guardian_consent_evidence_not_valid.sql'
       - 'supabase/tests/guardian_consent_evidence_regression.sql'
+      - 'supabase/tests/guardian_applications_rls_regression.sql'
+      - 'supabase/tests/guardian_applications_rls_regression.sql'
       - '.github/workflows/guardian-consent-postgres.yml'
   pull_request:
     paths:
@@ -44,7 +46,8 @@ jobs:
           CREATE ROLE anon NOLOGIN;
           CREATE ROLE authenticated NOLOGIN;
           CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS
-            'SELECT NULL::uuid';
+            'SELECT NULLIF(current_setting(''request.jwt.claim.sub'', true), '''')::uuid';
+          GRANT USAGE ON SCHEMA auth TO authenticated;
           SQL
       - name: Apply original guardian table and non-destructive consent migration
         run: |
@@ -52,3 +55,5 @@ jobs:
           psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261117_guardian_consent_evidence_not_valid.sql
       - name: Execute consent INSERT and UPDATE regression in PostgreSQL 16
         run: psql -v ON_ERROR_STOP=1 -f supabase/tests/guardian_consent_evidence_regression.sql
+      - name: Execute two-user guardian RLS regression in PostgreSQL 16
+        run: psql -v ON_ERROR_STOP=1 -f supabase/tests/guardian_applications_rls_regression.sql
