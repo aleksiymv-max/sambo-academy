@@ -6,6 +6,7 @@ BEGIN;
 DO $test$
 DECLARE
   constraint_present boolean;
+  constraint_validated boolean;
   rejected boolean;
 BEGIN
   SELECT EXISTS (
@@ -16,6 +17,15 @@ BEGIN
   ) INTO constraint_present;
   IF NOT constraint_present THEN
     RAISE EXCEPTION 'Consent evidence constraint is not deployed';
+  END IF;
+
+  SELECT convalidated INTO constraint_validated
+  FROM pg_constraint
+  WHERE conrelid = 'public.guardian_applications'::regclass
+    AND conname = 'guardian_application_consent_evidence_required'
+    AND contype = 'c';
+  IF constraint_validated IS DISTINCT FROM false THEN
+    RAISE EXCEPTION 'Expected NOT VALID constraint before historical-row review';
   END IF;
 
   CREATE TEMP TABLE guardian_consent_probe
@@ -70,6 +80,18 @@ BEGIN
   END;
   IF NOT rejected THEN RAISE EXCEPTION 'Blank declaration_text was accepted'; END IF;
 
+  rejected := false;
+  BEGIN
+    INSERT INTO guardian_consent_probe
+      (user_id, child_last_name, child_first_name, child_birth_date,
+       guardian_full_name, guardian_relation, declaration_text, consent_version, consent_at)
+    VALUES
+      ('00000000-0000-4000-8000-000000000006', 'Test', 'Child', DATE '2010-01-01',
+       'Test Guardian', 'parent', NULL, 'v-test', now());
+  EXCEPTION WHEN check_violation THEN rejected := true;
+  END;
+  IF NOT rejected THEN RAISE EXCEPTION 'NULL declaration_text was accepted'; END IF;
+
   INSERT INTO guardian_consent_probe
     (user_id, child_last_name, child_first_name, child_birth_date,
      guardian_full_name, guardian_relation, declaration_text, consent_version, consent_at)
@@ -77,7 +99,7 @@ BEGIN
     ('00000000-0000-4000-8000-000000000005', 'Test', 'Child', DATE '2010-01-01',
      'Test Guardian', 'parent', 'Acknowledged', 'v-test', now());
 
-  RAISE NOTICE 'PASS: 4 invalid consent-evidence cases rejected; valid evidence accepted';
+  RAISE NOTICE 'PASS: 5 invalid consent-evidence cases rejected; valid evidence accepted';
 END
 $test$;
 ROLLBACK;
