@@ -15,6 +15,11 @@ jobs:
         run: node scripts/check-athlete-applied-cases.cjs
       - name: Protect Foundations v2 historical question and progress mappings
         run: node scripts/check-foundations-v2-historical-mapping.cjs
+      - name: Guard Foundations v2 question locators against historical drift
+        run: |
+          node scripts/check-foundations-v2-question-locators.cjs
+          node scripts/check-foundations-v2-question-locators.cjs --json > /tmp/foundations-v2-locators.json
+          node -e "const a=require('/tmp/foundations-v2-locators.json');if(a.length!==8||a.some(x=>x.version!=='2026-10-26-2'||x.progressIndex!==2100))process.exit(1)"
       - name: Verify JavaScript syntax and core features
         run: |
           node <<'NODE'
