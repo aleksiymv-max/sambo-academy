@@ -99,7 +99,25 @@ BEGIN
     ('00000000-0000-4000-8000-000000000005', 'Test', 'Child', DATE '2010-01-01',
      'Test Guardian', 'parent', 'Acknowledged', 'v-test', now());
 
-  RAISE NOTICE 'PASS: 5 invalid consent-evidence cases rejected; valid evidence accepted';
+  -- NOT VALID must also protect UPDATE of a newly valid row.
+  -- A failed UPDATE must leave the accepted row unchanged.
+  rejected := false;
+  BEGIN
+    UPDATE guardian_consent_probe
+    SET consent_at = NULL
+    WHERE user_id = '00000000-0000-4000-8000-000000000005';
+  EXCEPTION WHEN check_violation THEN rejected := true;
+  END;
+  IF NOT rejected THEN RAISE EXCEPTION 'UPDATE clearing consent_at was accepted'; END IF;
+  IF NOT EXISTS (
+    SELECT 1 FROM guardian_consent_probe
+    WHERE user_id = '00000000-0000-4000-8000-000000000005'
+      AND consent_at IS NOT NULL
+  ) THEN
+    RAISE EXCEPTION 'Failed UPDATE changed accepted consent evidence';
+  END IF;
+
+  RAISE NOTICE 'PASS: 5 invalid INSERTs and 1 invalid UPDATE rejected; valid evidence retained';
 END
 $test$;
 ROLLBACK;
