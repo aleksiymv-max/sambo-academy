@@ -40,7 +40,7 @@ BEGIN
  END IF;
 END $$;
 SELECT set_config('request.jwt.claim.sub','00000000-0000-4000-8000-0000000000b2',true);
-DO $$
+DO $cross_user$
 DECLARE denied boolean := false;
 BEGIN
  IF (SELECT count(*) FROM public.guardian_applications) <> 0 THEN
@@ -82,7 +82,7 @@ BEGIN
  EXCEPTION WHEN insufficient_privilege THEN denied := true;
  END;
  IF NOT denied THEN RAISE EXCEPTION 'Authenticated user can DELETE applications'; END IF;
-END $;
+END $cross_user$;
 INSERT INTO public.guardian_applications
  (user_id,child_last_name,child_first_name,child_birth_date,guardian_full_name,
   guardian_relation,declaration_text,consent_version,consent_at)
