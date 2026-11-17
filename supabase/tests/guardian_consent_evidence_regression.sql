@@ -29,9 +29,9 @@ BEGIN
   END IF;
 
   CREATE TEMP TABLE guardian_consent_probe
-    (LIKE public.guardian_applications INCLUDING CONSTRAINTS) ON COMMIT DROP;
+    (LIKE public.guardian_applications INCLUDING CONSTRAINTS INCLUDING DEFAULTS) ON COMMIT DROP;
 
-  -- Each probe is isolated in a subtransaction, preserving the test table.
+  -- Copy DEFAULTS too: submitted_at and status are NOT NULL with defaults.\n  -- Without INCLUDING DEFAULTS, the positive INSERT fails for an unrelated reason.\n  -- Each probe is isolated in a subtransaction, preserving the test table.
   rejected := false;
   BEGIN
     INSERT INTO guardian_consent_probe
