@@ -1,6 +1,5 @@
 name: Prepublication history and privacy gate
-# Manual, non-deploying audit. Requires a full clone; ordinary PR validation
-# deliberately does not rewrite or purge historical commits.
+# Manual, non-deploying audit; never treats green PR checks as release approval.
 on:
   workflow_dispatch:
 permissions:
@@ -9,15 +8,16 @@ jobs:
   history-privacy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout all reachable branches and tags
+      - name: Checkout with complete commit history
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: false
-      - name: Confirm complete history is available
+      - name: Fetch all accessible branches, tags and PR heads
         run: |
+          git fetch --no-tags origin '+refs/heads/*:refs/remotes/origin/*' '+refs/tags/*:refs/tags/*' '+refs/pull/*/head:refs/remotes/pr-head/*'
           test "$(git rev-parse --is-shallow-repository)" = false
-          git branch -r
+          test -n "$(git for-each-ref --format='%(refname)' refs/remotes/origin)"
       - name: Run scanner self-test
         run: node scripts/check-repo-privacy.cjs --self-test
       - name: Block on tracked-file or reachable-history disclosures
@@ -25,7 +25,7 @@ jobs:
       - name: Explain remaining manual publication blockers
         if: always()
         run: |
-          echo 'This workflow does not deploy, rewrite Git history, or rotate secrets.'
-          echo 'Check inaccessible PR refs/forks, binary EXIF, faces, image licenses,'
-          echo 'Supabase permissions and premium JS exposure separately.'
-          echo 'A passing run alone is NOT authorization to publish.'
+          echo 'No deployment, history rewrite or secret rotation occurs here.'
+          echo 'Unreachable blobs, forks, EXIF, faces, image rights, RLS and'
+          echo 'publicly delivered premium JS require separate review.'
+          echo 'A passing run alone is NOT publication approval.'
