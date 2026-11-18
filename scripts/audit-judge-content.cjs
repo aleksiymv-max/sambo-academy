@@ -69,6 +69,23 @@ console.log('CROSS-MODULE lexical exam/self-check overlaps: '+crossModuleMatches
 for(const match of crossModuleMatches){
  console.log('  REVIEW '+match.examModule+' vs '+match.selfCheckModules.join(', ')+': '+match.stem);
 }
+// Report identical exam stems across expanded modules. This is advisory until
+// reviewers decide whether contexts legitimately differ; no answer keys change.
+const expandedExamStems=new Map();
+for(const mod of modules){
+ for(const question of mod.questions){
+  const stem=normalized(question.q);
+  if(!expandedExamStems.has(stem))expandedExamStems.set(stem,[]);
+  expandedExamStems.get(stem).push(mod.title);
+ }
+}
+const repeatedExamStems=[...expandedExamStems.entries()]
+ .filter(([,titles])=>titles.length>1);
+console.log('CROSS-MODULE duplicate expanded exam stems: '+repeatedExamStems.length);
+for(const [stem,titles] of repeatedExamStems){
+ console.log('  REVIEW '+titles.join(' / ')+': '+stem);
+}
+
 // Semantic paraphrases still require expert review; no exam IDs or keys change.
 
 // Audit the ACTIVE versioned banks, not only the preserved historical exam data.
