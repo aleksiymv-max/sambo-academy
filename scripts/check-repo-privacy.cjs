@@ -3,7 +3,8 @@
 
 // Fail closed for recognisable personal contact details and credentials in tracked
 // text files. A separate --history mode blocks publication when old commits carry
-// personal author addresses; it does not rewrite history or expose the addresses.
+// personal author addresses or disclosures in commit messages. It does not rewrite
+// history, inspect historical blob contents, or expose detected values.
 const fs = require('node:fs');
 const path = require('node:path');
 const {execFileSync} = require('node:child_process');
@@ -77,8 +78,23 @@ function scanHistory() {
   }
   if (exposed) findings.push('history — ' + exposed +
     ' commits expose non-noreply author/committer addresses across fetched refs');
+  // Commit messages are public metadata too. Inspect without printing any matched values.
+  // NUL-delimited records avoid ambiguity from multiline messages and separators.
+  const messages = git(['log', '--all', '--format=%H%x00%B%x00']).split('\0');
+  let checkedMessages = 0;
+  for (let i = 0; i + 1 < messages.length; i += 2) {
+    const sha = messages[i].trim();
+    if (!/^[0-9a-f]{40}$/.test(sha)) {
+      findings.push('history — malformed commit-message record');
+      break;
+    }
+    inspectText('commit-message:' + sha.slice(0, 12), messages[i + 1]);
+    checkedMessages++;
+  }
+  if (checkedMessages !== entries.length) findings.push('history — incomplete commit-message scan');
   console.log('Publication history review: ' + entries.length +
-    ' reachable commits checked (only fetched refs; deleted blobs, PR caches and forks require separate audit).');
+    ' reachable commits and ' + checkedMessages +
+    ' commit messages checked (historical blobs, deleted objects, PR caches and forks require separate audit).');
 }
 function selfTest() {
   const old = findings.length;
