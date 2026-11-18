@@ -100,6 +100,8 @@ active.questions.forEach((q,i)=>{
     'Repeated normalized answer choices at '+(i+1));
   assert.ok(Number.isInteger(q.correct)&&q.correct>=0&&q.correct<q.a.length,
     'Invalid answer index at '+(i+1));
+  assert.ok(typeof q.body==='string'&&q.body.trim().length>=20,
+    'Missing substantive explanation at '+(i+1));
 });
 assert.equal(new Set(locators.map(x=>[x.bank,x.version,x.progressIndex,x.display,x.source].join('|'))).size,8);
 assert.ok(locators.every(x=>x.bank!=='judge-exam-independent.js'),
