@@ -73,6 +73,15 @@ for(let display=17;display<=24;display++){
 // Reject repeated question stems within the published bank, including non-adjacent items.
 // This is a lexical safeguard only: conceptual overlap still needs editorial review.
 const normalizeStem=x=>x.normalize('NFKC').trim().replace(/\s+/g,' ').toLocaleLowerCase('ru');
+// Regression fixtures: whitespace and Unicode variants must collide, while distinct stems must not.
+assert.equal(normalizeStem('  ПРИЁМ\tв стойке  '),normalizeStem('приём в\nстойке'),
+  'Whitespace normalization regression');
+assert.equal(normalizeStem('Вопрос\u00a0№\u00a022'),normalizeStem('вопрос № 22'),
+  'Non-breaking spaces normalization regression');
+assert.equal(normalizeStem('Оценка ２'),normalizeStem('оценка 2'),
+  'Unicode NFKC normalization regression');
+assert.notEqual(normalizeStem('Оценка 2'),normalizeStem('Оценка 4'),
+  'Distinct question stems must remain distinct');
 const stems=active.questions.map((q,i)=>{
   assert.equal(typeof q.q,'string','Missing stem at '+(i+1));
   return normalizeStem(q.q);
