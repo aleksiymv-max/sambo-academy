@@ -101,6 +101,13 @@ function selfTest() {
   inspectText('fixture', 'person' + '@' + 'gmail.com\n');
   inspectText('fixture', 'ghp_' + 'A'.repeat(36) + '\n');
   if (findings.length !== old + 2) throw new Error('Credential/email detection regression');
+  // Commit bodies can be multiline; findings must identify locations without echoing values.
+  const beforeMultiline = findings.length;
+  inspectText('commit-message:fixture', 'Routine change\n\nContact: ' + 'person' + '@' + 'gmail.com' + '\n');
+  if (findings.length !== beforeMultiline + 1 ||
+      !findings[findings.length - 1].startsWith('commit-message:fixture:3')) {
+    throw new Error('Multiline commit-message privacy regression');
+  }
   findings.length = old;
   console.log('PASS: privacy scanner self-test');
 }
