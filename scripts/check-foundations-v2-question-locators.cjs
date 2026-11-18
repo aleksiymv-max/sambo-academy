@@ -92,6 +92,8 @@ assert.equal(new Set(stems).size,stems.length,
 assert.equal(normalizeStem('  ВАРИАНТ\tА  '),normalizeStem('вариант а'),
   'Answer-choice whitespace normalization regression');
 active.questions.forEach((q,i)=>{
+  assert.equal(typeof q.q,'string','Question stem must be text at '+(i+1));
+  assert.ok(q.q.trim().length>=20,'Question stem is unexpectedly short at '+(i+1));
   assert.ok(Array.isArray(q.a)&&q.a.length>=3,
     'Missing or insufficient answer choices at '+(i+1));
   assert.ok(q.a.every(x=>typeof x==='string'&&x.trim()),
