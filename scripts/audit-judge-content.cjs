@@ -90,6 +90,16 @@ const sanctionsChecks=new Set(modules[5].lessons.flatMap(l=>l.checks.map(q=>norm
 const repeatedFoundation=foundationActive.questions.filter(q=>foundationChecks.has(normalized(q.q))).length;
 const repeatedSanctions=sanctionsActive.questions.filter(q=>sanctionsChecks.has(normalized(q.q))).length;
 const activeCount=foundationActive.questions.length+examTotal-modules[5].questions.length+sanctionsActive.questions.length;
+// Foundations is a separately published module: count its active exam too.
+// Keep this distinct from the legacy expanded-module inventory until reconciled.
+const allPublishedActiveQuestions=activeCount+foundationActive.questions.length;
+console.log('ALL PUBLISHED ACTIVE (expanded modules + Foundations): '+allPublishedActiveQuestions+
+ ' exam questions; Foundations contributes '+foundationActive.questions.length+'.');
+if(allPublishedActiveQuestions!==activeCount+foundationActive.questions.length ||
+   allPublishedActiveQuestions<activeCount){
+ console.error('EDITORIAL GAP: published exam inventory arithmetic inconsistent');
+ process.exitCode=1;
+}
 console.log('ACTIVE: '+activeCount+' exam questions; foundation revision '+foundationActive.examRevision+
  ' (progress '+foundationActive.progressIndex+', repeated '+repeatedFoundation+'); sanctions revision '+
  sanctionsActive.examRevision+' (progress '+sanctionsActive.progressIndex+', repeated '+repeatedSanctions+')');
