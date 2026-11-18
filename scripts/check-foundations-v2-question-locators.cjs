@@ -48,6 +48,18 @@ for(let display=17;display<=24;display++){
   assert.equal(a.correct,h.correct,'Answer drift at '+display);
   assert.equal(a.body,h.body,'Explanation drift at '+display);
   assert.equal(a.kind,h.kind,'Type drift at '+display);
+  // Fail closed on malformed published MCQ structure without asserting normative correctness.
+  assert.equal(typeof a.q,'string','Question stem must be text at '+display);
+  assert.ok(a.q.trim().length>=20,'Question stem is unexpectedly short at '+display);
+  assert.ok(Array.isArray(a.a),'Answer choices must be an array at '+display);
+  assert.ok(a.a.length>=3,'Insufficient answer choices at '+display);
+  assert.ok(a.a.every(x=>typeof x==='string'&&x.trim()),'Blank choice at '+display);
+  assert.equal(new Set(a.a.map(x=>x.trim().replace(/\\s+/g,' ').toLocaleLowerCase('ru'))).size,a.a.length,
+    'Duplicate normalized answer choices at '+display);
+  assert.ok(Number.isInteger(a.correct)&&a.correct>=0&&a.correct<a.a.length,
+    'Answer index out of bounds at '+display);
+  assert.ok(typeof a.body==='string'&&a.body.trim().length>=20,
+    'Missing substantive explanation at '+display);
   locators.push({
     bank:'judge-exam-foundations-v2.js',
     version:active.version,
