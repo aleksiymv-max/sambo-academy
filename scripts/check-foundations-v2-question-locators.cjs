@@ -54,7 +54,7 @@ for(let display=17;display<=24;display++){
   assert.ok(Array.isArray(a.a),'Answer choices must be an array at '+display);
   assert.ok(a.a.length>=3,'Insufficient answer choices at '+display);
   assert.ok(a.a.every(x=>typeof x==='string'&&x.trim()),'Blank choice at '+display);
-  assert.equal(new Set(a.a.map(x=>x.trim().replace(/\\s+/g,' ').toLocaleLowerCase('ru'))).size,a.a.length,
+  assert.equal(new Set(a.a.map(x=>x.trim().replace(/\s+/g,' ').toLocaleLowerCase('ru'))).size,a.a.length,
     'Duplicate normalized answer choices at '+display);
   assert.ok(Number.isInteger(a.correct)&&a.correct>=0&&a.correct<a.a.length,
     'Answer index out of bounds at '+display);
