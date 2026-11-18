@@ -70,6 +70,15 @@ for(let display=17;display<=24;display++){
     historicalProgressIndex:historical.progressIndex
   });
 }
+// Reject repeated question stems within the published bank, including non-adjacent items.
+// This is a lexical safeguard only: conceptual overlap still needs editorial review.
+const normalizeStem=x=>x.normalize('NFKC').trim().replace(/\\s+/g,' ').toLocaleLowerCase('ru');
+const stems=active.questions.map((q,i)=>{
+  assert.equal(typeof q.q,'string','Missing stem at '+(i+1));
+  return normalizeStem(q.q);
+});
+assert.equal(new Set(stems).size,stems.length,
+  'Repeated normalized exam stems in active Foundations v2');
 assert.equal(new Set(locators.map(x=>[x.bank,x.version,x.progressIndex,x.display,x.source].join('|'))).size,8);
 assert.ok(locators.every(x=>x.bank!=='judge-exam-independent.js'),
   'Independent officials exam #22 must never be identified as Foundations #22');
