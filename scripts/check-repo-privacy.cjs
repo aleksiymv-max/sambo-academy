@@ -75,6 +75,7 @@ function scanHistory() {
     const [sha, author, committer] = line.split('\t');
     if ([author, committer].some(mail => mail && !allowEmail.test(mail))) exposed++;
   }
+  if (!entries.length) findings.push('history — no reachable commits were enumerated');
   if (exposed) findings.push('history — ' + exposed +
     ' commits expose non-noreply author/committer addresses across fetched refs');
   // Public commit messages may contain personal contact details or credentials.
@@ -107,6 +108,11 @@ function selfTest() {
   if (findings.length !== beforeMultiline + 1 ||
       !findings[findings.length - 1].startsWith('commit-message:fixture:3')) {
     throw new Error('Multiline commit-message privacy regression');
+  }
+  // Findings must never include the original credential or contact value.
+  const fixtureFindings = findings.slice(old).join('\n');
+  if (fixtureFindings.includes('gmail.com') || fixtureFindings.includes('ghp_')) {
+    throw new Error('Privacy scanner output leaks matched values');
   }
   findings.length = old;
   console.log('PASS: privacy scanner self-test');
