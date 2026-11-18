@@ -79,8 +79,15 @@ for(const mod of modules){
   expandedExamStems.get(stem).push(mod.title);
  }
 }
+// A repeated stem inside one module is a separate defect, not a cross-module match.
+const isCrossModuleDuplicate=titles=>new Set(titles).size>1;
+// Regression: same-module repetition must not inflate the cross-module counter.
+if(isCrossModuleDuplicate(['Module A','Module A']) ||
+   !isCrossModuleDuplicate(['Module A','Module B'])){
+ throw Error('Cross-module duplicate classifier regression');
+}
 const repeatedExamStems=[...expandedExamStems.entries()]
- .filter(([,titles])=>titles.length>1);
+ .filter(([,titles])=>isCrossModuleDuplicate(titles));
 console.log('CROSS-MODULE duplicate expanded exam stems: '+repeatedExamStems.length);
 for(const [stem,titles] of repeatedExamStems){
  console.log('  REVIEW '+titles.join(' / ')+': '+stem);
