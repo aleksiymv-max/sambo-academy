@@ -88,6 +88,19 @@ const stems=active.questions.map((q,i)=>{
 });
 assert.equal(new Set(stems).size,stems.length,
   'Repeated normalized exam stems in active Foundations v2');
+// Structural validation of every published question, not just positions 17–24.
+assert.equal(normalizeStem('  ВАРИАНТ\tА  '),normalizeStem('вариант а'),
+  'Answer-choice whitespace normalization regression');
+active.questions.forEach((q,i)=>{
+  assert.ok(Array.isArray(q.a)&&q.a.length>=3,
+    'Missing or insufficient answer choices at '+(i+1));
+  assert.ok(q.a.every(x=>typeof x==='string'&&x.trim()),
+    'Blank answer choice at '+(i+1));
+  assert.equal(new Set(q.a.map(normalizeStem)).size,q.a.length,
+    'Repeated normalized answer choices at '+(i+1));
+  assert.ok(Number.isInteger(q.correct)&&q.correct>=0&&q.correct<q.a.length,
+    'Invalid answer index at '+(i+1));
+});
 assert.equal(new Set(locators.map(x=>[x.bank,x.version,x.progressIndex,x.display,x.source].join('|'))).size,8);
 assert.ok(locators.every(x=>x.bank!=='judge-exam-independent.js'),
   'Independent officials exam #22 must never be identified as Foundations #22');
