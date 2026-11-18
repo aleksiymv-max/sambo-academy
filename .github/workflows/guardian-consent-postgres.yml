@@ -1,0 +1,59 @@
+name: Guardian consent PostgreSQL regression
+on:
+  push:
+    paths:
+      - 'supabase/guardian_applications.sql'
+      - 'supabase/migrations/20261117_guardian_consent_evidence_not_valid.sql'
+      - 'supabase/tests/guardian_consent_evidence_regression.sql'
+      - 'supabase/tests/guardian_applications_rls_regression.sql'
+      - '.github/workflows/guardian-consent-postgres.yml'
+  pull_request:
+    paths:
+      - 'supabase/guardian_applications.sql'
+      - 'supabase/migrations/20261117_guardian_consent_evidence_not_valid.sql'
+      - 'supabase/tests/guardian_consent_evidence_regression.sql'
+      - 'supabase/tests/guardian_applications_rls_regression.sql'
+      - '.github/workflows/guardian-consent-postgres.yml'
+jobs:
+  guardian-consent-sql:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: sambo_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d sambo_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: sambo_test
+    steps:
+      - uses: actions/checkout@v5
+      - name: Prepare isolated Supabase auth schema stub (no real users)
+        run: |
+          psql -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE SCHEMA auth;
+          CREATE TABLE auth.users (id uuid PRIMARY KEY);
+          CREATE ROLE anon NOLOGIN;
+          CREATE ROLE authenticated NOLOGIN;
+          CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS
+            'SELECT NULLIF(current_setting(''request.jwt.claim.sub'', true), '''')::uuid';
+          GRANT USAGE ON SCHEMA auth TO authenticated;
+          SQL
+      - name: Apply original guardian table and non-destructive consent migration
+        run: |
+          psql -v ON_ERROR_STOP=1 -f supabase/guardian_applications.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261117_guardian_consent_evidence_not_valid.sql
+      - name: Execute consent INSERT and UPDATE regression in PostgreSQL 16
+        run: psql -v ON_ERROR_STOP=1 -f supabase/tests/guardian_consent_evidence_regression.sql
+      - name: Execute two-user guardian RLS regression in PostgreSQL 16
+        run: psql -v ON_ERROR_STOP=1 -f supabase/tests/guardian_applications_rls_regression.sql

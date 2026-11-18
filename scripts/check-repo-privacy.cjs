@@ -75,10 +75,25 @@ function scanHistory() {
     const [sha, author, committer] = line.split('\t');
     if ([author, committer].some(mail => mail && !allowEmail.test(mail))) exposed++;
   }
+  if (!entries.length) findings.push('history — no reachable commits were enumerated');
   if (exposed) findings.push('history — ' + exposed +
     ' commits expose non-noreply author/committer addresses across fetched refs');
+  // Public commit messages may contain personal contact details or credentials.
+  // NUL-delimited records preserve multiline commit messages without printing values.
+  const records = git(['log', '--all', '--format=%H%x00%B%x00']).split('\0');
+  let checked = 0;
+  for (let i = 0; i + 1 < records.length; i += 2) {
+    const sha = records[i].trim();
+    if (!/^[0-9a-f]{40}$/.test(sha)) {
+      findings.push('history — malformed commit-message record');
+      break;
+    }
+    inspectText('commit-message:' + sha.slice(0, 12), records[i + 1]);
+    checked++;
+  }
+  if (checked !== entries.length) findings.push('history — incomplete commit-message scan');
   console.log('Publication history review: ' + entries.length +
-    ' reachable commits checked (only fetched refs; deleted blobs, PR caches and forks require separate audit).');
+    ' reachable commits and ' + checked + ' commit messages checked; historical blobs, deleted objects, PR caches and forks require separate audit.');
 }
 function selfTest() {
   const old = findings.length;
@@ -87,6 +102,18 @@ function selfTest() {
   inspectText('fixture', 'person' + '@' + 'gmail.com\n');
   inspectText('fixture', 'ghp_' + 'A'.repeat(36) + '\n');
   if (findings.length !== old + 2) throw new Error('Credential/email detection regression');
+  // Commit bodies can be multiline; findings must identify locations without echoing values.
+  const beforeMultiline = findings.length;
+  inspectText('commit-message:fixture', 'Routine change\n\nContact: ' + 'person' + '@' + 'gmail.com' + '\n');
+  if (findings.length !== beforeMultiline + 1 ||
+      !findings[findings.length - 1].startsWith('commit-message:fixture:3')) {
+    throw new Error('Multiline commit-message privacy regression');
+  }
+  // Findings must never include the original credential or contact value.
+  const fixtureFindings = findings.slice(old).join('\n');
+  if (fixtureFindings.includes('gmail.com') || fixtureFindings.includes('ghp_')) {
+    throw new Error('Privacy scanner output leaks matched values');
+  }
   findings.length = old;
   console.log('PASS: privacy scanner self-test');
 }
