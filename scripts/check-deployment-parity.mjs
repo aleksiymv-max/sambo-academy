@@ -9,7 +9,7 @@ import { createHash } from 'node:crypto';
 import assert from 'node:assert/strict';
 
 const assets=[
- 'index.html','judge-foundations.css','auth-config.js',
+ 'index.html','privacy.html','judge-foundations.css','auth-config.js',
  'athlete-applied-cases.js','judge-admission-v2.css','judge-admission-exam-v3.js',
  'judge-program-admission-v2.js',
  'progress.js','judge-foundations.js','judge-exam-foundations-v2.js',
@@ -49,7 +49,7 @@ async function compareOne(base,asset,{attempts=30,waitMs=5000}={}){
 }
 
 async function selfTest(){
- for(const asset of ['athlete-applied-cases.js','judge-admission-exam-v3.js','judge-program-admission-v2.js']){
+ for(const asset of ['privacy.html','athlete-applied-cases.js','judge-admission-v2.css','judge-admission-exam-v3.js','judge-program-admission-v2.js']){
   assert.ok(assets.includes(asset),'required course asset missing from deployment parity manifest: '+asset);
  }
  assert.equal(new Set(assets).size,assets.length,'deployment parity manifest contains duplicate assets');
