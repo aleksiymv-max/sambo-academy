@@ -41,6 +41,18 @@ function duplicates(banks) {
   }
   return [...seen.values()].filter(group => new Set(group.map(x => x.bank)).size > 1);
 }
+function withinBankDuplicates(banks) {
+  const hits = [];
+  for (const bank of banks) {
+    const seen = new Map();
+    for (const [index, question] of bank.questions.entries()) {
+      const stem = normalize(question.q);
+      if (seen.has(stem)) hits.push({bank:bank.id, first:seen.get(stem), second:index + 1});
+      else seen.set(stem, index + 1);
+    }
+  }
+  return hits;
+}
 function assertFixtures() {
   const q = stem => ({q:stem});
   if (duplicates([{id:'a',questions:[q('Same'),q('same')] }]).length !== 0)
@@ -49,6 +61,10 @@ function assertFixtures() {
     throw new Error('Cross-module normalized repetition was missed');
   if (duplicates([{id:'a',questions:[q('A')]},{id:'b',questions:[q('B')]}]).length !== 0)
     throw new Error('False positive for different stems');
+  if (withinBankDuplicates([{id:'a',questions:[q(' Same '),q('same')]}]).length !== 1)
+    throw new Error('Intra-bank lexical repetition must be reported');
+  if (withinBankDuplicates([{id:'a',questions:[q('A'),q('B')]}]).length !== 0)
+    throw new Error('Distinct intra-bank questions must not be flagged');
   // Distinct bank IDs are required: otherwise a real cross-bank repeat is hidden.
   let rejected = false;
   try { duplicates([{id:'a',questions:[q('Same')]},{id:'a',questions:[q('Same')]}]); }
@@ -59,7 +75,7 @@ assertFixtures();
 // A fixture-only mode lets CI exercise the classifier without claiming that
 // the production exam banks or their normative keys were reviewed.
 if (process.argv.includes('--self-test')) {
-  console.log('Duplicate classifier: 4 synthetic fixtures passed');
+  console.log('Duplicate classifier: 6 synthetic fixtures passed');
   process.exit(0);
 }
 const ctx = {window:{}};
@@ -83,9 +99,12 @@ if (banks.length !== 12 || questionCount !== 128) {
     ', questions=' + questionCount + ' (expected 12/128); review bank versions');
 }
 const hits = duplicates(banks);
+const internalHits = withinBankDuplicates(banks);
 console.log('Active judge exam banks:', banks.length,
   'questions:', questionCount);
 console.log('Exact cross-module lexical duplicates:', hits.length);
+console.log('Exact within-bank lexical duplicates (editorial review):', internalHits.length);
+for (const hit of internalHits) console.log('REVIEW within bank:', hit.bank+'#'+hit.first+' / #'+hit.second);
 for (const hit of hits) console.log('REVIEW:', hit.map(x=>x.bank+'#'+x.index).join(' / '));
 console.log('This does not detect semantic paraphrases or verify legal correctness.');
 if (hits.length) process.exitCode = 2;
