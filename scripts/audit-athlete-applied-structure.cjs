@@ -20,7 +20,7 @@ for (const [title, item] of entries) {
   assert.ok(Number.isInteger(item.correct) && item.correct >= 0 && item.correct < item.answers.length, title + ': invalid answer key');
   const normalized = item.answers.map(answer => {
     assert.ok(typeof answer === 'string' && answer.trim(), title + ': blank answer');
-    return answer.normalize('NFKC').trim().replace(/\\s+/g, ' ').toLocaleLowerCase('ru');
+    return answer.normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase('ru');
   });
   assert.equal(new Set(normalized).size, normalized.length, title + ': duplicate answer options');
   assert.ok(item.ref.includes('Статья'), title + ': missing article reference');
