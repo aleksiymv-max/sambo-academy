@@ -62,7 +62,7 @@ function duplicateOptions(banks) {
   for (const bank of banks) {
     for (const [index, question] of bank.questions.entries()) {
       const options = question.options || question.answers || question.a;
-      if (!Array.isArray(options)) throw new Error('Missing answer-option array in ' + bank.id + ' #' + (index + 1));
+      if (!Array.isArray(options) || options.length < 2) throw new Error('Missing or insufficient answer-option array in ' + bank.id + ' #' + (index + 1));
       const seen = new Map();
       for (const [optionIndex, option] of options.entries()) {
         const label = normalize(typeof option === 'string' ? option : option?.text);
@@ -82,7 +82,7 @@ function blankOptions(banks) {
   for (const bank of banks) {
     for (const [index, question] of bank.questions.entries()) {
       const options = question.options || question.answers || question.a;
-      if (!Array.isArray(options)) throw new Error('Missing answer-option array in ' + bank.id + ' #' + (index + 1));
+      if (!Array.isArray(options) || options.length < 2) throw new Error('Missing or insufficient answer-option array in ' + bank.id + ' #' + (index + 1));
       for (const [optionIndex, option] of options.entries()) {
         const label = normalize(typeof option === 'string' ? option : option?.text);
         if (!label) hits.push({bank:bank.id, question:index+1, option:optionIndex+1});
@@ -138,6 +138,15 @@ function assertFixtures() {
     catch (error) { rejected = /Missing answer-option array/.test(error.message); }
     if (!rejected) throw new Error('Unsupported answer schema must fail closed');
   }
+  // Zero or one option cannot form a meaningful multiple-choice item.
+  for (const audit of [duplicateOptions, blankOptions]) {
+    for (const a of [[], ['Only one']]) {
+      let rejected = false;
+      try { audit([{id:'a',questions:[{q:'Question',a}]}]); }
+      catch (error) { rejected = /insufficient answer-option array/.test(error.message); }
+      if (!rejected) throw new Error('Insufficient answer options must fail closed');
+    }
+  }
   if (hasBlockingLexicalDefects([], [], [], []))
     throw new Error('Clean bank must not block CI');
   // Distinct bank IDs are required: otherwise a real cross-bank repeat is hidden.
@@ -150,7 +159,7 @@ assertFixtures();
 // A fixture-only mode lets CI exercise the classifier without claiming that
 // the production exam banks or their normative keys were reviewed.
 if (process.argv.includes('--self-test')) {
-  console.log('Duplicate classifier: 20 synthetic fixtures passed');
+  console.log('Duplicate classifier: 24 synthetic fixtures passed');
   process.exit(0);
 }
 const ctx = {window:{}};
