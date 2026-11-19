@@ -135,7 +135,7 @@ function assertFixtures() {
   for (const audit of [duplicateOptions, blankOptions]) {
     let rejected = false;
     try { audit([{id:'a',questions:[{q:'Question',choices:['Yes','No']}]}]); }
-    catch (error) { rejected = /Missing answer-option array/.test(error.message); }
+    catch (error) { rejected = /Missing or insufficient answer-option array/.test(error.message); }
     if (!rejected) throw new Error('Unsupported answer schema must fail closed');
   }
   // Zero or one option cannot form a meaningful multiple-choice item.
