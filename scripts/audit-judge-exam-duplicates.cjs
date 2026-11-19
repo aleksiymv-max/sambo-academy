@@ -46,6 +46,12 @@ function assertFixtures() {
     throw new Error('False positive for different stems');
 }
 assertFixtures();
+// A fixture-only mode lets CI exercise the classifier without claiming that
+// the production exam banks or their normative keys were reviewed.
+if (process.argv.includes('--self-test')) {
+  console.log('Duplicate classifier: 3 synthetic fixtures passed');
+  process.exit(0);
+}
 const ctx = {window:{}};
 vm.createContext(ctx);
 for (const file of files) {
