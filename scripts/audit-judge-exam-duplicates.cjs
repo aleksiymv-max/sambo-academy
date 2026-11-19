@@ -75,6 +75,22 @@ function duplicateOptions(banks) {
   return hits;
 }
 
+
+function blankOptions(banks) {
+  const hits = [];
+  for (const bank of banks) {
+    for (const [index, question] of bank.questions.entries()) {
+      const options = question.options || question.answers;
+      if (!Array.isArray(options)) continue;
+      for (const [optionIndex, option] of options.entries()) {
+        const label = normalize(typeof option === 'string' ? option : option?.text);
+        if (!label) hits.push({bank:bank.id, question:index+1, option:optionIndex+1});
+      }
+    }
+  }
+  return hits;
+}
+
 function assertFixtures() {
   const q = stem => ({q:stem});
   if (duplicates([{id:'a',questions:[q('Same'),q('same')] }]).length !== 0)
@@ -91,6 +107,10 @@ function assertFixtures() {
     throw new Error('Duplicate answer options must be reported');
   if (duplicateOptions([{id:'a',questions:[{q:'Q',options:['Да', 'Нет']}]}]).length !== 0)
     throw new Error('Distinct answer options must not be flagged');
+  if (blankOptions([{id:'a',questions:[{q:'Q',options:['Да','   ']}]}]).length !== 1)
+    throw new Error('Blank answer option must be reported');
+  if (blankOptions([{id:'a',questions:[{q:'Q',options:['Да','Нет']}]}]).length !== 0)
+    throw new Error('Nonblank answer options must not be flagged');
   // Distinct bank IDs are required: otherwise a real cross-bank repeat is hidden.
   let rejected = false;
   try { duplicates([{id:'a',questions:[q('Same')]},{id:'a',questions:[q('Same')]}]); }
@@ -101,7 +121,7 @@ assertFixtures();
 // A fixture-only mode lets CI exercise the classifier without claiming that
 // the production exam banks or their normative keys were reviewed.
 if (process.argv.includes('--self-test')) {
-  console.log('Duplicate classifier: 8 synthetic fixtures passed');
+  console.log('Duplicate classifier: 10 synthetic fixtures passed');
   process.exit(0);
 }
 const ctx = {window:{}};
@@ -127,11 +147,14 @@ if (banks.length !== 12 || questionCount !== 128) {
 const hits = duplicates(banks);
 const internalHits = withinBankDuplicates(banks);
 const optionHits = duplicateOptions(banks);
+const blankHits = blankOptions(banks);
 console.log('Active judge exam banks:', banks.length,
   'questions:', questionCount);
 console.log('Exact cross-module lexical duplicates:', hits.length);
 console.log('Exact within-bank lexical duplicates (editorial review):', internalHits.length);
 console.log('Duplicate answer options (editorial review):', optionHits.length);
+console.log('Blank answer options (editorial review):', blankHits.length);
+for (const hit of blankHits) console.log('REVIEW blank answer option:', hit.bank+'#'+hit.question+' option '+hit.option);
 for (const hit of optionHits) console.log('REVIEW answer options:', hit.bank+'#'+hit.question+
   ' options '+hit.first+' / '+hit.second);
 for (const hit of internalHits) console.log('REVIEW within bank:', hit.bank+'#'+hit.first+' / #'+hit.second);
