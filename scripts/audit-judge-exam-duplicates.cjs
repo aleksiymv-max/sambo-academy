@@ -65,9 +65,16 @@ const banks = modules.map((mod, index) => ({
   id:'expanded-' + (index + 1), questions: index === 5 ? sanctions.questions : mod.questions
 }));
 banks.push({id:'foundations-v2',questions:foundation.questions});
+const questionCount = banks.reduce((n, b) => n + b.questions.length, 0);
+// Fail closed if a loader or active bank silently disappears. Update these
+// baselines only alongside an explicitly reviewed exam-bank revision.
+if (banks.length !== 12 || questionCount !== 128) {
+  throw new Error('Active exam inventory changed: banks=' + banks.length +
+    ', questions=' + questionCount + ' (expected 12/128); review bank versions');
+}
 const hits = duplicates(banks);
 console.log('Active judge exam banks:', banks.length,
-  'questions:', banks.reduce((n,b)=>n+b.questions.length,0));
+  'questions:', questionCount);
 console.log('Exact cross-module lexical duplicates:', hits.length);
 for (const hit of hits) console.log('REVIEW:', hit.map(x=>x.bank+'#'+x.index).join(' / '));
 console.log('This does not detect semantic paraphrases or verify legal correctness.');
