@@ -1,0 +1,19 @@
+name: Judge exam duplicate audit
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit-judge-exam-duplicates.cjs'
+      - 'judge-*.js'
+      - '.github/workflows/judge-exam-duplicates.yml'
+  workflow_dispatch:
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check duplicate classifier synthetic fixtures
+        run: node scripts/audit-judge-exam-duplicates.cjs --self-test
+      - name: Audit active judge exam banks (lexical only)
+        run: node scripts/audit-judge-exam-duplicates.cjs
