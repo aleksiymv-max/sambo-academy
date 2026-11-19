@@ -22,6 +22,7 @@ const files = [
 ];
 function normalize(stem) {
   return String(stem || '').normalize('NFKC').toLocaleLowerCase('ru')
+    .replace(/[\u200B-\u200D\u2060\uFEFF]/g, '') // invisible format chars must not evade duplicate detection
     .replace(/\s+/g, ' ').trim();
 }
 function duplicates(banks) {
@@ -101,6 +102,10 @@ function assertFixtures() {
     throw new Error('Intra-module repetition must not be called cross-module');
   if (duplicates([{id:'a',questions:[q('  Оценка  ') ]},{id:'b',questions:[q('оценка')]}]).length !== 1)
     throw new Error('Cross-module normalized repetition was missed');
+  if (duplicates([{id:'a',questions:[q('Оценка')]},{id:'b',questions:[q('Оце\u200Bнка')]}]).length !== 1)
+    throw new Error('Invisible format characters must not bypass duplicate detection');
+  if (duplicateOptions([{id:'a',questions:[{q:'Q',options:['Да','Д\u200Bа']}]}]).length !== 1)
+    throw new Error('Invisible format characters must not bypass option collisions');
   if (duplicates([{id:'a',questions:[q('A')]},{id:'b',questions:[q('B')]}]).length !== 0)
     throw new Error('False positive for different stems');
   if (withinBankDuplicates([{id:'a',questions:[q(' Same '),q('same')]}]).length !== 1)
@@ -133,7 +138,7 @@ assertFixtures();
 // A fixture-only mode lets CI exercise the classifier without claiming that
 // the production exam banks or their normative keys were reviewed.
 if (process.argv.includes('--self-test')) {
-  console.log('Duplicate classifier: 14 synthetic fixtures passed');
+  console.log('Duplicate classifier: 16 synthetic fixtures passed');
   process.exit(0);
 }
 const ctx = {window:{}};
