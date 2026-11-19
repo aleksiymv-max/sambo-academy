@@ -13,6 +13,8 @@ jobs:
           node scripts/check-repo-privacy.cjs
       - name: Verify source-backed athlete training scenarios and preserved progress keys
         run: node scripts/check-athlete-applied-cases.cjs
+      - name: Verify shuffled athlete case answers preserve source keys
+        run: node scripts/test-athlete-applied-case-order.cjs
       - name: Verify JavaScript syntax and core features
         run: |
           node <<'NODE'
