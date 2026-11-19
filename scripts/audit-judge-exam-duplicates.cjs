@@ -61,7 +61,7 @@ function duplicateOptions(banks) {
   const hits = [];
   for (const bank of banks) {
     for (const [index, question] of bank.questions.entries()) {
-      const options = question.options || question.answers;
+      const options = question.options || question.answers || question.a;
       if (!Array.isArray(options)) continue;
       const seen = new Map();
       for (const [optionIndex, option] of options.entries()) {
@@ -81,7 +81,7 @@ function blankOptions(banks) {
   const hits = [];
   for (const bank of banks) {
     for (const [index, question] of bank.questions.entries()) {
-      const options = question.options || question.answers;
+      const options = question.options || question.answers || question.a;
       if (!Array.isArray(options)) continue;
       for (const [optionIndex, option] of options.entries()) {
         const label = normalize(typeof option === 'string' ? option : option?.text);
@@ -112,6 +112,10 @@ function assertFixtures() {
     throw new Error('Intra-bank lexical repetition must be reported');
   if (withinBankDuplicates([{id:'a',questions:[q('A'),q('B')]}]).length !== 0)
     throw new Error('Distinct intra-bank questions must not be flagged');
+  if (duplicateOptions([{id:'a',questions:[{q:'Q',a:[' Да ', 'да']}]}]).length !== 1)
+    throw new Error('Actual exam a[] choices must be checked for duplicates');
+  if (blankOptions([{id:'a',questions:[{q:'Q',a:['Да', '  ']}]}]).length !== 1)
+    throw new Error('Actual exam a[] choices must be checked for blanks');
   if (duplicateOptions([{id:'a',questions:[{q:'Q',options:[' Да ', 'да']}]}]).length !== 1)
     throw new Error('Duplicate answer options must be reported');
   if (duplicateOptions([{id:'a',questions:[{q:'Q',options:['Да', 'Нет']}]}]).length !== 0)
@@ -138,7 +142,7 @@ assertFixtures();
 // A fixture-only mode lets CI exercise the classifier without claiming that
 // the production exam banks or their normative keys were reviewed.
 if (process.argv.includes('--self-test')) {
-  console.log('Duplicate classifier: 16 synthetic fixtures passed');
+  console.log('Duplicate classifier: 18 synthetic fixtures passed');
   process.exit(0);
 }
 const ctx = {window:{}};
