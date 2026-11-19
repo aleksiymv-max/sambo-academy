@@ -53,6 +53,28 @@ function withinBankDuplicates(banks) {
   }
   return hits;
 }
+
+// Answer-option collisions are editorial blockers for unambiguous multiple-choice
+// items. This reports evidence only; it never rewrites historical answer keys.
+function duplicateOptions(banks) {
+  const hits = [];
+  for (const bank of banks) {
+    for (const [index, question] of bank.questions.entries()) {
+      const options = question.options || question.answers;
+      if (!Array.isArray(options)) continue;
+      const seen = new Map();
+      for (const [optionIndex, option] of options.entries()) {
+        const label = normalize(typeof option === 'string' ? option : option?.text);
+        if (!label) continue;
+        if (seen.has(label)) hits.push({bank:bank.id, question:index+1,
+          first:seen.get(label), second:optionIndex+1});
+        else seen.set(label, optionIndex+1);
+      }
+    }
+  }
+  return hits;
+}
+
 function assertFixtures() {
   const q = stem => ({q:stem});
   if (duplicates([{id:'a',questions:[q('Same'),q('same')] }]).length !== 0)
@@ -65,6 +87,10 @@ function assertFixtures() {
     throw new Error('Intra-bank lexical repetition must be reported');
   if (withinBankDuplicates([{id:'a',questions:[q('A'),q('B')]}]).length !== 0)
     throw new Error('Distinct intra-bank questions must not be flagged');
+  if (duplicateOptions([{id:'a',questions:[{q:'Q',options:[' Да ', 'да']}]}]).length !== 1)
+    throw new Error('Duplicate answer options must be reported');
+  if (duplicateOptions([{id:'a',questions:[{q:'Q',options:['Да', 'Нет']}]}]).length !== 0)
+    throw new Error('Distinct answer options must not be flagged');
   // Distinct bank IDs are required: otherwise a real cross-bank repeat is hidden.
   let rejected = false;
   try { duplicates([{id:'a',questions:[q('Same')]},{id:'a',questions:[q('Same')]}]); }
@@ -75,7 +101,7 @@ assertFixtures();
 // A fixture-only mode lets CI exercise the classifier without claiming that
 // the production exam banks or their normative keys were reviewed.
 if (process.argv.includes('--self-test')) {
-  console.log('Duplicate classifier: 6 synthetic fixtures passed');
+  console.log('Duplicate classifier: 8 synthetic fixtures passed');
   process.exit(0);
 }
 const ctx = {window:{}};
@@ -100,10 +126,14 @@ if (banks.length !== 12 || questionCount !== 128) {
 }
 const hits = duplicates(banks);
 const internalHits = withinBankDuplicates(banks);
+const optionHits = duplicateOptions(banks);
 console.log('Active judge exam banks:', banks.length,
   'questions:', questionCount);
 console.log('Exact cross-module lexical duplicates:', hits.length);
 console.log('Exact within-bank lexical duplicates (editorial review):', internalHits.length);
+console.log('Duplicate answer options (editorial review):', optionHits.length);
+for (const hit of optionHits) console.log('REVIEW answer options:', hit.bank+'#'+hit.question+
+  ' options '+hit.first+' / '+hit.second);
 for (const hit of internalHits) console.log('REVIEW within bank:', hit.bank+'#'+hit.first+' / #'+hit.second);
 for (const hit of hits) console.log('REVIEW:', hit.map(x=>x.bank+'#'+x.index).join(' / '));
 console.log('This does not detect semantic paraphrases or verify legal correctness.');
