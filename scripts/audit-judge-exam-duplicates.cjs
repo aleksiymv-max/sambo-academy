@@ -25,6 +25,11 @@ function normalize(stem) {
     .replace(/\s+/g, ' ').trim();
 }
 function duplicates(banks) {
+  const bankIds = new Set();
+  for (const bank of banks) {
+    if (!bank.id || bankIds.has(bank.id)) throw new Error('Missing or duplicate exam bank ID: ' + bank.id);
+    bankIds.add(bank.id);
+  }
   const seen = new Map();
   for (const bank of banks) {
     for (const [index, q] of bank.questions.entries()) {
@@ -44,12 +49,17 @@ function assertFixtures() {
     throw new Error('Cross-module normalized repetition was missed');
   if (duplicates([{id:'a',questions:[q('A')]},{id:'b',questions:[q('B')]}]).length !== 0)
     throw new Error('False positive for different stems');
+  // Distinct bank IDs are required: otherwise a real cross-bank repeat is hidden.
+  let rejected = false;
+  try { duplicates([{id:'a',questions:[q('Same')]},{id:'a',questions:[q('Same')]}]); }
+  catch (error) { rejected = /duplicate exam bank ID/.test(error.message); }
+  if (!rejected) throw new Error('Duplicate bank IDs must fail closed');
 }
 assertFixtures();
 // A fixture-only mode lets CI exercise the classifier without claiming that
 // the production exam banks or their normative keys were reviewed.
 if (process.argv.includes('--self-test')) {
-  console.log('Duplicate classifier: 3 synthetic fixtures passed');
+  console.log('Duplicate classifier: 4 synthetic fixtures passed');
   process.exit(0);
 }
 const ctx = {window:{}};
