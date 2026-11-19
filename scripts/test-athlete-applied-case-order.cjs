@@ -12,6 +12,12 @@ const cases=window.samboAthleteAppliedCases;
 assert.equal(Object.keys(cases).length,4);
 for(const [title,item] of Object.entries(cases)){
  assert.equal(item.correct,0,'historical source key must remain unchanged');
+ assert.ok(Array.isArray(item.answers) && item.answers.length>=2,'at least two options required');
+ assert.ok(Number.isInteger(item.correct) && item.correct>=0 && item.correct<item.answers.length,'valid correct index');
+ const normalized=item.answers.map(answer=>String(answer).trim().replace(/\s+/g,' ').toLocaleLowerCase('ru'));
+ assert.ok(normalized.every(Boolean),'no blank answers');
+ assert.equal(new Set(normalized).size,normalized.length,'no duplicate answer options');
+ assert.equal(normalized.filter(answer=>answer===normalized[item.correct]).length,1,'one unambiguous correct answer');
  const original=JSON.stringify(item.answers);
  const positions=new Set();
  for(const value of [0,0.999999]){
