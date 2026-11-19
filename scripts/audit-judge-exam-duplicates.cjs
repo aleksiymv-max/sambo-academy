@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* Read-only lexical duplicate inventory. Does not approve normative correctness.
  * Run: node scripts/audit-judge-exam-duplicates.cjs
- * Exit 2 indicates exact duplicate exam stems across distinct modules.
+ * Exit 2 indicates lexical duplicates or blank/duplicate answer options; not normative review.
  */
 'use strict';
 const fs = require('node:fs');
@@ -91,6 +91,10 @@ function blankOptions(banks) {
   return hits;
 }
 
+function hasBlockingLexicalDefects(cross, internal, options, blank) {
+  return cross.length > 0 || internal.length > 0 || options.length > 0 || blank.length > 0;
+}
+
 function assertFixtures() {
   const q = stem => ({q:stem});
   if (duplicates([{id:'a',questions:[q('Same'),q('same')] }]).length !== 0)
@@ -111,6 +115,14 @@ function assertFixtures() {
     throw new Error('Blank answer option must be reported');
   if (blankOptions([{id:'a',questions:[{q:'Q',options:['Да','Нет']}]}]).length !== 0)
     throw new Error('Nonblank answer options must not be flagged');
+  if (!hasBlockingLexicalDefects([], [{bank:'a',first:1,second:2}], [], []))
+    throw new Error('Within-bank duplicate must block CI');
+  if (!hasBlockingLexicalDefects([], [], [{bank:'a',question:1,first:1,second:2}], []))
+    throw new Error('Duplicate options must block CI');
+  if (!hasBlockingLexicalDefects([], [], [], [{bank:'a',question:1,option:2}]))
+    throw new Error('Blank options must block CI');
+  if (hasBlockingLexicalDefects([], [], [], []))
+    throw new Error('Clean bank must not block CI');
   // Distinct bank IDs are required: otherwise a real cross-bank repeat is hidden.
   let rejected = false;
   try { duplicates([{id:'a',questions:[q('Same')]},{id:'a',questions:[q('Same')]}]); }
@@ -121,7 +133,7 @@ assertFixtures();
 // A fixture-only mode lets CI exercise the classifier without claiming that
 // the production exam banks or their normative keys were reviewed.
 if (process.argv.includes('--self-test')) {
-  console.log('Duplicate classifier: 10 synthetic fixtures passed');
+  console.log('Duplicate classifier: 14 synthetic fixtures passed');
   process.exit(0);
 }
 const ctx = {window:{}};
@@ -160,4 +172,4 @@ for (const hit of optionHits) console.log('REVIEW answer options:', hit.bank+'#'
 for (const hit of internalHits) console.log('REVIEW within bank:', hit.bank+'#'+hit.first+' / #'+hit.second);
 for (const hit of hits) console.log('REVIEW:', hit.map(x=>x.bank+'#'+x.index).join(' / '));
 console.log('This does not detect semantic paraphrases or verify legal correctness.');
-if (hits.length) process.exitCode = 2;
+if (hasBlockingLexicalDefects(hits, internalHits, optionHits, blankHits)) process.exitCode = 2;
