@@ -48,7 +48,13 @@
  root.samboAthleteAppliedCaseCard=function(part,course){
   if(course!=='athlete'||!part)return '';
   const item=scenarios[part.title];if(!item)return '';
-  const options=item.answers.map(a=>'<li>'+escapeHtml(a)+'</li>').join('');
+  // Shuffle presentation only: keep the original answer array, correct index and progress IDs intact.
+  const displayed=item.answers.map((answer,index)=>({answer,index}));
+  for(let i=displayed.length-1;i>0;i--){
+   const j=Math.floor(Math.random()*(i+1));
+   [displayed[i],displayed[j]]=[displayed[j],displayed[i]];
+  }
+  const options=displayed.map(({answer})=>'<li>'+escapeHtml(answer)+'</li>').join('');
   return '<section class="sambo-lesson-intro sambo-athlete-applied-case">'+
     '<h4>Практическая ситуация спортсмена</h4><p>'+escapeHtml(item.situation)+'</p>'+
     '<p><strong>Ваше решение:</strong> '+escapeHtml(item.question)+'</p><ol>'+options+'</ol>'+
