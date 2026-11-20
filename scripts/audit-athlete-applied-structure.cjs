@@ -35,7 +35,8 @@ for (const [title, item] of entries) {
   const escapeHtml = value => value.replace(/[&<>"']/g, char => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   }[char]));
-  assert.deepEqual(displayedOptions, item.answers.map(escapeHtml),
+  // Convert VM-realm answers into a host-realm array for strict prototype-aware comparison.
+  assert.deepEqual(displayedOptions, Array.from(item.answers, escapeHtml),
     title + ': lesson card hides, duplicates, reorders or fails to escape answer options');
   assert.equal(window.samboAthleteAppliedCaseCard({ title }, 'judge'), '', title + ': athlete scenario leaked into judge course');
   assert.equal(window.samboAthleteAppliedCaseCard({ title }, 'unknown'), '', title + ': athlete scenario leaked into another course');
