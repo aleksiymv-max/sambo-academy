@@ -58,6 +58,12 @@ function walk(dir) {
       walk(file);
     } else if (item.isFile() && /\.(?:js|mjs|cjs)$/i.test(item.name)) {
       inspectFile(file, path.relative(root, file));
+    } else if (item.isFile() && /\.html?$/i.test(item.name)) {
+      // Any deployed HTML can contain inline answer keys, not just index.html.
+      const page = fs.readFileSync(file, 'utf8');
+      for (const match of page.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script\s*>/gi)) {
+        if (keyPattern.test(match[1])) findings.push('client-visible answer key in inline ' + path.relative(root, file) + ' script');
+      }
     }
   }
 }
