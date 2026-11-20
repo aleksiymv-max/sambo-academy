@@ -24,5 +24,14 @@ for (const [title, item] of entries) {
   });
   assert.equal(new Set(normalized).size, normalized.length, title + ': duplicate answer options');
   assert.ok(item.ref.includes('Статья'), title + ': missing article reference');
+  // A valid registry entry must also be reachable from the athlete lesson renderer.
+  const athleteHtml = window.samboAthleteAppliedCaseCard({ title }, 'athlete');
+  assert.ok(typeof athleteHtml === 'string' && athleteHtml.includes('sambo-athlete-applied-case'), title + ': athlete card not rendered');
+  for (const expected of [item.situation, item.question, item.decision, item.trap, item.ref, item.answers[item.correct]]) {
+    assert.ok(athleteHtml.includes(expected), title + ': lesson card omits scenario, answer, rationale or source');
+  }
+  assert.equal(window.samboAthleteAppliedCaseCard({ title }, 'judge'), '', title + ': athlete scenario leaked into judge course');
+  assert.equal(window.samboAthleteAppliedCaseCard({ title }, 'unknown'), '', title + ': athlete scenario leaked into another course');
+
 }
 console.log('PASS: ' + entries.length + ' athlete applied scenarios pass structural checks; normative review still required');
