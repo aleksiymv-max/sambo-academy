@@ -30,6 +30,13 @@ for (const [title, item] of entries) {
   for (const expected of [item.situation, item.question, item.decision, item.trap, item.ref, item.answers[item.correct]]) {
     assert.ok(athleteHtml.includes(expected), title + ': lesson card omits scenario, answer, rationale or source');
   }
+  // Verify that every distractor is actually shown once, not merely stored in the registry.
+  const displayedOptions = [...athleteHtml.matchAll(/<li>([\\s\\S]*?)<\\/li>/g)].map(match => match[1]);
+  const escapeHtml = value => value.replace(/[&<>"']/g, char => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[char]));
+  assert.deepEqual(displayedOptions, item.answers.map(escapeHtml),
+    title + ': lesson card hides, duplicates, reorders or fails to escape answer options');
   assert.equal(window.samboAthleteAppliedCaseCard({ title }, 'judge'), '', title + ': athlete scenario leaked into judge course');
   assert.equal(window.samboAthleteAppliedCaseCard({ title }, 'unknown'), '', title + ': athlete scenario leaked into another course');
 
