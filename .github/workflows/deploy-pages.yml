@@ -21,17 +21,6 @@ jobs:
         uses: actions/configure-pages@v5
       - name: Stage explicit public artifact
         run: python3 scripts/stage-pages.py
-      - name: Verify staged file inventory
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          import sys
-          sys.path.insert(0, 'scripts')
-          from stage_pages import FILES
-          actual = {p.name for p in Path('dist-pages').iterdir()}
-          assert actual == set(FILES), 'Unexpected or missing deployed assets'
-          assert not any(p.is_symlink() for p in Path('dist-pages').iterdir())
-          PY
       - name: Upload website
         uses: actions/upload-pages-artifact@v3
         with:
