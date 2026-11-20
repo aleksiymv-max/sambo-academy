@@ -31,7 +31,7 @@ for (const [title, item] of entries) {
     assert.ok(athleteHtml.includes(expected), title + ': lesson card omits scenario, answer, rationale or source');
   }
   // Verify that every distractor is actually shown once, not merely stored in the registry.
-  const displayedOptions = [...athleteHtml.matchAll(/<li>([\\s\\S]*?)<\\/li>/g)].map(match => match[1]);
+  const displayedOptions = [...athleteHtml.matchAll(/<li>([\s\S]*?)<\/li>/g)].map(match => match[1]);
   const escapeHtml = value => value.replace(/[&<>"']/g, char => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   }[char]));
