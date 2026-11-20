@@ -48,6 +48,14 @@ try {
     '<script src="exam.js"></script>',
     { 'exam.js': "questions[0]['correctIndex'] = 1;" },
     1, /client-visible answer key/);
+  fixture('dynamic-import-unlinked-script',
+    '<script src="app.js"></script>',
+    { 'app.js': 'import("./payload.js");', 'payload.js': 'const exam = [{ correct: 1 }];' },
+    1, /client-visible answer key in payload.js/);
+  fixture('renamed-exam-script',
+    '<script src="app.js"></script>',
+    { 'app.js': 'const questions = [{ correctIndex: 2 }];' },
+    1, /client-visible answer key in app.js/);
   fixture('safe-exam-no-key',
     '<script src="exam.js"></script>',
     { 'exam.js': 'const questions = [{ id: "q1", prompt: "Scenario?" }];' },
