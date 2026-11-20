@@ -39,12 +39,15 @@ for (const src of scriptSrc) {
   inspectFile(resolved, local);
 }
 // Include dynamically imported or fetched scripts, even when renamed.
-// Symlinks are skipped to avoid escaping the deployment directory.
+// Fail closed on symlinks: public servers may follow them outside the scanned tree.
 // Scan every directory inside the deploy root: even a node_modules or .cache
 // folder is publicly accessible if accidentally copied into the output.
 function walk(dir) {
   for (const item of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (item.isSymbolicLink()) continue;
+    if (item.isSymbolicLink()) {
+      findings.push('deployment symlink requires explicit resolution: ' + path.relative(root, path.join(dir, item.name)));
+      continue;
+    }
     const file = path.join(dir, item.name);
     if (item.isDirectory()) {
       walk(file);
