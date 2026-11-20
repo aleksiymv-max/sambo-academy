@@ -1,32 +1,61 @@
 #!/usr/bin/env node
 'use strict';
-// Release-blocking static scan. Run against the exact deploy directory.
-// This detects known client-side exam key exposure, not all possible leaks.
+// Release-blocking heuristic scan of the exact deployment directory.
+// This is not a substitute for private server-side question storage and grading.
 const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(process.argv[2] || '.');
 const entry = path.join(root, 'index.html');
-if (!fs.existsSync(entry)) { console.error('BLOCK: missing deployment entry index.html'); process.exit(2); }
+if (!fs.existsSync(entry)) {
+  console.error('BLOCK: missing deployment entry index.html');
+  process.exit(2);
+}
 const html = fs.readFileSync(entry, 'utf8');
 const scriptSrc = [...html.matchAll(/<script\b[^>]*\bsrc\s*=\s*["']([^"']+)["']/gi)].map(m => m[1]);
 const knownExam = /(?:exam|assessment|test|quiz)/i;
+const keyPattern = /(?:\bcorrect(?:Index|Answer)?\b|["']correct(?:Index|Answer)?["'])\s*[:=]|\[\s*["']correct(?:Index|Answer)?["']\s*\]\s*=/i;
 const findings = [];
-// Also inspect deployable JS not referenced by index.html: dynamic imports and fetch()\n// can otherwise expose answer keys under arbitrary filenames.\nconst visited = new Set();\nfunction inspectFile(resolved, label) {\n  if (visited.has(resolved)) return;\n  visited.add(resolved);\n  const js = fs.readFileSync(resolved, 'utf8');\n  if (/(?:\\bcorrect(?:Index|Answer)?\\b|[\"']correct(?:Index|Answer)?[\"'])\\s*[:=]|\\[\\s*[\"']correct(?:Index|Answer)?[\"']\\s*\\]\\s*=/i.test(js)) {\n    findings.push('client-visible answer key in ' + label);\n  }\n}\nfor (const src of scriptSrc) {
+const visited = new Set();
+function inspectFile(file, label) {
+  if (visited.has(file)) return;
+  visited.add(file);
+  if (keyPattern.test(fs.readFileSync(file, 'utf8'))) {
+    findings.push('client-visible answer key in ' + label);
+  }
+}
+for (const src of scriptSrc) {
   if (/^(?:https?:)?\/\//i.test(src)) continue;
   const local = src.split(/[?#]/)[0].replace(/^\.\//, '');
   if (!knownExam.test(local)) continue;
   const resolved = path.resolve(root, local);
-  if (!resolved.startsWith(root + path.sep)) { findings.push('unsafe script path: ' + local); continue; }
-  if (!fs.existsSync(resolved)) { findings.push('missing referenced exam script: ' + local); continue; }
-  const js = fs.readFileSync(resolved, 'utf8');
-  if (/(?:\bcorrect(?:Index|Answer)?\b|["']correct(?:Index|Answer)?["'])\s*[:=]|\[\s*["']correct(?:Index|Answer)?["']\s*\]\s*=/i.test(js)) {
-    findings.push('client-visible answer key in ' + local);
+  if (!resolved.startsWith(root + path.sep)) {
+    findings.push('unsafe script path: ' + local);
+    continue;
+  }
+  if (!fs.existsSync(resolved)) {
+    findings.push('missing referenced exam script: ' + local);
+    continue;
+  }
+  inspectFile(resolved, local);
+}
+// Include dynamically imported or fetched scripts, even when renamed.
+// Symlinks are skipped to avoid escaping the deployment directory.
+function walk(dir) {
+  for (const item of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (item.isSymbolicLink()) continue;
+    const file = path.join(dir, item.name);
+    if (item.isDirectory()) {
+      if (!['.git', 'node_modules', '.cache'].includes(item.name)) walk(file);
+    } else if (item.isFile() && /\.(?:js|mjs|cjs)$/i.test(item.name)) {
+      inspectFile(file, path.relative(root, file));
+    }
   }
 }
+walk(root);
 if (findings.length) {
   console.error('BLOCK: independent examination must be scored server-side; found:');
   findings.forEach(f => console.error('- ' + f));
   process.exit(1);
 }
-console.log('PASS: no known inline correct-key patterns in locally referenced exam scripts.');
-console.log('NOTE: this does not establish server-side authorization, payment security or full coverage.');
+console.log('PASS: no known correct-key patterns in deployable JavaScript.');
+console.log('NOTE: heuristic only; does not prove server-side authorization or payment security.');
