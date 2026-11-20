@@ -13,6 +13,8 @@ jobs:
           node scripts/check-repo-privacy.cjs
       - name: Verify source-backed athlete training scenarios and preserved progress keys
         run: node scripts/check-athlete-applied-cases.cjs
+      - name: Audit athlete applied scenario structure (not normative approval)
+        run: node scripts/audit-athlete-applied-structure.cjs
       - name: Verify JavaScript syntax and core features
         run: |
           node <<'NODE'
