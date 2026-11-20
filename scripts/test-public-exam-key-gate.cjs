@@ -32,6 +32,14 @@ try {
     '<script src="./exam.js?v=1"></script>',
     { 'exam.js': 'const correctIndex = 2;' },
     1, /client-visible answer key/);
+  fixture('quoted-correct-key',
+    '<script src="exam.js"></script>',
+    { 'exam.js': 'const questions = [{ "correct": 2 }];' },
+    1, /client-visible answer key/);
+  fixture('quoted-correct-index',
+    '<script src="exam.js"></script>',
+    { 'exam.js': "const questions = [{ 'correctIndex': 2 }];" },
+    1, /client-visible answer key/);
   fixture('safe-exam-no-key',
     '<script src="exam.js"></script>',
     { 'exam.js': 'const questions = [{ id: "q1", prompt: "Scenario?" }];' },
