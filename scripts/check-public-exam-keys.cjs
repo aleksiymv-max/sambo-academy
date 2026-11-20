@@ -19,7 +19,7 @@ for (const src of scriptSrc) {
   if (!resolved.startsWith(root + path.sep)) { findings.push('unsafe script path: ' + local); continue; }
   if (!fs.existsSync(resolved)) { findings.push('missing referenced exam script: ' + local); continue; }
   const js = fs.readFileSync(resolved, 'utf8');
-  if (/\bcorrect\s*:/i.test(js) || /\bcorrect(?:Index|Answer)\s*[:=]/i.test(js)) {
+  if (/(?:\bcorrect(?:Index|Answer)?\b|["']correct(?:Index|Answer)?["'])\s*[:=]/i.test(js)) {
     findings.push('client-visible answer key in ' + local);
   }
 }
