@@ -69,6 +69,14 @@ try {
   fixture('inline-answer-key',
     '<script>const questions = [{ correct: 2 }];</script>', {},
     1, /client-visible answer key in inline index.html script/);
+  fixture('nested-html-inline-answer-key',
+    '<script src="app.js"></script>',
+    { 'app.js': 'console.log("safe")', 'lessons/extra.html': '<script>const exam = [{ correctIndex: 1 }];</script>' },
+    1, /client-visible answer key in inline lessons\/extra.html script/);
+  fixture('nested-html-inline-safe',
+    '<script src="app.js"></script>',
+    { 'app.js': 'console.log("safe")', 'lessons/extra.html': '<script>const exam = [{ id: "q1" }];</script>' },
+    0, /PASS:/);
   fixture('inline-safe-script',
     '<script>const questions = [{ id: "q1", prompt: "Scenario?" }];</script>', {},
     0, /PASS:/);
