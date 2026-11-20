@@ -40,12 +40,14 @@ for (const src of scriptSrc) {
 }
 // Include dynamically imported or fetched scripts, even when renamed.
 // Symlinks are skipped to avoid escaping the deployment directory.
+// Scan every directory inside the deploy root: even a node_modules or .cache
+// folder is publicly accessible if accidentally copied into the output.
 function walk(dir) {
   for (const item of fs.readdirSync(dir, { withFileTypes: true })) {
     if (item.isSymbolicLink()) continue;
     const file = path.join(dir, item.name);
     if (item.isDirectory()) {
-      if (!['.git', 'node_modules', '.cache'].includes(item.name)) walk(file);
+      walk(file);
     } else if (item.isFile() && /\.(?:js|mjs|cjs)$/i.test(item.name)) {
       inspectFile(file, path.relative(root, file));
     }
