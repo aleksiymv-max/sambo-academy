@@ -66,6 +66,12 @@ try {
     '<script src="app.js"></script>',
     { 'app.js': 'console.log("app");', '.cache/hidden.js': 'const quiz = [{ correctIndex: 1 }];' },
     1, /client-visible answer key in .cache/);
+  fixture('inline-answer-key',
+    '<script>const questions = [{ correct: 2 }];</script>', {},
+    1, /client-visible answer key in inline index.html script/);
+  fixture('inline-safe-script',
+    '<script>const questions = [{ id: "q1", prompt: "Scenario?" }];</script>', {},
+    0, /PASS:/);
   fixture('safe-without-symlinks',
     '<script src="app.js"></script>',
     { 'app.js': 'console.log("safe");' },
