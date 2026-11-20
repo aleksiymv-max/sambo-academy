@@ -11,7 +11,7 @@ const html = fs.readFileSync(entry, 'utf8');
 const scriptSrc = [...html.matchAll(/<script\b[^>]*\bsrc\s*=\s*["']([^"']+)["']/gi)].map(m => m[1]);
 const knownExam = /(?:exam|assessment|test|quiz)/i;
 const findings = [];
-for (const src of scriptSrc) {
+// Also inspect deployable JS not referenced by index.html: dynamic imports and fetch()\n// can otherwise expose answer keys under arbitrary filenames.\nconst visited = new Set();\nfunction inspectFile(resolved, label) {\n  if (visited.has(resolved)) return;\n  visited.add(resolved);\n  const js = fs.readFileSync(resolved, 'utf8');\n  if (/(?:\\bcorrect(?:Index|Answer)?\\b|[\"']correct(?:Index|Answer)?[\"'])\\s*[:=]|\\[\\s*[\"']correct(?:Index|Answer)?[\"']\\s*\\]\\s*=/i.test(js)) {\n    findings.push('client-visible answer key in ' + label);\n  }\n}\nfor (const src of scriptSrc) {
   if (/^(?:https?:)?\/\//i.test(src)) continue;
   const local = src.split(/[?#]/)[0].replace(/^\.\//, '');
   if (!knownExam.test(local)) continue;
