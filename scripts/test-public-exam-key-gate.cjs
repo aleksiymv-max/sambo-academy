@@ -66,6 +66,16 @@ try {
     '<script src="app.js"></script>',
     { 'app.js': 'console.log("app");', '.cache/hidden.js': 'const quiz = [{ correctIndex: 1 }];' },
     1, /client-visible answer key in .cache/);
+  fixture('safe-without-symlinks',
+    '<script src="app.js"></script>',
+    { 'app.js': 'console.log("safe");' },
+    0, /PASS:/);
+  const linkDir = path.join(root, 'safe-without-symlinks');
+  fs.symlinkSync(path.join(linkDir, 'app.js'), path.join(linkDir, 'alias.js'));
+  const symlinkResult = spawnSync(process.execPath, [scanner, linkDir], { encoding: 'utf8' });
+  assert.equal(symlinkResult.status, 1, 'deployment symlink must block');
+  assert.match(symlinkResult.stderr, /deployment symlink requires explicit resolution/);
+  passed++;
   fixture('safe-exam-no-key',
     '<script src="exam.js"></script>',
     { 'exam.js': 'const questions = [{ id: "q1", prompt: "Scenario?" }];' },
