@@ -15,6 +15,11 @@ const scriptSrc = [...html.matchAll(/<script\b[^>]*\bsrc\s*=\s*["']([^"']+)["']/
 const knownExam = /(?:exam|assessment|test|quiz)/i;
 const keyPattern = /(?:\bcorrect(?:Index|Answer)?\b|["']correct(?:Index|Answer)?["'])\s*[:=]|\[\s*["']correct(?:Index|Answer)?["']\s*\]\s*=/i;
 const findings = [];
+// Inline JavaScript is deployed inside index.html and must be scanned too.
+// Exclude ordinary HTML attributes/text to avoid unrelated false positives.
+for (const match of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script\s*>/gi)) {
+  if (keyPattern.test(match[1])) findings.push('client-visible answer key in inline index.html script');
+}
 const visited = new Set();
 function inspectFile(file, label) {
   if (visited.has(file)) return;
