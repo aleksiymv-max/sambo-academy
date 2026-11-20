@@ -15,7 +15,9 @@ function fixture(name, html, scripts, expectedStatus, expectedText) {
   fs.mkdirSync(dir);
   fs.writeFileSync(path.join(dir, 'index.html'), html);
   for (const [file, source] of Object.entries(scripts)) {
-    fs.writeFileSync(path.join(dir, file), source);
+    const target = path.join(dir, file);
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.writeFileSync(target, source);
   }
   const result = spawnSync(process.execPath, [scanner, dir], { encoding: 'utf8' });
   assert.equal(result.error, undefined, name + ': scanner process error');
@@ -56,6 +58,14 @@ try {
     '<script src="app.js"></script>',
     { 'app.js': 'const questions = [{ correctIndex: 2 }];' },
     1, /client-visible answer key in app.js/);
+  fixture('deploy-node-modules-key',
+    '<script src="app.js"></script>',
+    { 'app.js': 'console.log("app");', 'node_modules/leaked.js': 'const quiz = [{ correct: 2 }];' },
+    1, /client-visible answer key in node_modules/);
+  fixture('deploy-cache-key',
+    '<script src="app.js"></script>',
+    { 'app.js': 'console.log("app");', '.cache/hidden.js': 'const quiz = [{ correctIndex: 1 }];' },
+    1, /client-visible answer key in .cache/);
   fixture('safe-exam-no-key',
     '<script src="exam.js"></script>',
     { 'exam.js': 'const questions = [{ id: "q1", prompt: "Scenario?" }];' },
