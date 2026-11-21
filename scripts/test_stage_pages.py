@@ -57,6 +57,16 @@ class StagePagesTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "Missing or unsafe"):
             stage.main()
 
+    def test_missing_source_preserves_existing_staged_artifact(self):
+        stage.main()
+        marker = self.dest / "index.html"
+        original = marker.read_text(encoding="utf-8")
+        (self.root / "app.js").unlink()
+        with self.assertRaisesRegex(RuntimeError, "Missing or unsafe"):
+            stage.main()
+        self.assertEqual(marker.read_text(encoding="utf-8"), original)
+        self.assertTrue((self.dest / "app.js").exists())
+
     def test_symlinked_source_fails(self):
         (self.root / "app.js").unlink()
         (self.root / "app.js").symlink_to(self.root / "index.html")
