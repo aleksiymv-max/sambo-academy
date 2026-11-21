@@ -37,6 +37,14 @@ for(const [index,title] of titles.entries()){
   click({target:button});
   assert.match(feedback.textContent,/Сначала выберите/,'Missing selection must be handled');
   assert.equal(details.open,false,'Missing selection should not reveal solution');
+  // Malformed DOM values must not be accepted or reveal the solution.
+  for(const invalid of ['','NaN','-1',String(item.answers.length),'1.5']){
+    selected={value:invalid};
+    details.open=false;
+    click({target:button});
+    assert.match(feedback.textContent,/Некорректный вариант/,'Invalid selection accepted: '+invalid);
+    assert.equal(details.open,false,'Invalid selection revealed solution');
+  }
   const correctPosition=(item.correct-offset+item.answers.length)%item.answers.length;
   selected={value:String(correctPosition)};
   click({target:button});
