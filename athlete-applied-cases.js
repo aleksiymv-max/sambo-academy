@@ -48,7 +48,7 @@
  root.samboAthleteAppliedCaseCard=function(part,course){
   if(course!=='athlete'||!part)return '';
   const item=scenarios[part.title];if(!item)return '';
-  const options=item.answers.map(a=>'<li>'+escapeHtml(a)+'</li>').join('');
+  // Rotate displayed self-check options by the stable lesson title, without\n  // changing the stored answer index or any historical quiz/progress data.\n  const titles=Object.keys(scenarios);\n  const offset=titles.indexOf(part.title)%item.answers.length;\n  const shown=item.answers.map((_,i)=>item.answers[(i+offset)%item.answers.length]);\n  const options=shown.map(a=>'<li>'+escapeHtml(a)+'</li>').join('');
   return '<section class="sambo-lesson-intro sambo-athlete-applied-case">'+
     '<h4>Практическая ситуация спортсмена</h4><p>'+escapeHtml(item.situation)+'</p>'+
     '<p><strong>Ваше решение:</strong> '+escapeHtml(item.question)+'</p><ol>'+options+'</ol>'+
