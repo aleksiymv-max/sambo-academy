@@ -35,6 +35,19 @@ class StagePagesTests(unittest.TestCase):
         self.assertEqual({p.name for p in self.dest.iterdir()}, {"index.html", "app.js"})
         self.assertFalse((self.dest / "secret.txt").exists())
 
+    def test_public_exam_answer_bundle_blocks_release(self):
+        (self.root / "judge-exam-independent.js").write_text(
+            "const questions = [{correct: 1}];", encoding="utf-8"
+        )
+        with patch.object(stage, "FILES", ["index.html", "judge-exam-independent.js"]):
+            with self.assertRaisesRegex(RuntimeError, "Release blocked"):
+                stage.main()
+        self.assertFalse(self.dest.exists())
+
+    def test_unrelated_public_javascript_remains_allowed(self):
+        stage.main()
+        self.assertTrue((self.dest / "app.js").is_file())
+
     def test_missing_allowlisted_asset_fails(self):
         (self.root / "app.js").unlink()
         with self.assertRaisesRegex(RuntimeError, "Missing or unsafe"):
