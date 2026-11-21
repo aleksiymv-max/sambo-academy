@@ -48,6 +48,19 @@ class StagePagesTests(unittest.TestCase):
                         stage.main()
                 self.assertFalse(self.dest.exists())
 
+    def test_actual_release_manifest_is_blocked_until_server_exam_migration(self):
+        # Unlike the isolated staging tests, this checks the unmodified release
+        # manifest. A passing test suite must not be mistaken for a deployable site.
+        actual_manifest = list(stage.FILES)
+        self.assertTrue(
+            set(actual_manifest) & stage.BLOCKED_EXAM_ASSETS,
+            "Review this release gate when the server-side exam migration lands",
+        )
+        with patch.object(stage, "FILES", actual_manifest):
+            with self.assertRaisesRegex(RuntimeError, "Release blocked"):
+                stage.main()
+        self.assertFalse(self.dest.exists())
+
     def test_unrelated_public_javascript_remains_allowed(self):
         stage.main()
         self.assertTrue((self.dest / "app.js").is_file())
