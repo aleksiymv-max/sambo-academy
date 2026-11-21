@@ -41,6 +41,18 @@ def main():
     exposed = set(FILES) & BLOCKED_EXAM_ASSETS
     if exposed:
         raise RuntimeError("Release blocked: client-side exam answer bundles: " + ", ".join(sorted(exposed)))
+    # Removing a forbidden bundle from FILES alone must not silently publish a
+    # broken HTML shell that still references that bundle. Fail closed until
+    # server-side exam delivery and the HTML loader have both been migrated.
+    html_source = ROOT / "index.html"
+    if html_source.is_file() and not html_source.is_symlink():
+        html = html_source.read_text(encoding="utf-8")
+        referenced = sorted(name for name in BLOCKED_EXAM_ASSETS if name in html)
+        if referenced:
+            raise RuntimeError(
+                "Release blocked: HTML still references client exam bundles: "
+                + ", ".join(referenced)
+            )
     # The allowlist must contain plain filenames, never paths that can escape DEST.
     if len(FILES) != len(set(FILES)) or any(
         not name or Path(name).name != name or name in {'.', '..'} or '\\' in name
