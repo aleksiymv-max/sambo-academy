@@ -157,6 +157,9 @@ jobs:
       - name: Reject positional guessing in athlete applied self-checks
         run: node scripts/check-athlete-applied-answer-positions.cjs
 
+      - name: Exercise athlete applied self-check interactions
+        run: node scripts/check-athlete-applied-interaction.cjs
+
       - name: Report editorial gaps without treating them as a validated course
         run: node scripts/audit-judge-content.cjs
 
