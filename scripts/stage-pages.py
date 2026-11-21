@@ -41,6 +41,11 @@ def main():
     exposed = set(FILES) & BLOCKED_EXAM_ASSETS
     if exposed:
         raise RuntimeError("Release blocked: client-side exam answer bundles: " + ", ".join(sorted(exposed)))
+    # Validate all sources before touching an existing staged artifact.
+    for name in FILES:
+        source = ROOT / name
+        if not source.is_file() or source.is_symlink():
+            raise RuntimeError(f"Missing or unsafe public asset: {name}")
     if DEST.exists():
         if DEST.is_symlink() or not DEST.is_dir():
             raise RuntimeError("Unsafe output directory")
@@ -48,8 +53,6 @@ def main():
     DEST.mkdir()
     for name in FILES:
         source = ROOT / name
-        if not source.is_file() or source.is_symlink():
-            raise RuntimeError(f"Missing or unsafe public asset: {name}")
         shutil.copyfile(source, DEST / name)
     actual = {p.name for p in DEST.iterdir()}
     if actual != set(FILES) or any(p.is_symlink() for p in DEST.iterdir()):
