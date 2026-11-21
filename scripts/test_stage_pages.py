@@ -52,6 +52,21 @@ class StagePagesTests(unittest.TestCase):
         stage.main()
         self.assertTrue((self.dest / "app.js").is_file())
 
+    def test_manifest_rejects_path_traversal_and_duplicates(self):
+        # An accidental manifest edit must not read or write outside the public root.
+        for names in (
+            ["index.html", "../outside.txt"],
+            ["index.html", "/tmp/outside.txt"],
+            ["index.html", "nested/file.js"],
+            ["index.html", "..\\outside.txt"],
+            ["index.html", "index.html"],
+        ):
+            with self.subTest(names=names):
+                with patch.object(stage, "FILES", names):
+                    with self.assertRaisesRegex(RuntimeError, "Unsafe or duplicate"):
+                        stage.main()
+                self.assertFalse(self.dest.exists())
+
     def test_missing_allowlisted_asset_fails(self):
         (self.root / "app.js").unlink()
         with self.assertRaisesRegex(RuntimeError, "Missing or unsafe"):
