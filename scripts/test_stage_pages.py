@@ -73,6 +73,19 @@ class StagePagesTests(unittest.TestCase):
         after = {p.name: p.read_bytes() for p in self.dest.iterdir()}
         self.assertEqual(after, before)
 
+    def test_removing_exam_files_from_manifest_does_not_bypass_html_gate(self):
+        # A deploy that omits exam JS but keeps its script tags is still unsafe
+        # and broken. Reject before replacing the last safe staged artifact.
+        stage.main()
+        before = {p.name: p.read_bytes() for p in self.dest.iterdir()}
+        (self.root / "index.html").write_text(
+            '<script src="judge-exam-independent.js"></script>', encoding="utf-8"
+        )
+        with self.assertRaisesRegex(RuntimeError, "HTML still references"):
+            stage.main()
+        after = {p.name: p.read_bytes() for p in self.dest.iterdir()}
+        self.assertEqual(after, before)
+
     def test_unrelated_public_javascript_remains_allowed(self):
         stage.main()
         self.assertTrue((self.dest / "app.js").is_file())
