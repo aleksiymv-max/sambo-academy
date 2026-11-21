@@ -41,6 +41,12 @@ def main():
     exposed = set(FILES) & BLOCKED_EXAM_ASSETS
     if exposed:
         raise RuntimeError("Release blocked: client-side exam answer bundles: " + ", ".join(sorted(exposed)))
+    # The allowlist must contain plain filenames, never paths that can escape DEST.
+    if len(FILES) != len(set(FILES)) or any(
+        not name or Path(name).name != name or name in {'.', '..'} or '\\' in name
+        for name in FILES
+    ):
+        raise RuntimeError('Unsafe or duplicate public asset name')
     # Validate all sources before touching an existing staged artifact.
     for name in FILES:
         source = ROOT / name
