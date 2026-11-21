@@ -7,6 +7,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - name: Test GitHub Pages artifact staging
+        run: python3 -m unittest discover -s scripts -p 'test_stage_pages.py'
       - name: Prevent committing personal data or service secrets
         run: |
           node scripts/check-repo-privacy.cjs --self-test
