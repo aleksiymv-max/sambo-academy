@@ -82,7 +82,8 @@
    if(!item)return;
    const titles=Object.keys(scenarios);
    const offset=titles.indexOf(title)%item.answers.length;
-   const displayedIndex=Number(selected.value);
+   const rawValue=selected.value;
+   const displayedIndex=typeof rawValue==='string' && /^(0|[1-9][0-9]*)$/.test(rawValue) ? Number(rawValue) : NaN;
    if(!Number.isInteger(displayedIndex)||displayedIndex<0||displayedIndex>=item.answers.length){
     feedback.textContent='Некорректный вариант ответа. Выберите один из предложенных вариантов.';
     return;
