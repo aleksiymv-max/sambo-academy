@@ -82,7 +82,12 @@
    if(!item)return;
    const titles=Object.keys(scenarios);
    const offset=titles.indexOf(title)%item.answers.length;
-   const chosen=(Number(selected.value)+offset)%item.answers.length;
+   const displayedIndex=Number(selected.value);
+   if(!Number.isInteger(displayedIndex)||displayedIndex<0||displayedIndex>=item.answers.length){
+    feedback.textContent='Некорректный вариант ответа. Выберите один из предложенных вариантов.';
+    return;
+   }
+   const chosen=(displayedIndex+offset)%item.answers.length;
    feedback.textContent=chosen===item.correct?'Верно. Изучите объяснение ниже.':'Неверно. Изучите разбор и типичную ошибку ниже.';
    const details=card.querySelector('details.sambo-self-check');
    if(details)details.open=true;
