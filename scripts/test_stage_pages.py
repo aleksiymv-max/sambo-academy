@@ -10,6 +10,8 @@ SCRIPT = Path(__file__).resolve().with_name("stage-pages.py")
 spec = importlib.util.spec_from_file_location("stage_pages", SCRIPT)
 stage = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(stage)
+# Preserve the production manifest before setUp replaces FILES for isolated tests.
+RELEASE_FILES = tuple(stage.FILES)
 
 
 class StagePagesTests(unittest.TestCase):
@@ -51,7 +53,7 @@ class StagePagesTests(unittest.TestCase):
     def test_actual_release_manifest_is_blocked_until_server_exam_migration(self):
         # Unlike the isolated staging tests, this checks the unmodified release
         # manifest. A passing test suite must not be mistaken for a deployable site.
-        actual_manifest = list(stage.FILES)
+        actual_manifest = list(RELEASE_FILES)
         self.assertTrue(
             set(actual_manifest) & stage.BLOCKED_EXAM_ASSETS,
             "Review this release gate when the server-side exam migration lands",
