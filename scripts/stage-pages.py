@@ -27,7 +27,20 @@ FILES = [
     "i (1).jpeg",
 ]
 
+# Fail closed while public exam bundles contain answer keys. A manifest is not
+# authorization to expose independent exam answers. Remove this gate only after
+# server-side assessment and a reviewed public-asset audit.
+BLOCKED_EXAM_ASSETS = {
+    "judge-exam-independent.js",
+    "judge-admission-exam-v3.js",
+    "judge-exam-foundations-v2.js",
+    "judge-exam-sanctions-v3.js",
+}
+
 def main():
+    exposed = set(FILES) & BLOCKED_EXAM_ASSETS
+    if exposed:
+        raise RuntimeError("Release blocked: client-side exam answer bundles: " + ", ".join(sorted(exposed)))
     if DEST.exists():
         if DEST.is_symlink() or not DEST.is_dir():
             raise RuntimeError("Unsafe output directory")
