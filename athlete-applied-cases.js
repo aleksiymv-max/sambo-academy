@@ -77,7 +77,6 @@
    const selected=card.querySelector('input[type="radio"]:checked');
    const feedback=card.querySelector('.sambo-case-feedback');
    if(!selected){feedback.textContent='Сначала выберите один вариант ответа.';return;}
-   const question=card.querySelector('p strong');
    const title=card.getAttribute('data-case-title');
    const item=scenarios[title];
    if(!item)return;
@@ -89,5 +88,4 @@
    if(details)details.open=true;
   });
  }
-};
 })(window);
