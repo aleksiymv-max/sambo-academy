@@ -11,8 +11,10 @@ const positions=[];
 for(const title of Object.keys(cases)){
   const item=cases[title];
   const html=render({title},'athlete');
-  const options=[...html.matchAll(/<li>(.*?)<\/li>/g)].map(m=>m[1]);
+  const options=[...html.matchAll(/<input type="radio"[^>]*value="(\d+)"[^>]*> ([^<]+)<\/label>/g)].map(m=>m[2]);
   assert.equal(options.length,item.answers.length,title);
+  assert.match(html,/class="sambo-case-check"/,title);
+  assert.match(html,/aria-live="polite"/,title);
   const answer=html.match(/<strong>Правильный ответ:<\/strong> ([^<]+)/);
   assert.ok(answer,title);
   const position=options.indexOf(answer[1]);
