@@ -63,6 +63,16 @@ class StagePagesTests(unittest.TestCase):
                 stage.main()
         self.assertFalse(self.dest.exists())
 
+    def test_blocked_release_preserves_previous_staged_artifact(self):
+        # A rejected production manifest must not destroy the last safe staging.
+        stage.main()
+        before = {p.name: p.read_bytes() for p in self.dest.iterdir()}
+        with patch.object(stage, "FILES", list(RELEASE_FILES)):
+            with self.assertRaisesRegex(RuntimeError, "Release blocked"):
+                stage.main()
+        after = {p.name: p.read_bytes() for p in self.dest.iterdir()}
+        self.assertEqual(after, before)
+
     def test_unrelated_public_javascript_remains_allowed(self):
         stage.main()
         self.assertTrue((self.dest / "app.js").is_file())
