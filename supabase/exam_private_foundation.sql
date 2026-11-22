@@ -1,7 +1,7 @@
 -- Staged design only. DO NOT run on production until entitlement, RLS and
 -- two-account integration tests have been implemented and reviewed.
 -- Never add real exam keys to this public repository.
--- Immutable exam-version and attempt storage for BOTH courses.
+-- Versioned exam storage for BOTH courses; immutability requires a follow-up migration.
 begin;
 create schema if not exists exam_private;
 revoke all on schema exam_private from public, anon, authenticated;
