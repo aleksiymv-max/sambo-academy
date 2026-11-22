@@ -3,11 +3,12 @@
 const fs=require('node:fs');
 const vm=require('node:vm');
 const assert=require('node:assert/strict');
-let click;
-const document={addEventListener(type,handler){if(type==='click')click=handler;}};
+let click,change;
+const document={addEventListener(type,handler){if(type==='click')click=handler;if(type==='change')change=handler;}};
 const window={document};
 vm.runInNewContext(fs.readFileSync('athlete-applied-cases.js','utf8'),{window});
 assert.equal(typeof click,'function','Delegated click listener missing');
+assert.equal(typeof change,'function','Delegated change listener missing');
 const cases=window.samboAthleteAppliedCases;
 const titles=Object.keys(cases);
 assert.equal(titles.length,4,'Unexpected scenario count: review test coverage');
@@ -50,6 +51,9 @@ for(const [index,title] of titles.entries()){
   click({target:button});
   assert.match(feedback.textContent,/^Верно/,'Rotated correct option rejected: '+title);
   assert.equal(details.open,true,'Explanation should open after checking');
+  // Switching the selected option must invalidate stale feedback.
+  change({target:{matches(selector){assert.equal(selector,'.sambo-case-option input[type="radio"]');return true;},closest(selector){assert.equal(selector,'.sambo-athlete-applied-case');return card;}}});
+  assert.match(feedback.textContent,/Ответ изменён/,'Stale grade shown after changing answer');
   details.open=false;
   selected={value:String((correctPosition+1)%item.answers.length)};
   click({target:button});
