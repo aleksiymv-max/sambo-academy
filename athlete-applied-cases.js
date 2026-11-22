@@ -48,10 +48,18 @@
  root.samboAthleteAppliedCaseCard=function(part,course){
   if(course!=='athlete'||!part)return '';
   const item=scenarios[part.title];if(!item)return '';
-  const options=item.answers.map(a=>'<li>'+escapeHtml(a)+'</li>').join('');
-  return '<section class="sambo-lesson-intro sambo-athlete-applied-case">'+
+  // Rotate displayed self-check options by the stable lesson title, without
+  // changing the stored answer index or any historical quiz/progress data.
+  const titles=Object.keys(scenarios);
+  const offset=titles.indexOf(part.title)%item.answers.length;
+  const shown=item.answers.map((_,i)=>item.answers[(i+offset)%item.answers.length]);
+  const options=shown.map((a,i)=>'<label class="sambo-case-option"><input type="radio" name="sambo-case-'+titles.indexOf(part.title)+'" value="'+i+'"> '+escapeHtml(a)+'</label>').join('');
+  return '<section class="sambo-lesson-intro sambo-athlete-applied-case" data-case-title="'+escapeHtml(part.title)+'">'+
     '<h4>Практическая ситуация спортсмена</h4><p>'+escapeHtml(item.situation)+'</p>'+
-    '<p><strong>Ваше решение:</strong> '+escapeHtml(item.question)+'</p><ol>'+options+'</ol>'+
+    '<p><strong>Ваше решение:</strong> '+escapeHtml(item.question)+'</p>'+
+    '<fieldset class="sambo-case-choices"><legend>Выберите один ответ</legend>'+options+'</fieldset>'+
+    '<p class="sambo-case-feedback" role="status" aria-live="polite">Выберите вариант, затем проверьте решение.</p>'+
+    '<button type="button" class="sambo-case-check">Проверить ответ</button>'+
     '<details class="sambo-self-check"><summary>Открыть решение, норму и типичную ошибку</summary>'+
     '<p><strong>Правильный ответ:</strong> '+escapeHtml(item.answers[item.correct])+'</p>'+
     '<p><strong>Разбор:</strong> '+escapeHtml(item.decision)+'</p>'+
@@ -59,4 +67,46 @@
     '<p><strong>Нормативная основа:</strong> '+escapeHtml(item.ref)+' (редакция 14.09.2026).</p>'+
     '</details></section>';
  };
+ // Clear stale grading feedback when the learner changes an answer.
+ // Keep the explanation available as study material, but do not display a
+ // previous answer's grade as though it applies to the newly selected option.
+ if(root.document&&root.document.addEventListener){
+  root.document.addEventListener('change',function(event){
+   const target=event.target;
+   if(!target||!target.matches||!target.matches('.sambo-case-option input[type="radio"]'))return;
+   const card=target.closest&&target.closest('.sambo-athlete-applied-case');
+   if(!card)return;
+   const feedback=card.querySelector('.sambo-case-feedback');
+   if(feedback)feedback.textContent='Ответ изменён. Нажмите «Проверить ответ» для новой проверки.';
+   const details=card.querySelector('details.sambo-self-check');
+   if(details)details.open=false;
+  });
+ }
+ // Event delegation also supports lesson content inserted after initial page load.
+ if(root.document&&root.document.addEventListener){
+  root.document.addEventListener('click',function(event){
+   const button=event.target.closest&&event.target.closest('.sambo-case-check');
+   if(!button)return;
+   const card=button.closest('.sambo-athlete-applied-case');
+   if(!card)return;
+   const selected=card.querySelector('input[type="radio"]:checked');
+   const feedback=card.querySelector('.sambo-case-feedback');
+   if(!selected){feedback.textContent='Сначала выберите один вариант ответа.';return;}
+   const title=card.getAttribute('data-case-title');
+   const item=scenarios[title];
+   if(!item)return;
+   const titles=Object.keys(scenarios);
+   const offset=titles.indexOf(title)%item.answers.length;
+   const rawValue=selected.value;
+   const displayedIndex=typeof rawValue==='string' && /^(0|[1-9][0-9]*)$/.test(rawValue) ? Number(rawValue) : NaN;
+   if(!Number.isInteger(displayedIndex)||displayedIndex<0||displayedIndex>=item.answers.length){
+    feedback.textContent='Некорректный вариант ответа. Выберите один из предложенных вариантов.';
+    return;
+   }
+   const chosen=(displayedIndex+offset)%item.answers.length;
+   feedback.textContent=chosen===item.correct?'Верно. Изучите объяснение ниже.':'Неверно. Изучите разбор и типичную ошибку ниже.';
+   const details=card.querySelector('details.sambo-self-check');
+   if(details)details.open=true;
+  });
+ }
 })(window);
