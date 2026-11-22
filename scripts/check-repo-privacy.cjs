@@ -16,7 +16,7 @@ const allowEmail = /(?:@example\.(?:com|org|net|test|invalid)|@(?:users\.)?norep
 const privateFilename = /(?:^|\/)(?:\.env(?:\..+)?|id_(?:rsa|ed25519)(?:\.pub)?|.*\.(?:pem|p12|pfx|key|sqlite3?|db|dump|bak)|(?:users?|accounts?|customers?|contacts?)[-_]?(?:export|backup)\.(?:csv|json|sql)|.*(?:backup|dump)\.sql)$/i;
 const secretPatterns = [
   ['private key', /-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----/g],
-  ['credential', /\b(?:ghp_|gho_|ghu_|ghs_|ghr_|github_pat_|sb_secret_|sk_live_|sk_test_|rk_live_|rk_test_|sk-proj-|sk-svcacct-|xox[baprs]-|AIza)[A-Za-z0-9_\-]{12,}\b/g],
+  ['credential', /\b(?:ghp_|gho_|ghu_|ghs_|ghr_|github_pat_|npm_|sb_secret_|sk_live_|sk_test_|rk_live_|rk_test_|sk-proj-|sk-svcacct-|xox[baprs]-|AIza)[A-Za-z0-9_\-]{12,}\b/g],
   ['npm authentication token', /(?:^|\n)\s*(?:\/\/[^\s=]+\/:)?_authToken\s*=\s*['\"]?((?!\$\{|\$\(|\$[A-Za-z_])[A-Za-z0-9._-]{16,})/g],
   ['AWS access key', /\b(?:AKIA|ASIA)[A-Z0-9]{16}\b/g],
   ['JWT', /\beyJ[A-Za-z0-9_-]{12,}\.eyJ[A-Za-z0-9_-]{12,}\.[A-Za-z0-9_-]{12,}\b/g],
@@ -87,12 +87,13 @@ function selfTest() {
   if (findings.length !== old) throw new Error('Allowed test addresses rejected');
   inspectText('fixture', 'person' + '@' + 'gmail.com\n');
   inspectText('fixture', 'ghp_' + 'A'.repeat(36) + '\n');
+  inspectText('fixture', 'npm_' + 'A'.repeat(36) + '\n');
   inspectText('fixture', 'sk-proj-' + 'A'.repeat(36) + '\n');
   inspectText('fixture', 'sk-svcacct-' + 'A'.repeat(36) + '\n');
   inspectText('fixture', 'rk_live_' + 'A'.repeat(36) + '\n');
   inspectText('fixture', 'rk_test_' + 'A'.repeat(36) + '\n');
   inspectText('fixture', '//registry.npmjs.org/:_authToken=' + 'A'.repeat(36) + '\n');
-  if (findings.length !== old + 7) throw new Error('Credential/email detection regression');
+  if (findings.length !== old + 8) throw new Error('Credential/email detection regression');
   findings.length = old;
   console.log('PASS: privacy scanner self-test');
 }
