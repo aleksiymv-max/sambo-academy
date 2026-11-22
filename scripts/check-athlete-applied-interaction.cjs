@@ -54,6 +54,7 @@ for(const [index,title] of titles.entries()){
   // Switching the selected option must invalidate stale feedback.
   change({target:{matches(selector){assert.equal(selector,'.sambo-case-option input[type="radio"]');return true;},closest(selector){assert.equal(selector,'.sambo-athlete-applied-case');return card;}}});
   assert.match(feedback.textContent,/Ответ изменён/,'Stale grade shown after changing answer');
+  assert.equal(details.open,false,'Changing answer must hide previously revealed solution');
   details.open=false;
   selected={value:String((correctPosition+1)%item.answers.length)};
   click({target:button});
