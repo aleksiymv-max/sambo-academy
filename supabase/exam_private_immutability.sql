@@ -21,6 +21,11 @@ begin
      or new.started_at is distinct from old.started_at then
     raise exception 'attempt identity cannot change';
   end if;
+  -- A draft must never carry precomputed results. The trusted grading path
+  -- must atomically set submitted_at, score and total together.
+  if new.submitted_at is null and (new.score is not null or new.total is not null) then
+    raise exception 'draft exam attempts cannot carry scores';
+  end if;
   -- A submission is only valid if score/total/submitted_at are set together.
   if new.submitted_at is not null and
      (new.score is null or new.total is null) then
