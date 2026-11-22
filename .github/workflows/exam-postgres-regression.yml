@@ -1,0 +1,67 @@
+name: Private exam PostgreSQL regression
+on:
+  pull_request:
+    paths:
+      - 'supabase/exam_private_*.sql'
+      - 'supabase/tests/exam_private_*.sql'
+      - '.github/workflows/exam-postgres-regression.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  sql-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: sambo_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres -d sambo_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: sambo_test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare disposable Auth fixture
+        run: |
+          psql -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE EXTENSION IF NOT EXISTS pgcrypto;
+          CREATE ROLE anon NOLOGIN;
+          CREATE ROLE authenticated NOLOGIN;
+          CREATE SCHEMA auth;
+          CREATE TABLE auth.users (
+            id uuid PRIMARY KEY, instance_id uuid, aud text, role text,
+            email text, encrypted_password text
+          );
+          SQL
+      - name: Apply staged migrations
+        run: |
+          set -euo pipefail
+          for f in supabase/exam_private_foundation.sql supabase/exam_private_immutability.sql supabase/exam_private_version_guard.sql supabase/exam_private_attempt_insert_guard.sql; do
+            psql -v ON_ERROR_STOP=1 -f "$f"
+          done
+      - name: Run PostgreSQL regression fixtures
+        run: |
+          set -euo pipefail
+          for f in supabase/tests/exam_private_*_regression.sql; do
+            echo "Running $f"
+            psql -v ON_ERROR_STOP=1 -f "$f"
+          done
+      - name: Verify fixture rollback
+        run: |
+          psql -v ON_ERROR_STOP=1 -Atc "SELECT CASE WHEN
+            (SELECT count(*) FROM exam_private.versions)=0 AND
+            (SELECT count(*) FROM exam_private.questions)=0 AND
+            (SELECT count(*) FROM exam_private.attempts)=0 AND
+            (SELECT count(*) FROM exam_private.answers)=0 AND
+            (SELECT count(*) FROM auth.users)=0
+            THEN 'PASS' ELSE 'FAIL' END;" | grep -x PASS
