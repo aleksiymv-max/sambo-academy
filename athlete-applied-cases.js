@@ -67,6 +67,19 @@
     '<p><strong>Нормативная основа:</strong> '+escapeHtml(item.ref)+' (редакция 14.09.2026).</p>'+
     '</details></section>';
  };
+ // Clear stale grading feedback when the learner changes an answer.
+ // Keep the explanation available as study material, but do not display a
+ // previous answer's grade as though it applies to the newly selected option.
+ if(root.document&&root.document.addEventListener){
+  root.document.addEventListener('change',function(event){
+   const target=event.target;
+   if(!target||!target.matches||!target.matches('.sambo-case-option input[type="radio"]'))return;
+   const card=target.closest&&target.closest('.sambo-athlete-applied-case');
+   if(!card)return;
+   const feedback=card.querySelector('.sambo-case-feedback');
+   if(feedback)feedback.textContent='Ответ изменён. Нажмите «Проверить ответ» для новой проверки.';
+  });
+ }
  // Event delegation also supports lesson content inserted after initial page load.
  if(root.document&&root.document.addEventListener){
   root.document.addEventListener('click',function(event){
