@@ -60,7 +60,7 @@ begin
     raise exception 'answer question does not belong to attempt exam version';
   end if;
   return new;
-end $;
+end $$;
 
 drop trigger if exists exam_answer_immutable on exam_private.answers;
 create trigger exam_answer_immutable before insert or update or delete
