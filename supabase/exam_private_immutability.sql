@@ -38,9 +38,10 @@ create or replace function exam_private.guard_answer_mutation()
 returns trigger language plpgsql set search_path = '' as $$
 declare target_attempt uuid;
 declare submission_time timestamptz;
+declare attempt_version uuid;
 begin
   target_attempt := case when tg_op = 'DELETE' then old.attempt_id else new.attempt_id end;
-  select a.submitted_at into submission_time
+  select a.submitted_at, a.version_id into submission_time, attempt_version
   from exam_private.attempts a where a.id = target_attempt for update;
   if not found then raise exception 'exam attempt missing'; end if;
   if submission_time is not null then
@@ -50,8 +51,16 @@ begin
     raise exception 'answer updates are prohibited; use server-controlled submission';
   end if;
   if tg_op = 'DELETE' then return old; end if;
+  -- Reject answers for arbitrary question IDs, even from a different exam version.
+  -- Lock the attempt first so concurrent submission cannot bypass this check.
+  if not exists (
+    select 1 from exam_private.questions q
+    where q.version_id = attempt_version and q.question_id = new.question_id
+  ) then
+    raise exception 'answer question does not belong to attempt exam version';
+  end if;
   return new;
-end $$;
+end $;
 
 drop trigger if exists exam_answer_immutable on exam_private.answers;
 create trigger exam_answer_immutable before insert or update or delete
