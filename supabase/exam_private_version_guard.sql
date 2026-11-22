@@ -17,6 +17,12 @@ begin
      or new.created_at is distinct from old.created_at then
     raise exception 'exam version identity is immutable';
   end if;
+  -- Never activate an empty exam: a version with no questions cannot be graded.
+  -- Locking the version row serializes activation with question mutations.
+  if old.activated_at is null and new.activated_at is not null
+     and not exists (select 1 from exam_private.questions q where q.version_id = old.id) then
+    raise exception 'cannot activate exam version without questions';
+  end if;
   if old.activated_at is not null
      and new.activated_at is distinct from old.activated_at then
     raise exception 'exam activation cannot be changed or reset';
