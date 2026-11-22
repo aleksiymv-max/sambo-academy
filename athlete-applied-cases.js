@@ -78,6 +78,8 @@
    if(!card)return;
    const feedback=card.querySelector('.sambo-case-feedback');
    if(feedback)feedback.textContent='Ответ изменён. Нажмите «Проверить ответ» для новой проверки.';
+   const details=card.querySelector('details.sambo-self-check');
+   if(details)details.open=false;
   });
  }
  // Event delegation also supports lesson content inserted after initial page load.
