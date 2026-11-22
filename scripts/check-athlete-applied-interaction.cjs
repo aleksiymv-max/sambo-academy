@@ -38,7 +38,7 @@ for(const [index,title] of titles.entries()){
   assert.match(feedback.textContent,/Сначала выберите/,'Missing selection must be handled');
   assert.equal(details.open,false,'Missing selection should not reveal solution');
   // Malformed DOM values must not be accepted or reveal the solution.
-  for(const invalid of ['','NaN','-1',String(item.answers.length),'1.5']){
+  for(const invalid of ['',' ','NaN','-1',String(item.answers.length),'1.5','01','+0','0x0','0e0','Infinity']){
     selected={value:invalid};
     details.open=false;
     click({target:button});
