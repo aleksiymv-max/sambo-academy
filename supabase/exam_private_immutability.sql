@@ -91,5 +91,6 @@ create trigger exam_question_version_guard before insert or update or delete
 on exam_private.questions for each row
 execute function exam_private.guard_question_mutation();
 
+-- SQL delimiter fix: every PL/pgSQL body must end with the opening $ tag.
 -- No client grants or policies are added by this migration.
 commit;
