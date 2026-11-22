@@ -29,9 +29,12 @@ function scan(root) {
       if (forbidden.includes(item.name)) findings.push(relative + ': forbidden answer bundle');
       if (!extensions.test(item.name)) continue;
       const text = fs.readFileSync(full, 'utf8');
+      // Browsers resolve percent-encoded URL components; scan that representation too.
+      // Restrict normalization to common filename escapes to avoid decoding arbitrary content.
+      const normalized = text.replace(/%2e/ig, '.').replace(/%2d/ig, '-');
       for (const name of forbidden) {
         // Detect references, copies, and renamed bundles; do not print content.
-        if (text.includes(name)) findings.push(relative + ': references forbidden exam bundle ' + name);
+        if (normalized.includes(name)) findings.push(relative + ': references forbidden exam bundle ' + name);
       }
     }
   }
@@ -49,6 +52,9 @@ function selfTest() {
     fs.writeFileSync(path.join(dir, 'app.js'), 'import "./' + forbidden[1] + '"');
     assert(scan(dir).some(x => x.includes('references forbidden exam bundle')));
     fs.rmSync(path.join(dir, 'app.js'));
+    fs.writeFileSync(path.join(dir, 'index.html'), '<script src="judge-exam-independent%2Ejs"></script>');
+    assert(scan(dir).some(x => x.includes('references forbidden exam bundle')));
+    fs.writeFileSync(path.join(dir, 'index.html'), '<h1>Public course overview</h1>');
     assert.deepEqual(scan(dir), []);
     console.log('PASS: exam asset audit self-test');
   } finally { fs.rmSync(dir, {recursive:true, force:true}); }
