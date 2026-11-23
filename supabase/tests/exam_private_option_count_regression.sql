@@ -33,6 +33,18 @@ begin
     raise exception 'out-of-range correct answer was accepted';
   exception when check_violation then null;
   end;
+  -- Verify the minimum permitted option_count (2) and both valid zero-based indices.
+  insert into exam_private.questions(version_id,question_id,correct_option,option_count,explanation,source_ref)
+    values(v,'athlete-two-options',0,2,'fixture','fixture');
+  insert into exam_private.answers(attempt_id,question_id,selected_option,is_correct)
+    values(a,'athlete-two-options',0,true);
+  rejected := false;
+  begin
+    insert into exam_private.answers(attempt_id,question_id,selected_option,is_correct)
+      values(a,'athlete-two-options',-1,false);
+  exception when check_violation then rejected := true;
+  end;
+  if not rejected then raise exception 'FAIL: negative selected_option accepted'; end if;
   -- The judge course must enforce the same limits as the athlete course.
   insert into exam_private.versions(id,course_key,version_key)
     values(jv,'judge','option-range-judge-fixture');
