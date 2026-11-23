@@ -52,7 +52,7 @@ jobs:
       - name: Apply staged migrations
         run: |
           set -euo pipefail
-          for f in supabase/exam_private_foundation.sql supabase/exam_private_immutability.sql supabase/exam_private_version_guard.sql supabase/exam_private_attempt_insert_guard.sql; do
+          for f in supabase/exam_private_foundation.sql supabase/exam_private_immutability.sql supabase/exam_private_version_guard.sql supabase/exam_private_attempt_insert_guard.sql supabase/exam_private_option_count.sql; do
             psql -v ON_ERROR_STOP=1 -f "$f"
           done
       - name: Run PostgreSQL regression fixtures
