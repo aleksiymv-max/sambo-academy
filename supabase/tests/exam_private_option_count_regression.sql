@@ -8,6 +8,8 @@ declare jv uuid := gen_random_uuid();
 declare ja uuid := gen_random_uuid();
 declare a2 uuid := gen_random_uuid();
 declare ja2 uuid := gen_random_uuid();
+declare athlete_negative_attempt uuid := gen_random_uuid();
+declare judge_negative_attempt uuid := gen_random_uuid();
 declare rejected boolean;
 begin
   insert into auth.users(id) values(u);
@@ -44,10 +46,12 @@ begin
   insert into exam_private.attempts(id,user_id,version_id) values(a2,u,v);
   insert into exam_private.answers(attempt_id,question_id,selected_option,is_correct)
     values(a2,'athlete-two-options',1,false);
+  -- Isolate negative-index rejection from the duplicate-answer uniqueness constraint.
+  insert into exam_private.attempts(id,user_id,version_id) values(athlete_negative_attempt,u,v);
   rejected := false;
   begin
     insert into exam_private.answers(attempt_id,question_id,selected_option,is_correct)
-      values(a,'athlete-two-options',-1,false);
+      values(athlete_negative_attempt,'athlete-two-options',-1,false);
   exception when check_violation then rejected := true;
   end;
   if not rejected then raise exception 'FAIL: negative selected_option accepted'; end if;
@@ -64,11 +68,12 @@ begin
   insert into exam_private.answers(attempt_id,question_id,selected_option,is_correct)
     values(ja2,'judge-20',0,false);
 
-  -- Negative indices must be rejected for judges as well, not only athletes.
+  -- Use an unanswered attempt so a uniqueness failure cannot mask the intended constraint.
+  insert into exam_private.attempts(id,user_id,version_id) values(judge_negative_attempt,u,jv);
   rejected := false;
   begin
     insert into exam_private.answers(attempt_id,question_id,selected_option,is_correct)
-      values(ja2,'judge-20',-1,false);
+      values(judge_negative_attempt,'judge-20',-1,false);
   exception when check_violation then rejected := true;
   end;
   if not rejected then raise exception 'FAIL: judge negative selected_option accepted'; end if;
