@@ -67,5 +67,5 @@ begin
   exception when check_violation then rejected := true;
   end;
   if not rejected then raise exception 'FAIL: option_count=21 accepted'; end if;
-end $;
+end $$;
 rollback;
