@@ -5,6 +5,12 @@ on:
       - 'supabase/exam_private_*.sql'
       - 'supabase/tests/exam_private_*.sql'
       - '.github/workflows/exam-postgres-regression.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/exam_private_*.sql'
+      - 'supabase/tests/exam_private_*.sql'
+      - '.github/workflows/exam-postgres-regression.yml'
   workflow_dispatch:
 permissions:
   contents: read
