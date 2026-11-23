@@ -13,8 +13,8 @@ begin
   exception when raise_exception then blocked := true;
   end;
   if not blocked then raise exception 'FAIL: empty version activated'; end if;
-  insert into exam_private.questions(version_id,question_id,correct_option,explanation,source_ref)
-  values (v,'regression-q',0,'fixture','fixture');
+  insert into exam_private.questions(version_id,question_id,correct_option,explanation,source_ref,option_count)
+  values (v,'regression-q',0,'fixture','fixture',2);
   update exam_private.versions set activated_at=now() where id=v;
   blocked := false;
   begin
