@@ -13,8 +13,8 @@ begin
     values (course, 'regression-activated-question-mutations')
     returning id into v;
 
-    insert into exam_private.questions(version_id,question_id,correct_option,explanation,source_ref)
-    values (v,'first',0,'synthetic explanation','synthetic reference');
+    insert into exam_private.questions(version_id,question_id,correct_option,explanation,source_ref,option_count)
+    values (v,'first',0,'synthetic explanation','synthetic reference',2);
 
     -- Before activation, draft questions may be edited.
     update exam_private.questions set explanation='revised fixture'
