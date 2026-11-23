@@ -22,6 +22,13 @@ try {
   await writeFile(join(root, 'judge-exam.js'), "const questions=[{q:'Synthetic',a:['A','B']}];\n");
   result = run();
   assert.equal(result.status, 0, 'Safe synthetic fixture must pass');
+  await writeFile(join(root, 'judge-questions.json'), '{"questions":[{"q":"Synthetic","correct":1}]}');
+  result = run();
+  assert.equal(result.status, 1, 'Quoted correct index in JSON exam bundle must block publication');
+  assert.match(result.stderr, /judge-questions\\.json/);
+  await writeFile(join(root, 'judge-questions.json'), '{"questions":[{"q":"Synthetic"}]}');
+  result = run();
+  assert.equal(result.status, 0, 'Safe JSON exam bundle must pass');
   await mkdir(join(root, 'scripts'));
   await writeFile(join(root, 'scripts', 'internal-exam.js'), 'const correct=1;\n');
   result = run();
