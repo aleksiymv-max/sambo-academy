@@ -6,6 +6,8 @@ declare u uuid := gen_random_uuid();
 declare a uuid := gen_random_uuid();
 declare jv uuid := gen_random_uuid();
 declare ja uuid := gen_random_uuid();
+declare a2 uuid := gen_random_uuid();
+declare ja2 uuid := gen_random_uuid();
 declare rejected boolean;
 begin
   insert into auth.users(id) values(u);
@@ -38,9 +40,10 @@ begin
     values(v,'athlete-two-options',0,2,'fixture','fixture');
   insert into exam_private.answers(attempt_id,question_id,selected_option,is_correct)
     values(a,'athlete-two-options',0,true);
-  -- The other valid index for a two-option athlete question must also be accepted.
+  -- Separate attempt avoids the one-answer-per-question uniqueness constraint.
+  insert into exam_private.attempts(id,user_id,version_id) values(a2,u,v);
   insert into exam_private.answers(attempt_id,question_id,selected_option,is_correct)
-    values(a,'athlete-two-options',1,false);
+    values(a2,'athlete-two-options',1,false);
   rejected := false;
   begin
     insert into exam_private.answers(attempt_id,question_id,selected_option,is_correct)
@@ -56,9 +59,10 @@ begin
   insert into exam_private.attempts(id,user_id,version_id) values(ja,u,jv);
   insert into exam_private.answers(attempt_id,question_id,selected_option,is_correct)
     values(ja,'judge-20',19,true);
-  -- A judge answer at the lower valid boundary must be accepted too.
+  -- Use a separate attempt for the judge lower boundary.
+  insert into exam_private.attempts(id,user_id,version_id) values(ja2,u,jv);
   insert into exam_private.answers(attempt_id,question_id,selected_option,is_correct)
-    values(ja,'judge-20',0,false);
+    values(ja2,'judge-20',0,false);
 
   rejected := false;
   begin
