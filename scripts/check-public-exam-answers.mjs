@@ -15,7 +15,7 @@ const ignored = new Set(['.git', 'node_modules', '.wrangler', 'coverage', 'supab
 const examFile = /(?:exam|quiz|question|test)/i;
 // Include JSON bundles: otherwise a build can move the same answer keys from JS to JSON.
 const clientAsset = /\.(?:m?js|json)$/i;
-const keyPattern = /(?:\bcorrect\s*:\s*(?:\d+|['"][^'"]+['"])|\bcorrect\s*[,}]|\b(?:correctAnswer|answerKey|correctIndex)\s*[:=])/g;
+const keyPattern = /(?:["']?correct["']?\s*:\s*(?:\d+|["'][^"']+["'])|\bcorrect\s*[,}]|["']?(?:correctAnswer|answerKey|correctIndex)["']?\s*[:=])/g;
 
 async function walk(dir) {
   for (const entry of await readdir(dir, { withFileTypes: true })) {
