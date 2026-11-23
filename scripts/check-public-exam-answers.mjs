@@ -13,13 +13,15 @@ const root = process.argv[2] || '.';
 const findings = [];
 const ignored = new Set(['.git', 'node_modules', '.wrangler', 'coverage', 'supabase', 'tests', 'scripts']);
 const examFile = /(?:exam|quiz|question|test)/i;
+// Include JSON bundles: otherwise a build can move the same answer keys from JS to JSON.
+const clientAsset = /\.(?:m?js|json)$/i;
 const keyPattern = /(?:\bcorrect\s*:\s*(?:\d+|['"][^'"]+['"])|\bcorrect\s*[,}]|\b(?:correctAnswer|answerKey|correctIndex)\s*[:=])/g;
 
 async function walk(dir) {
   for (const entry of await readdir(dir, { withFileTypes: true })) {
     if (entry.isDirectory()) {
       if (!ignored.has(entry.name)) await walk(join(dir, entry.name));
-    } else if (entry.isFile() && /\.m?js$/i.test(entry.name) && examFile.test(entry.name)) {
+    } else if (entry.isFile() && clientAsset.test(entry.name) && examFile.test(entry.name)) {
       const file = join(dir, entry.name);
       const source = await readFile(file, 'utf8');
       const matches = [...source.matchAll(keyPattern)];
