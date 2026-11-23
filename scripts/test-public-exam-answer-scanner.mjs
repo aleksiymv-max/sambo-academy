@@ -25,7 +25,7 @@ try {
   await writeFile(join(root, 'judge-questions.json'), '{"questions":[{"q":"Synthetic","correct":1}]}');
   result = run();
   assert.equal(result.status, 1, 'Quoted correct index in JSON exam bundle must block publication');
-  assert.match(result.stderr, /judge-questions\\.json/);
+  assert.match(result.stderr, /judge-questions\.json/);
   await writeFile(join(root, 'judge-questions.json'), '{"questions":[{"q":"Synthetic"}]}');
   result = run();
   assert.equal(result.status, 0, 'Safe JSON exam bundle must pass');
