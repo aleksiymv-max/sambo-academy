@@ -38,6 +38,9 @@ begin
     values(v,'athlete-two-options',0,2,'fixture','fixture');
   insert into exam_private.answers(attempt_id,question_id,selected_option,is_correct)
     values(a,'athlete-two-options',0,true);
+  -- The other valid index for a two-option athlete question must also be accepted.
+  insert into exam_private.answers(attempt_id,question_id,selected_option,is_correct)
+    values(a,'athlete-two-options',1,false);
   rejected := false;
   begin
     insert into exam_private.answers(attempt_id,question_id,selected_option,is_correct)
@@ -53,6 +56,9 @@ begin
   insert into exam_private.attempts(id,user_id,version_id) values(ja,u,jv);
   insert into exam_private.answers(attempt_id,question_id,selected_option,is_correct)
     values(ja,'judge-20',19,true);
+  -- A judge answer at the lower valid boundary must be accepted too.
+  insert into exam_private.answers(attempt_id,question_id,selected_option,is_correct)
+    values(ja,'judge-20',0,false);
 
   rejected := false;
   begin
