@@ -64,6 +64,15 @@ begin
   insert into exam_private.answers(attempt_id,question_id,selected_option,is_correct)
     values(ja2,'judge-20',0,false);
 
+  -- Negative indices must be rejected for judges as well, not only athletes.
+  rejected := false;
+  begin
+    insert into exam_private.answers(attempt_id,question_id,selected_option,is_correct)
+      values(ja2,'judge-20',-1,false);
+  exception when check_violation then rejected := true;
+  end;
+  if not rejected then raise exception 'FAIL: judge negative selected_option accepted'; end if;
+
   rejected := false;
   begin
     insert into exam_private.answers(attempt_id,question_id,selected_option,is_correct)
