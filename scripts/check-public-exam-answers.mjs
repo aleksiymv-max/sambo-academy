@@ -13,7 +13,7 @@ const root = process.argv[2] || '.';
 const findings = [];
 const ignored = new Set(['.git', 'node_modules', '.wrangler', 'coverage', 'supabase', 'tests', 'scripts']);
 // Include JSON bundles: otherwise a build can move the same answer keys from JS to JSON.
-const clientAsset = /\.(?:m?js|cjs|json|map)$/i;
+const clientAsset = /\.(?:m?js|cjs|json|map|html?|xhtml|svg)$/i;
 const keyPattern = /(?:["']?correct["']?\s*:\s*(?:\d+|["'][^"']+["'])|\bcorrect\s*[,}]|["']?(?:correctAnswer|answerKey|correctIndex)["']?\s*[:=])/g;
 
 async function walk(dir) {
