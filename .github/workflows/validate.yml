@@ -11,6 +11,12 @@ jobs:
         run: |
           node scripts/check-repo-privacy.cjs --self-test
           node scripts/check-repo-privacy.cjs
+      - name: Test public exam answer leak scanner with synthetic fixtures
+        run: |
+          node scripts/test-public-exam-answer-scanner.mjs
+          node --test scripts/check-public-exam-answers.test.mjs
+      - name: Block publication when actual client exam files expose answer keys
+        run: node scripts/check-public-exam-answers.mjs .
       - name: Verify source-backed athlete training scenarios and preserved progress keys
         run: node scripts/check-athlete-applied-cases.cjs
       - name: Verify JavaScript syntax and core features
