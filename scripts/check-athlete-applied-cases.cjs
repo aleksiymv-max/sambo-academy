@@ -10,6 +10,9 @@ const cases=ctx.window.samboAthleteAppliedCases;
 assert(cases,'Athlete case bank unavailable');
 const titles=Object.keys(cases);
 assert.equal(titles.length,4,'Expected four source-verified athlete cases');
+assert(new Set(Object.values(cases).map(item=>item.correct)).size>=3,'Predictable correct-answer positions');
+const expectedAnswers=["Не допускать к соревнованиям","Свидетельство о рождении и справка с фотографией","Подать сигнал жестом или голосом","Немедленно явиться на ковёр по вызову судейской коллегии"];
+assert.deepEqual(titles.map(title=>cases[title].answers[cases[title].correct]),expectedAnswers,'Correct answer text changed');
 const expected={
  'Взвешивание: важные действия спортсмена':'Статья 8, пункт 2',
  'Взвешивание: документы, одежда и медицинский осмотр':'Статья 8, пункты 4–5',
