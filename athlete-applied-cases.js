@@ -48,15 +48,29 @@
  root.samboAthleteAppliedCaseCard=function(part,course){
   if(course!=='athlete'||!part)return '';
   const item=scenarios[part.title];if(!item)return '';
-  const options=item.answers.map(a=>'<li>'+escapeHtml(a)+'</li>').join('');
+  const options=item.answers.map((a,i)=>'<li><button type="button" class="sambo-case-option" data-case-choice="'+i+'" aria-pressed="false">'+escapeHtml(a)+'</button></li>').join('');
   return '<section class="sambo-lesson-intro sambo-athlete-applied-case">'+
     '<h4>Практическая ситуация спортсмена</h4><p>'+escapeHtml(item.situation)+'</p>'+
-    '<p><strong>Ваше решение:</strong> '+escapeHtml(item.question)+'</p><ol>'+options+'</ol>'+
-    '<details class="sambo-self-check"><summary>Открыть решение, норму и типичную ошибку</summary>'+
+    '<p><strong>Ваше решение:</strong> '+'<span class="sambo-case-question">'+escapeHtml(item.question)+'</span></p><ol>'+options+'</ol>'+
+    '<p role="status" class="sambo-case-feedback">Выберите ответ.</p><div class="sambo-case-solution" hidden>'+
     '<p><strong>Правильный ответ:</strong> '+escapeHtml(item.answers[item.correct])+'</p>'+
     '<p><strong>Разбор:</strong> '+escapeHtml(item.decision)+'</p>'+
     '<p><strong>Типичная ошибка:</strong> '+escapeHtml(item.trap)+'</p>'+
     '<p><strong>Нормативная основа:</strong> '+escapeHtml(item.ref)+' (редакция 14.09.2026).</p>'+
-    '</details></section>';
+    '</div></section>';
  };
+ if(root.document)root.document.addEventListener('click',event=>{
+  const button=event.target.closest?.('button[data-case-choice]');
+  const card=button?.closest('.sambo-athlete-applied-case');
+  if(!card)return;
+  const buttons=Array.from(card.querySelectorAll('button[data-case-choice]'));
+  const solution=card.querySelector('.sambo-case-solution');
+  const feedback=card.querySelector('.sambo-case-feedback');
+  if(!solution||!feedback)return;
+  const item=Object.values(scenarios).find(s=>s.question===card.querySelector('.sambo-case-question')?.textContent);
+  if(!item)return;
+  buttons.forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
+  feedback.textContent=Number(button.dataset.caseChoice)===item.correct?'Верно.':'Неверно. Изучите разбор и попробуйте снова.';
+  solution.hidden=false;
+ });
 })(window);
