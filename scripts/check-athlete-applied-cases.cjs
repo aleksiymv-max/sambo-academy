@@ -38,3 +38,37 @@ assert(html.includes("return group?.progressIndex??(100+moduleIndex);"),'Progres
 assert(html.includes("const base=group.parts.map(p=>({q:p.q,a:p.a,correct:p.correct,body:p.body,kind:'Теория'}))"),
  'Historical quiz source changed');
 console.log('PASS: four distinct athlete cases with references, explanations, no quiz/progress mutation');
+
+/* Exercise the actual delegated handler with a minimal DOM double.
+ * Native keyboard activation and visual rendering require browser tests. */
+let click;
+const interactive={window:{document:{addEventListener(type,fn){assert.equal(type,'click');click=fn;}}}};
+vm.runInNewContext(code,interactive);
+assert.equal(typeof click,'function');
+function makeCard(item){
+ const solution={hidden:true},feedback={textContent:'Выберите ответ.'};
+ const buttons=item.answers.map((_,i)=>({dataset:{caseChoice:String(i)},pressed:'false',setAttribute(k,v){assert.equal(k,'aria-pressed');this.pressed=v;},closest(){return card;}}));
+ const card={querySelectorAll(){return buttons;},querySelector(s){return ({'.sambo-case-solution':solution,'.sambo-case-feedback':feedback,'.sambo-case-question':{textContent:item.question}})[s];}};
+ return {solution,feedback,buttons};
+}
+const cards=titles.map(t=>makeCard(cases[t]));
+for(const [i,title] of titles.entries()){
+ const item=cases[title],card=cards[i];
+ const rendered=interactive.window.samboAthleteAppliedCaseCard({title},'athlete');
+ assert(rendered.includes('class="sambo-case-solution" hidden'));
+ assert(rendered.includes('role="status"'));
+ assert.equal((rendered.match(/<button type="button"/g)||[]).length,item.answers.length);
+ assert.equal(card.solution.hidden,true);
+ for(const j of [...item.answers.keys(),item.correct]){
+  const others=cards.filter(c=>c!==card).map(c=>[c,c.solution.hidden,c.feedback.textContent,c.buttons.map(b=>b.pressed)]);
+  click({target:{closest(){return card.buttons[j];}}});
+  assert.equal(card.solution.hidden,false);
+  assert.equal(card.feedback.textContent,j===item.correct?'Верно.':'Неверно. Изучите разбор и попробуйте снова.');
+  assert.deepEqual(card.buttons.map(b=>b.pressed),item.answers.map((_,k)=>String(k===j)));
+  for(const [c,hidden,feedback,pressed] of others){
+   assert.equal(c.solution.hidden,hidden);assert.equal(c.feedback.textContent,feedback);assert.deepEqual(c.buttons.map(b=>b.pressed),pressed);
+  }
+ }
+}
+click({target:{closest(){return null;}}});
+console.log('PASS: delegated practice handler, all choices, retry and card isolation (DOM double)');
